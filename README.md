@@ -284,6 +284,63 @@ Configuration file location: `~/.igntui.json`
 }
 ```
 
+## 🐛 Troubleshooting
+
+### Windows: "igntui is not recognized"
+
+If you see `'igntui' is not recognized as an internal or external command`, the Scripts directory is not in your PATH.
+
+**Quick Fix - Use Python Module:**
+
+```powershell
+python -m igntui
+```
+
+**Permanent Fix - Add to PATH:**
+
+1. Press `Win + X` and select "System"
+2. Click "Advanced system settings" → "Environment Variables"
+3. Under "User variables", select "Path" and click "Edit"
+4. Click "New" and add: `C:\Users\YOUR_USERNAME\AppData\Roaming\Python\Python3XX\Scripts`
+5. Click "OK" and **restart your terminal**
+
+Or use PowerShell (as Administrator):
+
+```powershell
+$currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
+$newPath = $currentPath + ";C:\Users\$env:USERNAME\AppData\Roaming\Python\Python313\Scripts"
+[Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+```
+
+### Linux/macOS: Permission Denied
+
+If you get permission errors:
+
+```bash
+# Use --user flag
+pip install --user igntui
+
+# Or add ~/.local/bin to PATH
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+### ImportError: No module named 'curses'
+
+On Windows, install windows-curses:
+
+```bash
+pip install windows-curses
+```
+
+### API Connection Issues
+
+If templates won't load:
+
+1. Check internet connection
+2. Test API: `igntui test`
+3. Clear cache: `igntui cache --clear`
+4. Try with verbose: `igntui --verbose`
+
 ## 🧪 Development
 
 ### Setup Development Environment
