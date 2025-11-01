@@ -38,7 +38,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/MKAbuMattar/igntui"
 Repository = "https://github.com/MKAbuMattar/igntui"
-Documentation = "https://github.com/MKAbuMattar/igntui/blob/main/Module/Utility/GitIgnore/igntui/README.md"
+Documentation = "https://github.com/MKAbuMattar/igntui/blob/main/README.md"
 Issues = "https://github.com/MKAbuMattar/igntui/issues"
 
 [project.scripts]
