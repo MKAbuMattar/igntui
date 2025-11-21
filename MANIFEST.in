@@ -1,3 +1,9 @@
-include README.md
 include LICENSE
+include *.in
+include *.lock
+include README.md
+include .editorconfig
+include .python-version
+
 recursive-include src/igntui *.py
+recursive-include .vscode *.json
