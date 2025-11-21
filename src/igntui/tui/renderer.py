@@ -48,7 +48,7 @@ class TUIRenderer:
                 self.search_panel.filter_text = self.state.filter_text
                 self.search_panel.current_search_mode = self.state.current_search_mode
                 self.search_panel.is_active = self.state.current_panel == 0
-                self.search_panel.draw()
+                self.search_panel.draw(self.state.cursor_position)
             except Exception as e:
                 logger.error(f"Error rendering search panel: {e}")
 
