@@ -16,6 +16,7 @@ class TUIState:
     selected_templates: Set[str] = field(default_factory=set)
     generated_content: str = ""
     filter_text: str = ""
+    cursor_position: int = 0  # Cursor position in search input
     filtered_templates: List[str] = field(default_factory=list)
     current_search_mode: str = "fuzzy"  # fuzzy, exact, regex
     current_panel: int = 1  # 0=search, 1=templates, 2=selected, 3=content
@@ -32,6 +33,18 @@ class TUIState:
     def reset_template_selection(self) -> None:
         self.template_scroll = 0
         self.template_selected = 0
+
+    def adjust_template_selection_bounds(self) -> None:
+        """Adjust selection and scroll to stay within filtered results without jarring reset."""
+        display_templates = self.get_display_templates()
+        if not display_templates:
+            self.template_selected = 0
+            self.template_scroll = 0
+        else:
+            if self.template_selected >= len(display_templates):
+                self.template_selected = max(0, len(display_templates) - 1)
+            if self.template_scroll >= len(display_templates):
+                self.template_scroll = max(0, len(display_templates) - 1)
 
     def reset_selected_panel(self) -> None:
         self.selected_scroll = 0

@@ -28,7 +28,6 @@ class BaseCLI:
     def check_terminal_requirements(self) -> bool:
         try:
             import curses
-
             stdscr = curses.initscr()
             curses.endwin()
             return True
@@ -94,11 +93,6 @@ For more information, visit: https://github.com/toptal/gitignore.io
 
 
 def safe_exit(code: int = 0) -> None:
-    try:
-        import curses
-
-        curses.endwin()
-    except:
-        pass
-
+    # Note: Don't call curses.endwin() here as curses.wrapper handles cleanup
+    # Calling it multiple times causes "endwin() returned ERR" errors
     sys.exit(code)

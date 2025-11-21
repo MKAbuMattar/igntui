@@ -51,7 +51,6 @@ class CursesSetup:
             if stdscr:
                 stdscr.keypad(False)
             curses.curs_set(1)
-            curses.endwin()
         except:
             pass
 

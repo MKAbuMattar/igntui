@@ -146,23 +146,60 @@ class EventHandler:
         return True
 
     def _handle_search_input(self, key: int) -> bool:
-        if key in (8, 127):
-            if self.state.filter_text:
-                self.state.filter_text = self.state.filter_text[:-1]
+        if key in (8, 127, curses.KEY_BACKSPACE):
+            if self.state.cursor_position > 0:
+                self.state.filter_text = (
+                    self.state.filter_text[:self.state.cursor_position - 1] +
+                    self.state.filter_text[self.state.cursor_position:]
+                )
+                self.state.cursor_position -= 1
                 self._apply_filter()
-                self.state.reset_template_selection()
+                self.state.adjust_template_selection_bounds()
+
+        elif key == curses.KEY_DC:
+            if self.state.cursor_position < len(self.state.filter_text):
+                self.state.filter_text = (
+                    self.state.filter_text[:self.state.cursor_position] +
+                    self.state.filter_text[self.state.cursor_position + 1:]
+                )
+                self._apply_filter()
+                self.state.adjust_template_selection_bounds()
+
+        elif key == curses.KEY_LEFT:
+            self.state.cursor_position = max(0, self.state.cursor_position - 1)
+
+        elif key == curses.KEY_RIGHT:
+            self.state.cursor_position = min(len(self.state.filter_text), self.state.cursor_position + 1)
+
+        elif key == curses.KEY_HOME:
+            self.state.cursor_position = 0
+
+        elif key == curses.KEY_END:
+            self.state.cursor_position = len(self.state.filter_text)
 
         elif key == 21:
             self.state.filter_text = ""
+            self.state.cursor_position = 0
             self._apply_filter()
             self.state.reset_template_selection()
             self.state.set_status_message("Search cleared")
 
+        elif key == 1:
+            self.state.cursor_position = 0
+
+        elif key == 5:
+            self.state.cursor_position = len(self.state.filter_text)
+
         elif 32 <= key <= 126:
             char = chr(key)
-            self.state.filter_text += char
+            self.state.filter_text = (
+                self.state.filter_text[:self.state.cursor_position] +
+                char +
+                self.state.filter_text[self.state.cursor_position:]
+            )
+            self.state.cursor_position += 1
             self._apply_filter()
-            self.state.reset_template_selection()
+            self.state.adjust_template_selection_bounds()
 
         return True
 

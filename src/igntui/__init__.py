@@ -5,7 +5,7 @@
 import platform
 import sys
 
-__version__ = "0.0.0"
+__version__ = "0.0.1"
 __author__ = "Mohammad Abu Mattar"
 __email__ = "info@mkabumattar.com"
 __description__ = """A professional TUI application for generating .gitignore files from templates
