@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
     # Pin Python at the job level so every `uv` invocation (sync, run, tool)
     # picks the same interpreter. Without this, `uv run` falls back to the
     # system Python and rebuilds the venv without extras → ruff/pytest go
@@ -36,6 +36,12 @@ jobs:
         # Use uvx (isolated tool run) — doesn't depend on project venv state
         # and doesn't trigger a re-sync.
         run: uvx ruff check src tests
+
+      - name: Type-check core with ty
+        # ty is alpha (https://docs.astral.sh/ty/) — Phase 7 wires this
+        # in as a required step now that core/ is clean. Re-evaluate as
+        # ty matures; promote scope from `core/` to `src/` over time.
+        run: uvx ty check --python .venv src/igntui/core
 
       - name: Run tests with coverage
         # --frozen tells uv to use the existing venv as-is; no resolution.

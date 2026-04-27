@@ -1,6 +1,6 @@
 [project]
 name = "igntui"
-version = "0.1.0"
+version = "0.1.1"
 description = "Interactive Terminal User Interface for GitIgnore template generation"
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -10,11 +10,10 @@ authors = [
 maintainers = [
     { name = "Mohammad Abu Mattar", email = "mohammad.khaled@outlook.com" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "windows-curses>=2.4.1; sys_platform == 'win32'",
     "pyfiglet>=1.0.2",
-    "tomli>=2.0.0; python_version < '3.11'",
     "tomli-w>=1.0.0",
 ]
 keywords = ["gitignore", "tui", "terminal", "git", "templates", "cli"]
@@ -24,9 +23,9 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Version Control :: Git",
     "Topic :: Terminals",
@@ -73,7 +72,7 @@ build-backend = "uv_build"
 # Ruff configuration
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 
 # Enable specific rule sets
 [tool.ruff.lint]
@@ -103,7 +102,7 @@ ignore = [
 
 # MyPy configuration
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false  # Set to true when ready for full type checking
@@ -117,7 +116,7 @@ ignore_errors = true
 
 # Type checking with ty (https://docs.astral.sh/ty/)
 [tool.ty.environment]
-python-version = "3.10"
+python-version = "3.11"
 
 [tool.ty.src]
 include = ["src/igntui"]

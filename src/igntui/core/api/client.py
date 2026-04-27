@@ -191,7 +191,7 @@ class GitIgnoreAPI:
 
         unique_templates = sorted(set(all_templates), key=str.lower)
 
-        logger.debug(f"Parsed {len(unique_templates)} unique templates")
+        logger.debug("Parsed %d unique templates", len(unique_templates))
         return unique_templates
 
     def _clean_technology_names(self, technologies: list[str]) -> list[str]:
@@ -205,7 +205,7 @@ class GitIgnoreAPI:
             if clean_tech and self._is_valid_template_name(clean_tech):
                 clean_techs.append(clean_tech)
             else:
-                logger.warning(f"Skipping invalid template name: {tech}")
+                logger.warning("Skipping invalid template name: %s", tech)
 
         return clean_techs
 

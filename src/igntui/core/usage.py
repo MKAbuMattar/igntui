@@ -11,13 +11,9 @@ is auto-migrated to the new TOML path on first launch.
 import json
 import logging
 import time
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-
-try:
-    import tomllib  # Python 3.11+
-except ImportError:  # pragma: no cover - Python 3.10 fallback
-    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
 import tomli_w
 

@@ -109,7 +109,7 @@ $ igntui --no-cache list --count
 **Run with a project-specific config:**
 
 ```
-$ igntui --config ./team.igntui.json tui
+$ igntui --config ./team.igntui.cfg.toml tui
 ```
 
 ## EXIT CODES

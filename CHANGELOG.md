@@ -4,6 +4,32 @@ All notable changes to igntui are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-04-27
+
+### Changed
+
+- **Minimum Python bumped to 3.11.** Unlocks stdlib `tomllib` directly and
+  removes the `tomli` conditional runtime dep. Drops
+  `Programming Language :: Python :: 3.10` from classifiers; CI matrix is
+  now `3.11 / 3.12 / 3.13`.
+- **`core/` passes `uvx ty check` clean (0 diagnostics).** Required step
+  in CI between `ruff` and `pytest`. Achieved via:
+  - `ApiConfig`, `UiConfig`, `BehaviorConfig`, `LoggingConfig`,
+    `IgntuiConfig` `TypedDict` descriptors in `core/config.py` documenting
+    the schema.
+  - `Config._config` typed as `dict[str, Any]` so the recursive
+    `get`/`set`/env-override descent type-checks cleanly.
+  - `CacheManager(cache_dir=...)` accepts `str | Path` (was `str` only),
+    matching how `config.get_cache_dir()` returns paths.
+
+### Fixed
+
+- Last 3 f-string log calls in `core/api/rate_limiter.py` and
+  `core/api/client.py` migrated to `%s` deferred formatting.
+- Updated stale example in `docs/reference/igntui.md` from
+  `team.igntui.json` to `team.igntui.cfg.toml` to match the v0.1.0 file
+  format.
+
 ## [0.1.0] — 2026-04-27
 
 ### Renamed
@@ -67,12 +93,11 @@ All three legacy paths are scheduled for removal in v0.2.0.
 
 ### Documentation
 
-- New page: [`docs/files/igntui-repo-cfg-toml.md`](docs/files/igntui-repo-cfg-toml.md).
-- Every reference to old filenames swept across `docs/`, `README.md`, and
-  `enhancement/`.
-- New "File Naming Convention" section in
-  [`enhancement/INFORMATION_ARCHITECTURE.md`](enhancement/INFORMATION_ARCHITECTURE.md)
-  documents the contract going forward.
+- New page: [`docs/files/igntui-repo-cfg-toml.md`](docs/files/igntui-repo-cfg-toml.md)
+  documenting the new repo configuration file.
+- Every reference to old filenames swept across `docs/` and `README.md`.
+- New "File Naming Convention" section published, documenting the
+  `[.]igntui.[<scope>.]<role>.toml` contract going forward.
 
 ## [0.0.2] — 2026-04-27
 
@@ -159,6 +184,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
 
 - Initial release.
 
+[0.1.1]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.1.0
 [0.0.2]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.0.2
 [0.0.1]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.0.1

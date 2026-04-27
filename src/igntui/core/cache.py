@@ -31,7 +31,7 @@ class CacheEntry:
 
 
 class CacheManager:
-    def __init__(self, cache_dir: str, default_ttl: int = 3600):
+    def __init__(self, cache_dir: str | Path, default_ttl: int = 3600):
         self.cache_dir = Path(cache_dir)
         self.default_ttl = default_ttl
         self._memory_cache: dict[str, CacheEntry] = {}

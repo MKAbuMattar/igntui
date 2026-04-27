@@ -10,13 +10,9 @@ the legacy file is left on disk for the user to delete.
 import json
 import logging
 import os
+import tomllib
 from pathlib import Path
-from typing import Any
-
-try:
-    import tomllib  # Python 3.11+
-except ImportError:  # pragma: no cover - Python 3.10 fallback
-    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
+from typing import Any, TypedDict
 
 import tomli_w
 
@@ -28,8 +24,49 @@ USER_CONFIG_FILENAME = ".igntui.cfg.toml"
 LEGACY_USER_CONFIG_FILENAME = ".igntui.json"
 
 
+class ApiConfig(TypedDict, total=False):
+    base_url: str
+    timeout: int
+    user_agent: str
+    cache_ttl: int
+    retry_attempts: int
+
+
+class UiConfig(TypedDict, total=False):
+    theme: str
+    mouse_support: bool
+    auto_save: bool
+    panel_layout: str
+    show_help: bool
+    animation_speed: int
+
+
+class BehaviorConfig(TypedDict, total=False):
+    max_recent_templates: int
+    auto_refresh_interval: int
+    fuzzy_search_threshold: float
+    save_usage_stats: bool
+    auto_backup: bool
+    max_cache_entries: int
+
+
+class LoggingConfig(TypedDict, total=False):
+    level: str
+    file_enabled: bool
+    console_enabled: bool
+    max_file_size: int
+    backup_count: int
+
+
+class IgntuiConfig(TypedDict, total=False):
+    api: ApiConfig
+    ui: UiConfig
+    behavior: BehaviorConfig
+    logging: LoggingConfig
+
+
 class Config:
-    DEFAULT_CONFIG = {
+    DEFAULT_CONFIG: IgntuiConfig = {
         "api": {
             "base_url": "https://www.toptal.com/developers/gitignore/api",
             "timeout": 10,
@@ -69,7 +106,12 @@ class Config:
     ):
         self.config_path = config_path or Path.home() / USER_CONFIG_FILENAME
         self.repo_config_path = repo_config_path
-        self._config = self.DEFAULT_CONFIG.copy()
+        # The on-disk shape is documented by `IgntuiConfig` (above), but the
+        # in-memory store is typed as `dict[str, Any]` so the recursive
+        # descent in `get`/`set`/`_load_env_overrides` doesn't fight the
+        # type checker. The TypedDict serves as documentation + the source
+        # of truth for the section names.
+        self._config: dict[str, Any] = {**self.DEFAULT_CONFIG}
         self._migrate_legacy_user_config_if_present()
         self._load_user_config()
         self._load_repo_config()
@@ -129,8 +171,8 @@ class Config:
         logger.info("Applied repo config from %s", self.repo_config_path)
 
     def _merge_config(self, new_config: dict[str, Any]) -> None:
-        def merge_dict(base: dict, override: dict) -> dict:
-            result = base.copy()
+        def merge_dict(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+            result: dict[str, Any] = dict(base)
             for key, value in override.items():
                 if (
                     key in result
@@ -166,20 +208,28 @@ class Config:
                     elif value.replace(".", "").isdigit():
                         value = float(value)
 
-                    config_section = self._config
+                    # Walk into the nested dict structure. Annotated as Any so
+                    # the type checker doesn't try to narrow each step of the
+                    # arbitrary-depth descent (TypedDict members carry varied types).
+                    section: Any = self._config
                     for key in config_path[:-1]:
-                        config_section = config_section[key]
-                    config_section[config_path[-1]] = value
+                        section = section[key]
+                    section[config_path[-1]] = value
 
                     logger.debug(
-                        f"Set {'.'.join(config_path)} = {value} from {env_var}"
+                        "Set %s = %s from %s",
+                        ".".join(config_path),
+                        value,
+                        env_var,
                     )
                 except (ValueError, KeyError) as e:
-                    logger.warning(f"Failed to set config from {env_var}: {e}")
+                    logger.warning("Failed to set config from %s: %s", env_var, e)
 
     def get(self, *keys: str, default: Any = None) -> Any:
+        # `value` is `Any` so the recursive subscript is unconstrained for the
+        # type checker; runtime KeyError/TypeError handle missing paths.
+        value: Any = self._config
         try:
-            value = self._config
             for key in keys:
                 value = value[key]
             return value
@@ -187,12 +237,12 @@ class Config:
             return default
 
     def set(self, *keys: str, value: Any) -> None:
-        config_section = self._config
+        section: Any = self._config
         for key in keys[:-1]:
-            if key not in config_section:
-                config_section[key] = {}
-            config_section = config_section[key]
-        config_section[keys[-1]] = value
+            if key not in section:
+                section[key] = {}
+            section = section[key]
+        section[keys[-1]] = value
 
     def save(self) -> None:
         try:
@@ -204,7 +254,7 @@ class Config:
             logger.error("Failed to save configuration: %s", e)
 
     def reset_to_defaults(self) -> None:
-        self._config = self.DEFAULT_CONFIG.copy()
+        self._config = {**self.DEFAULT_CONFIG}
         logger.info("Reset configuration to defaults")
 
     def get_cache_dir(self) -> Path:

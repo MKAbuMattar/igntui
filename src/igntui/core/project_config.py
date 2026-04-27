@@ -8,14 +8,10 @@ directory restores the same starting state. Safe to commit to git.
 
 import logging
 import time
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
-
-try:
-    import tomllib  # Python 3.11+
-except ImportError:  # pragma: no cover - Python 3.10 fallback
-    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
 import tomli_w
 
