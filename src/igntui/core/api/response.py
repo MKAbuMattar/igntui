@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
-from dataclasses import dataclass
-from typing import Any, Optional
+from dataclasses import dataclass, replace
+from typing import Any
 
 
-@dataclass
+@dataclass(frozen=True)
 class APIResponse:
     success: bool
     data: Any
-    error_message: Optional[str] = None
-    status_code: Optional[int] = None
-    response_time: Optional[float] = None
+    error_message: str | None = None
+    status_code: int | None = None
+    response_time: float | None = None
     from_cache: bool = False
+
+    def with_data(self, data: Any) -> "APIResponse":
+        """Return a copy with `data` replaced — use instead of mutating in place."""
+        return replace(self, data=data)

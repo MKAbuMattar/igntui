@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import logging
 import time
 import urllib.error
 import urllib.request
-from typing import Optional
 
 from .errors import APIError, NetworkError, RateLimitError, ServiceUnavailableError
 from .rate_limiter import RateLimiter
@@ -23,7 +21,7 @@ class RequestHandler:
         self.rate_limiter = RateLimiter(min_interval=0.1)
         self.stats = {"requests_made": 0, "errors": 0, "total_response_time": 0.0}
 
-    def make_request(self, url: str, timeout: Optional[float] = None) -> APIResponse:
+    def make_request(self, url: str, timeout: float | None = None) -> APIResponse:
         self.rate_limiter.wait_if_needed()
 
         start_time = time.time()
@@ -47,7 +45,7 @@ class RequestHandler:
                 self.stats["requests_made"] += 1
                 self.stats["total_response_time"] += response_time
 
-                logger.debug(f"API request to {url} took {response_time:.3f}s")
+                logger.debug("API request to %s took %.3fs", url, response_time)
 
                 return APIResponse(
                     success=True,
@@ -57,32 +55,29 @@ class RequestHandler:
                 )
 
         except urllib.error.HTTPError as e:
-            response_time = time.time() - start_time
             self.stats["errors"] += 1
 
             error_msg = f"HTTP {e.code}: {e.reason}"
 
             if e.code == 429:
                 retry_after = int(e.headers.get("Retry-After", 60))
-                raise RateLimitError(error_msg, e.code, retry_after)
+                raise RateLimitError(error_msg, e.code, retry_after) from e
             elif e.code >= 500:
-                raise ServiceUnavailableError(error_msg, e.code)
+                raise ServiceUnavailableError(error_msg, e.code) from e
             else:
-                raise APIError(error_msg, e.code)
+                raise APIError(error_msg, e.code) from e
 
         except urllib.error.URLError as e:
-            response_time = time.time() - start_time
             self.stats["errors"] += 1
 
             if "timeout" in str(e.reason).lower():
-                raise NetworkError(f"Request timeout after {timeout}s")
+                raise NetworkError(f"Request timeout after {timeout}s") from e
             else:
-                raise NetworkError(f"Network error: {e.reason}")
+                raise NetworkError(f"Network error: {e.reason}") from e
 
         except Exception as e:
-            response_time = time.time() - start_time
             self.stats["errors"] += 1
-            raise APIError(f"Unexpected error: {str(e)}")
+            raise APIError(f"Unexpected error: {e}") from e
 
     def make_request_with_retry(self, url: str) -> APIResponse:
         last_exception = None
@@ -95,7 +90,7 @@ class RequestHandler:
                 if attempt < self.retry_attempts - 1:
                     wait_time = e.retry_after or (2**attempt)
                     logger.warning(
-                        f"Rate limited, waiting {wait_time}s before retry {attempt + 1}"
+                        "Rate limited, waiting %ds before retry %d", wait_time, attempt + 1
                     )
                     time.sleep(wait_time)
                     last_exception = e
@@ -106,7 +101,7 @@ class RequestHandler:
                 if attempt < self.retry_attempts - 1:
                     wait_time = 2**attempt
                     logger.warning(
-                        f"Request failed, retrying in {wait_time}s (attempt {attempt + 1})"
+                        "Request failed, retrying in %ds (attempt %d)", wait_time, attempt + 1
                     )
                     time.sleep(wait_time)
                     last_exception = e

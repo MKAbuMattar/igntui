@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
 import logging
 import threading
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class SplashScreen:
     def __init__(self, stdscr):
         self.stdscr = stdscr
         self.loading_complete = False
-        self.loading_error: Optional[str] = None
+        self.loading_error: str | None = None
         self.template_count = 0
         self.current_stage = 0
         self.stages = [
@@ -33,7 +32,7 @@ class SplashScreen:
             ("✅", "Ready!"),
         ]
 
-    def show(self, load_callback: Optional[Callable] = None) -> bool:
+    def show(self, load_callback: Callable | None = None) -> bool:
         max_y, max_x = self.stdscr.getmaxyx()
         self.stdscr.clear()
 

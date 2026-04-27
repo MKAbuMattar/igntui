@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import json
@@ -8,9 +7,9 @@ import logging.handlers
 import os
 import time
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from ..core.config import config
 
@@ -21,12 +20,12 @@ class PerformanceMetric:
     duration: float
     timestamp: float
     success: bool
-    details: Optional[Dict[str, Any]] = None
+    details: dict[str, Any] | None = None
 
 
 class PerformanceLogger:
     def __init__(self):
-        self.metrics: Dict[str, list] = {}
+        self.metrics: dict[str, list] = {}
         self.logger = logging.getLogger(f"{__name__}.performance")
 
     def record_metric(self, metric: PerformanceMetric) -> None:
@@ -44,7 +43,7 @@ class PerformanceLogger:
 
     @contextmanager
     def measure_operation(
-        self, operation_name: str, details: Optional[Dict[str, Any]] = None
+        self, operation_name: str, details: dict[str, Any] | None = None
     ):
         start_time = time.time()
         success = True
@@ -65,7 +64,7 @@ class PerformanceLogger:
             )
             self.record_metric(metric)
 
-    def get_stats(self, operation: Optional[str] = None) -> Dict[str, Any]:
+    def get_stats(self, operation: str | None = None) -> dict[str, Any]:
         if operation:
             metrics = self.metrics.get(operation, [])
             operations = {operation: metrics}
@@ -92,7 +91,7 @@ class PerformanceLogger:
 
         return stats
 
-    def clear_metrics(self, operation: Optional[str] = None) -> None:
+    def clear_metrics(self, operation: str | None = None) -> None:
         if operation:
             self.metrics.pop(operation, None)
         else:
@@ -149,12 +148,12 @@ class LoggingManager:
     def __init__(self):
         self.initialized = False
         self.performance_logger = PerformanceLogger()
-        self._log_dir: Optional[Path] = None
+        self._log_dir: Path | None = None
 
     def setup_logging(
         self,
-        log_level: Optional[str] = None,
-        log_file: Optional[str] = None,
+        log_level: str | None = None,
+        log_file: str | None = None,
         enable_console: bool = True,
         enable_json: bool = False,
     ) -> None:
@@ -223,7 +222,7 @@ class LoggingManager:
 
         logger.info(f"Logging configuration: {config_info}")
 
-    def get_log_stats(self) -> Dict[str, Any]:
+    def get_log_stats(self) -> dict[str, Any]:
         root_logger = logging.getLogger()
 
         stats = {
@@ -261,7 +260,7 @@ class LoggingManager:
         with self.performance_logger.measure_operation(operation_name, kwargs):
             yield
 
-    def get_performance_stats(self) -> Dict[str, Any]:
+    def get_performance_stats(self) -> dict[str, Any]:
         return self.performance_logger.get_stats()
 
     def clear_performance_metrics(self) -> None:
@@ -284,5 +283,5 @@ def measure_performance(operation_name: str, **kwargs):
     return logging_manager.measure_performance(operation_name, **kwargs)
 
 
-def get_performance_stats() -> Dict[str, Any]:
+def get_performance_stats() -> dict[str, Any]:
     return logging_manager.get_performance_stats()

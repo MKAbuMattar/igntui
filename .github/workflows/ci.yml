@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    # Pin Python at the job level so every `uv` invocation (sync, run, tool)
+    # picks the same interpreter. Without this, `uv run` falls back to the
+    # system Python and rebuilds the venv without extras → ruff/pytest go
+    # missing on the next step.
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install project + test + dev extras
+        run: uv sync --extra test --extra dev
+
+      - name: Lint with ruff
+        # Use uvx (isolated tool run) — doesn't depend on project venv state
+        # and doesn't trigger a re-sync.
+        run: uvx ruff check src tests
+
+      - name: Type-check core with ty
+        # ty is alpha (https://docs.astral.sh/ty/) — Phase 7 wires this
+        # in as a required step now that core/ is clean. Re-evaluate as
+        # ty matures; promote scope from `core/` to `src/` over time.
+        run: uvx ty check --python .venv src/igntui/core
+
+      - name: Run tests with coverage
+        # --frozen tells uv to use the existing venv as-is; no resolution.
+        run: uv run --frozen pytest tests/ --cov --cov-report=term-missing
+
+  build:
+    name: build (sanity)
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build wheel + sdist
+        run: uv build
+
+      - name: Verify package metadata
+        run: uv tool run --from twine twine check dist/*

@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import logging
 from logging.handlers import RotatingFileHandler
-from typing import Optional
 
 from ..core.config import config
 
 
-def setup_logging(verbose: bool = False, log_level: Optional[str] = None) -> None:
+def setup_logging(verbose: bool = False, log_level: str | None = None) -> None:
     if log_level:
         level = getattr(logging, log_level.upper(), logging.INFO)
     elif verbose:
@@ -57,12 +55,9 @@ def setup_logging(verbose: bool = False, log_level: Optional[str] = None) -> Non
 
 
 def check_curses_availability() -> bool:
-    try:
-        import curses
+    import importlib.util
 
-        return True
-    except ImportError:
-        return False
+    return importlib.util.find_spec("curses") is not None
 
 
 def print_curses_error() -> None:

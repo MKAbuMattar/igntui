@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
 import os
-from typing import Optional
 
 from .base_dialog import BaseDialog
 
@@ -20,7 +18,7 @@ class ExportDialog(BaseDialog):
             self.file_path = default_path
         self.cursor_pos = len(self.file_path)
 
-    def show(self) -> Optional[str]:
+    def show(self) -> str | None:
         width = 70
         height = 10
         y, x = self.calculate_position(width, height)

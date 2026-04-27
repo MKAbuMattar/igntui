@@ -134,8 +134,17 @@ igntui generate python
 # Multiple templates
 igntui generate python node visualstudiocode
 
-# Save to file
+# Save to file (also writes .igntui.cfg.toml sidecar by default)
 igntui generate python --output .gitignore
+
+# Preview without writing
+igntui generate python --output .gitignore --dry-run
+
+# Skip writing the sidecar
+igntui generate python --output .gitignore --no-sidecar
+
+# Overwrite without prompt
+igntui generate python --output .gitignore --force
 ```
 
 #### List Available Templates
@@ -144,8 +153,8 @@ igntui generate python --output .gitignore
 # List all templates
 igntui list
 
-# Search templates
-igntui list --search python
+# Filter by pattern
+igntui list --filter python
 
 # Show count only
 igntui list --count
@@ -155,23 +164,63 @@ igntui list --count
 
 ```bash
 igntui test
+igntui test --timeout 5
 ```
 
 #### Cache Management
 
 ```bash
-# Show cache info
-igntui cache --info
-
-# Clear cache
-igntui cache --clear
+igntui cache info             # show cache stats
+igntui cache stats            # show usage statistics
+igntui cache clear --force    # clear all cached entries
 ```
 
-#### Show Version
+#### Global Flags
 
 ```bash
-igntui --version
-# Output: igntui/1.0.0 Python/3.13.0 Windows/11
+igntui --no-cache list                  # bypass cache for the session
+igntui --config /path/to/config.json    # load alternate config
+igntui --verbose <command>              # verbose / debug output
+igntui --version                        # print version + Python + OS
+```
+
+#### Project Sidecar (`.igntui.cfg.toml`)
+
+When you save a `.gitignore` (via TUI or CLI), igntui writes a small TOML
+sidecar next to it that pins the templates and search mode used. Re-running
+`igntui` in the same directory **auto-loads** that selection so you can iterate
+without re-picking templates. The sidecar is safe to commit so teammates
+inherit the same starting state.
+
+```toml
+# .igntui.cfg.toml
+schema_version = 1
+generated_at   = "2026-04-27T12:00:00Z"
+igntui_version = "0.0.2"
+
+[selection]
+templates   = ["python", "node", "macos"]
+search_mode = "fuzzy"
+
+[output]
+path                = ".gitignore"
+preserve_user_edits = true
+```
+
+User-added rules outside the `# >>> igntui >>>` / `# <<< igntui <<<` markers
+are preserved on every re-save.
+
+#### Shell Completion
+
+```bash
+# bash
+eval "$(igntui completion bash)"
+
+# zsh — install to a directory on $fpath
+igntui completion zsh > ~/.zsh/completions/_igntui
+
+# fish
+igntui completion fish | source
 ```
 
 ## 🎮 TUI Usage
@@ -180,32 +229,40 @@ igntui --version
 
 #### Navigation
 
-- `Tab` / `Shift+Tab` - Navigate between panels
-- `↑` / `↓` - Move selection up/down
-- `PgUp` / `PgDn` - Page up/down
-- `Home` / `End` - Jump to top/bottom
+- `Tab` / `Shift+Tab` — Navigate between panels
+- `↑` / `↓` — Move selection up/down
+- `PgUp` / `PgDn` — Page up/down
+- `Home` / `End` — Jump to top/bottom
+- `/` — Focus the Search panel
+- `Esc` (in Search) — Exit search mode and return to Templates
 
 #### Search Modes
 
-- `F1` - Fuzzy search (default)
-- `F2` - Exact search
-- `F3` - Regex search
+- `F1` — Fuzzy search (default)
+- `F2` — Exact search
+- `F3` — Regex search
 
 #### Template Management
 
-- `Space` - Select/deselect template
-- `a` - Select all templates
-- `x` - Clear all selections
-- `Enter` - Generate `.gitignore` content
+- `Space` / `Enter` — Select/deselect template
+- `a` — Select all visible (filtered) templates
+- `x` — Remove all visible templates from selection
+- `c` — Clear entire selection
 
 #### Actions
 
-- `s` - Save generated `.gitignore` to file
-- `e` - Export selected templates as JSON
-- `F5` - Refresh template list
-- `h` / `?` - Show help dialog
-- `i` - Show app info
-- `q` / `Esc` - Quit application
+- `s` — Save `.gitignore` (writes `.igntui.cfg.toml` sidecar; shows diff preview if file exists)
+- `e` — Export selected templates as JSON
+- `r` / `F5` — Refresh template list from API
+- `h` / `?` / `F12` — Show help dialog
+- `i` — Show app info
+- `q` / `Esc` (outside Search) — Quit application
+
+#### Mouse Support
+
+- **Click** a panel to focus it
+- **Click** a row in Templates to select it (and toggle on the same click)
+- **Scroll wheel** scrolls the panel under the cursor without changing focus
 
 ### Panel Layout
 
@@ -260,7 +317,7 @@ igntui  # Select templates in TUI, press 'e' to export
 
 ## ⚙️ Configuration
 
-Configuration file location: `~/.igntui.json`
+Configuration file location: `~/.igntui.cfg.toml`
 
 ### Default Configuration
 

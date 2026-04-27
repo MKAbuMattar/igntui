@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
-from .app import GitIgnoreTUI, main
-from .state import TUIState
-from .curses_setup import CursesSetup
-from .lifecycle import TemplateLifecycle
-from .event_handler import EventHandler
 from .actions import TUIActions
+from .app import GitIgnoreTUI, main
+from .curses_setup import CursesSetup
+from .event_handler import EventHandler
+from .lifecycle import TemplateLifecycle
 from .renderer import TUIRenderer
+from .state import TUIState
 
 __all__ = [
     "GitIgnoreTUI",

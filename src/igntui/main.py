@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import argparse
-import sys
-from typing import Optional
 
 from .cli import (
     BaseCLI,
@@ -16,10 +13,14 @@ from .cli import (
 
 
 def main() -> int:
-    cli = BaseCLI()
     parser = create_base_parser()
     parser = create_command_parser(parser)
     args = parser.parse_args()
+
+    cli = BaseCLI(
+        config_path=args.config,
+        no_cache=args.no_cache,
+    )
 
     if args.verbose:
         cli.setup_logging(verbose=True)
@@ -60,10 +61,28 @@ def cli_main() -> None:
 
 
 def tui_main() -> None:
+    parser = argparse.ArgumentParser(
+        prog="gitignore-tui",
+        description="Interactive TUI for generating .gitignore files from gitignore.io",
+    )
+    from . import get_version_string
+
+    parser.add_argument("--version", "-V", action="version", version=get_version_string())
+    parser.add_argument(
+        "--no-splash", action="store_true", help="Skip the splash screen"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose/debug output"
+    )
+    args = parser.parse_args()
+
+    if args.verbose:
+        BaseCLI().setup_logging(verbose=True)
+
     try:
         from .app import run_tui
 
-        exit_code = run_tui(show_splash=True)
+        exit_code = run_tui(show_splash=not args.no_splash)
         safe_exit(exit_code)
     except Exception as e:
         print(f"Fatal error: {e}")

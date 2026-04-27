@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
@@ -31,7 +30,7 @@ class SearchPanel(BasePanel):
                 attr = curses.color_pair(8)
 
             self.stdscr.addstr(inner_y, inner_x, " " * (inner_width - 1), attr)
-            
+
             max_display_len = inner_width - 1
             if len(display_text) <= max_display_len:
                 self.stdscr.addstr(inner_y, inner_x, display_text, attr)
@@ -45,7 +44,7 @@ class SearchPanel(BasePanel):
                 if len(display_text) > max_display_len:
                     visible_start = max(0, cursor_position + len(prompt) - max_display_len + 1)
                     cursor_x = inner_x + len(prompt) + cursor_position - visible_start
-                
+
                 if inner_x <= cursor_x < inner_x + inner_width - 1:
                     try:
                         char_at_cursor = search_text[cursor_position] if cursor_position < len(search_text) else " "

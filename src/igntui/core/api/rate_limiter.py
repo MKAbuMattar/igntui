@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import logging
 import time
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +18,7 @@ class RateLimiter:
 
         if time_since_last < self.min_interval:
             sleep_time = self.min_interval - time_since_last
-            logger.debug(f"Rate limiting: sleeping for {sleep_time:.3f}s")
+            logger.debug("Rate limiting: sleeping for %.3fs", sleep_time)
             time.sleep(sleep_time)
 
     def mark_request(self) -> None:

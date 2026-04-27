@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import time
 from dataclasses import dataclass, field
-from typing import List, Optional, Set
 
 
 @dataclass
@@ -12,12 +10,12 @@ class TUIState:
     running: bool = True
     loading: bool = True
     generation_in_progress: bool = False
-    templates: List[str] = field(default_factory=list)
-    selected_templates: Set[str] = field(default_factory=set)
+    templates: list[str] = field(default_factory=list)
+    selected_templates: set[str] = field(default_factory=set)
     generated_content: str = ""
     filter_text: str = ""
     cursor_position: int = 0  # Cursor position in search input
-    filtered_templates: List[str] = field(default_factory=list)
+    filtered_templates: list[str] = field(default_factory=list)
     current_search_mode: str = "fuzzy"  # fuzzy, exact, regex
     current_panel: int = 1  # 0=search, 1=templates, 2=selected, 3=content
     template_scroll: int = 0
@@ -67,10 +65,10 @@ class TUIState:
             self.status_message = ""
             self.error_message = ""
 
-    def get_display_templates(self) -> List[str]:
+    def get_display_templates(self) -> list[str]:
         return self.filtered_templates if self.filter_text else self.templates
 
-    def get_selected_templates_list(self) -> List[str]:
+    def get_selected_templates_list(self) -> list[str]:
         return sorted(self.selected_templates)
 
     def toggle_template_selection(self, template: str) -> None:

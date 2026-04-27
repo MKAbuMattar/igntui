@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..cache import CacheManager, TemplateCache
 from ..config import config
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class GitIgnoreAPI:
-    def __init__(self, cache_manager: Optional[CacheManager] = None):
+    def __init__(self, cache_manager: CacheManager | None = None):
         self.base_url = config.get("api", "base_url")
         self.timeout = config.get("api", "timeout")
         self.user_agent = config.get("api", "user_agent")
@@ -30,8 +29,11 @@ class GitIgnoreAPI:
         )
         self.template_cache = TemplateCache(self.cache_manager)
         self.stats = {"cache_hits": 0, "cache_misses": 0}
+        # Session-wide override; set by `--no-cache`. Per-call force_refresh still wins.
+        self.force_refresh_default = False
 
     def list_templates(self, force_refresh: bool = False) -> APIResponse:
+        force_refresh = force_refresh or self.force_refresh_default
         if not force_refresh:
             cached_templates = self.template_cache.get_template_list()
             if cached_templates is not None:
@@ -47,21 +49,20 @@ class GitIgnoreAPI:
 
             if response.success:
                 templates = self._parse_template_list(response.data)
-
                 self.template_cache.set_template_list(templates)
-
-                response.data = templates
-                logger.info(f"Fetched {len(templates)} templates from API")
+                logger.info("Fetched %d templates from API", len(templates))
+                return response.with_data(templates)
 
             return response
 
         except Exception as e:
-            logger.error(f"Failed to fetch template list: {e}")
+            logger.error("Failed to fetch template list: %s", e)
             return APIResponse(success=False, data=[], error_message=str(e))
 
     def get_templates(
-        self, technologies: List[str], force_refresh: bool = False
+        self, technologies: list[str], force_refresh: bool = False
     ) -> APIResponse:
+        force_refresh = force_refresh or self.force_refresh_default
         if not technologies:
             return APIResponse(
                 success=True,
@@ -77,7 +78,7 @@ class GitIgnoreAPI:
         if not force_refresh:
             cached_content = self.template_cache.get_template_content(clean_techs)
             if cached_content is not None:
-                logger.debug(f"Using cached content for {len(clean_techs)} templates")
+                logger.debug("Using cached content for %d templates", len(clean_techs))
                 self.stats["cache_hits"] += 1
                 return APIResponse(success=True, data=cached_content, from_cache=True)
 
@@ -90,14 +91,14 @@ class GitIgnoreAPI:
 
             if response.success:
                 self.template_cache.set_template_content(clean_techs, response.data)
-                logger.info(f"Fetched content for templates: {', '.join(clean_techs)}")
+                logger.info("Fetched content for templates: %s", ", ".join(clean_techs))
 
             return response
 
         except Exception as e:
-            logger.error(f"Failed to fetch template content: {e}")
+            logger.error("Failed to fetch template content: %s", e)
 
-            fallback_content = f"""# Error generating content: {str(e)}
+            fallback_content = f"""# Error generating content: {e}
 # Selected templates: {', '.join(clean_techs)}
 #
 # This error typically means:
@@ -136,12 +137,12 @@ class GitIgnoreAPI:
                 )
 
         except Exception as e:
-            logger.error(f"API connection test failed: {e}")
+            logger.error("API connection test failed: %s", e)
             return APIResponse(
                 success=False, data={"status": "error"}, error_message=str(e)
             )
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         request_stats = self.request_handler.get_stats()
         total_requests = request_stats["requests_made"]
         avg_response_time = (
@@ -179,7 +180,7 @@ class GitIgnoreAPI:
     def invalidate_template(self, template_name: str) -> int:
         return self.template_cache.invalidate_template_content(template_name)
 
-    def _parse_template_list(self, response_text: str) -> List[str]:
+    def _parse_template_list(self, response_text: str) -> list[str]:
         all_templates = []
 
         for line in response_text.strip().split("\n"):
@@ -190,10 +191,10 @@ class GitIgnoreAPI:
 
         unique_templates = sorted(set(all_templates), key=str.lower)
 
-        logger.debug(f"Parsed {len(unique_templates)} unique templates")
+        logger.debug("Parsed %d unique templates", len(unique_templates))
         return unique_templates
 
-    def _clean_technology_names(self, technologies: List[str]) -> List[str]:
+    def _clean_technology_names(self, technologies: list[str]) -> list[str]:
         clean_techs = []
 
         for tech in technologies:
@@ -204,7 +205,7 @@ class GitIgnoreAPI:
             if clean_tech and self._is_valid_template_name(clean_tech):
                 clean_techs.append(clean_tech)
             else:
-                logger.warning(f"Skipping invalid template name: {tech}")
+                logger.warning("Skipping invalid template name: %s", tech)
 
         return clean_techs
 

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import argparse
-import sys
 
 from ..base import CLICommand
 
@@ -57,7 +55,7 @@ class TestCommand(CLICommand):
             return 1
         except Exception as e:
             print(f"\n\nError testing API: {e}")
-            if hasattr(args, "verbose") and args.verbose:
+            if args.verbose:
                 import traceback
 
                 traceback.print_exc()

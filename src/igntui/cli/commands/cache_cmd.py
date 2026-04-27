@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import argparse
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from ..base import CLICommand
+
+if TYPE_CHECKING:
+    from ...core.cache import CacheManager
 
 
 class CacheCommand(CLICommand):
@@ -33,43 +36,45 @@ class CacheCommand(CLICommand):
             elif args.cache_action == "stats":
                 return self._show_stats(cache)
             elif args.cache_action == "clear":
-                return self._clear_cache(
-                    cache, args.force if hasattr(args, "force") else False
-                )
+                return self._clear_cache(cache, args.force)
             else:
                 print(f"Unknown cache action: {args.cache_action}")
                 return 1
 
         except Exception as e:
             print(f"Error managing cache: {e}")
-            if hasattr(args, "verbose") and args.verbose:
+            if args.verbose:
                 import traceback
 
                 traceback.print_exc()
             return 1
 
     def _show_info(self, cache: "CacheManager") -> int:
+        from datetime import datetime
+
         print("Cache Information:")
         print(f"  Location: {cache.cache_dir}")
         print(f"  TTL: {cache.default_ttl} seconds")
 
-        try:
-            from pathlib import Path
+        cache_files = sorted(cache.cache_dir.glob("*.cache"))
+        if not cache_files:
+            print("  Cached entries: 0")
+            return 0
 
-            template_cache_file = Path(cache.cache_dir) / "templates.json"
-            if template_cache_file.exists():
-                import json
+        total_bytes = sum(f.stat().st_size for f in cache_files)
+        mtimes = [f.stat().st_mtime for f in cache_files]
+        oldest = datetime.fromtimestamp(min(mtimes)).strftime("%Y-%m-%d %H:%M:%S")
+        newest = datetime.fromtimestamp(max(mtimes)).strftime("%Y-%m-%d %H:%M:%S")
 
-                with open(template_cache_file, "r") as f:
-                    data = json.load(f)
-                    templates = data.get("templates", [])
-                    print(f"  Template cache: Valid")
-                    print(f"  Templates cached: {len(templates)}")
-            else:
-                print(f"  Template cache: Not found")
-        except Exception as e:
-            print(f"  Template cache: Error reading ({e})")
+        list_count = sum(1 for f in cache_files if f.stem == "gitignore_templates_list")
+        content_count = sum(1 for f in cache_files if f.stem.startswith("gitignore_content_"))
 
+        print(f"  Cached entries: {len(cache_files)}")
+        print(f"    template list: {list_count}")
+        print(f"    content blobs: {content_count}")
+        print(f"  Total size: {total_bytes:,} bytes")
+        print(f"  Oldest entry: {oldest}")
+        print(f"  Newest entry: {newest}")
         return 0
 
     def _show_stats(self, cache: "CacheManager") -> int:

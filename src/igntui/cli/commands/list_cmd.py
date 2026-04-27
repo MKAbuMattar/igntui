@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import argparse
@@ -18,7 +17,7 @@ class ListCommand(CLICommand):
 
     def execute(self, args: argparse.Namespace) -> int:
         try:
-            if hasattr(args, "verbose") and args.verbose:
+            if args.verbose:
                 print("Fetching templates from gitignore.io...")
 
             response = self.cli.api.list_templates()
@@ -29,16 +28,16 @@ class ListCommand(CLICommand):
 
             templates = response.data
 
-            if hasattr(args, "filter") and args.filter:
+            if args.filter:
                 pattern = args.filter.lower()
                 templates = [t for t in templates if pattern in t.lower()]
 
-            if hasattr(args, "count") and args.count:
+            if args.count:
                 print(f"Found {len(templates)} templates")
                 return 0
 
             if not templates:
-                if hasattr(args, "filter") and args.filter:
+                if args.filter:
                     print(f"No templates found matching '{args.filter}'")
                 else:
                     print("No templates found")

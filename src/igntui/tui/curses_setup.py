@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
@@ -18,10 +17,20 @@ class CursesSetup:
 
     @staticmethod
     def setup_curses(stdscr) -> None:
+        from ..core.config import config
+
         curses.curs_set(0)
         stdscr.keypad(True)
         stdscr.timeout(100)
         CursesSetup.setup_colors()
+
+        if config.get("ui", "mouse_support", default=True):
+            try:
+                curses.mousemask(
+                    curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
+                )
+            except curses.error:
+                pass  # terminal doesn't support mouse — graceful degrade
 
     @staticmethod
     def setup_colors() -> None:
@@ -51,7 +60,7 @@ class CursesSetup:
             if stdscr:
                 stdscr.keypad(False)
             curses.curs_set(1)
-        except:
+        except curses.error:
             pass
 
 

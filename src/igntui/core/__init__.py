@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
-from .config import config, Config
-from .api import GitIgnoreAPI, APIResponse
+from .api import APIResponse, GitIgnoreAPI
+from .config import Config, config
 
 __all__ = ["config", "Config", "GitIgnoreAPI", "APIResponse"]

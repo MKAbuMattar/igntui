@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 from .logging import (
-    setup_logging,
     get_logger,
-    measure_performance,
     get_performance_stats,
     logging_manager,
+    measure_performance,
+    setup_logging,
 )
 
 __all__ = [

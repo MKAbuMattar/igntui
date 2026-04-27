@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
-from typing import List, Set
 
 from .base_panel import BasePanel
 
@@ -11,9 +9,9 @@ from .base_panel import BasePanel
 class TemplatesPanel(BasePanel):
     def __init__(self, stdscr, y: int, x: int, height: int, width: int):
         super().__init__(stdscr, y, x, height, width, "Available Templates")
-        self.templates: List[str] = []
-        self.filtered_templates: List[str] = []
-        self.selected_templates: Set[str] = set()
+        self.templates: list[str] = []
+        self.filtered_templates: list[str] = []
+        self.selected_templates: set[str] = set()
         self.template_selected = 0
         self.template_scroll = 0
         self.loading = False

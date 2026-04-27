@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import platform
 import sys
 
-__version__ = "0.0.1"
+__version__ = "0.1.1"
 __author__ = "Mohammad Abu Mattar"
-__email__ = "info@mkabumattar.com"
+__email__ = "mohammad.khaled@outlook.com"
 __description__ = """A professional TUI application for generating .gitignore files from templates
 provided by gitignore.io with advanced search, caching, and performance features.
 """
@@ -22,11 +21,10 @@ def get_version_string() -> str:
     return f"igntui/{__version__} Python/{python_version} {os_name}/{os_version}"
 
 
-from .core.api import GitIgnoreAPI, APIResponse
+from .core.api import APIResponse, GitIgnoreAPI
+from .core.cache import CacheManager, TemplateCache
 from .core.config import config
 from .core.search import SearchManager, SearchMode
-from .core.cache import CacheManager, TemplateCache
-
 from .main import cli_main, tui_main
 
 try:

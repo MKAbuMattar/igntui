@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
-from typing import Optional
 
 from .base_dialog import BaseDialog
 
@@ -14,7 +12,7 @@ class SaveDialog(BaseDialog):
         self.file_path = default_path
         self.cursor_pos = len(self.file_path)
 
-    def show(self) -> Optional[str]:
+    def show(self) -> str | None:
         width = 60
         height = 8
         y, x = self.calculate_position(width, height)

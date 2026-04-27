@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import logging
@@ -8,7 +7,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,19 +22,19 @@ class SearchMode(Enum):
 class SearchResult:
     item: str
     score: float
-    match_positions: List[Tuple[int, int]]
+    match_positions: list[tuple[int, int]]
     search_mode: SearchMode
 
 
 @dataclass
 class SearchResults:
-    results: List[SearchResult]
+    results: list[SearchResult]
     query: str
     search_mode: SearchMode
     search_time: float
     total_items: int
 
-    def get_items(self) -> List[str]:
+    def get_items(self) -> list[str]:
         return [result.item for result in self.results]
 
 
@@ -49,11 +48,11 @@ class SearchEngine(ABC):
 
     @abstractmethod
     def search(
-        self, items: List[str], query: str, max_results: int = 100
+        self, items: list[str], query: str, max_results: int = 100
     ) -> SearchResults:
         pass
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         avg_search_time = self.stats["total_search_time"] / max(
             1, self.stats["searches_performed"]
         )
@@ -71,7 +70,7 @@ class FuzzySearchEngine(SearchEngine):
         self.case_sensitive = case_sensitive
 
     def search(
-        self, items: List[str], query: str, max_results: int = 100
+        self, items: list[str], query: str, max_results: int = 100
     ) -> SearchResults:
         start_time = time.time()
 
@@ -116,7 +115,7 @@ class FuzzySearchEngine(SearchEngine):
 
     def _fuzzy_match(
         self, query: str, text: str
-    ) -> Tuple[float, List[Tuple[int, int]]]:
+    ) -> tuple[float, list[tuple[int, int]]]:
         if not query:
             return 1.0, []
 
@@ -166,7 +165,7 @@ class ExactSearchEngine(SearchEngine):
         self.case_sensitive = case_sensitive
 
     def search(
-        self, items: List[str], query: str, max_results: int = 100
+        self, items: list[str], query: str, max_results: int = 100
     ) -> SearchResults:
         start_time = time.time()
 
@@ -232,7 +231,7 @@ class RegexSearchEngine(SearchEngine):
         self._compiled_patterns = {}
 
     def search(
-        self, items: List[str], query: str, max_results: int = 100
+        self, items: list[str], query: str, max_results: int = 100
     ) -> SearchResults:
         start_time = time.time()
 
@@ -267,7 +266,7 @@ class RegexSearchEngine(SearchEngine):
                 results.sort(key=lambda x: (-x.score, x.item.lower()))
 
             except re.error as e:
-                logger.warning(f"Invalid regex pattern '{query}': {e}")
+                logger.warning("Invalid regex pattern %r: %s", query, e)
                 results = []
 
         search_time = time.time() - start_time
@@ -314,9 +313,9 @@ class SearchManager:
 
     def search(
         self,
-        items: List[str],
+        items: list[str],
         query: str,
-        mode: Optional[SearchMode] = None,
+        mode: SearchMode | None = None,
         max_results: int = 100,
     ) -> SearchResults:
         search_mode = mode or self.current_mode
@@ -334,7 +333,7 @@ class SearchManager:
     def get_mode(self) -> SearchMode:
         return self.current_mode
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         stats = {
             "current_mode": self.current_mode.value,
             "case_sensitive": self.case_sensitive,
@@ -348,7 +347,7 @@ class SearchManager:
 
     def clear_caches(self) -> None:
         for engine in self.engines.values():
-            if hasattr(engine, "_compiled_patterns"):
+            if isinstance(engine, RegexSearchEngine):
                 engine._compiled_patterns.clear()
 
         logger.debug("Cleared search engine caches")
