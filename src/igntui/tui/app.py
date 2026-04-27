@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
 import logging
+import queue
 import time
-from typing import Optional
 
 from ..core.api import GitIgnoreAPI
+from ..core.project_config import ProjectConfig, find_sidecar
+from ..core.repo_config import RepoConfig, find_repo_config
 from ..core.search import SearchManager
 from ..ui import (
     ContentPanel,
@@ -23,6 +24,15 @@ from .event_handler import EventHandler
 from .lifecycle import TemplateLifecycle
 from .renderer import TUIRenderer
 from .state import TUIState
+from .updates import (
+    ContentGenerated,
+    ContentGenerationFailed,
+    GenerationCompleted,
+    LoadCompleted,
+    StateUpdate,
+    TemplatesLoaded,
+    TemplatesLoadFailed,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +44,7 @@ class GitIgnoreTUI:
         self.api = GitIgnoreAPI()
         self.search_manager = SearchManager()
         self.state = TUIState()
+        self.updates: queue.Queue[StateUpdate] = queue.Queue()
 
         CursesSetup.setup_curses(stdscr)
 
@@ -53,7 +64,7 @@ class GitIgnoreTUI:
         self._init_ui_components()
         self.lifecycle = TemplateLifecycle(self.api, self.search_manager)
         self.actions = TUIActions(self.stdscr, self.state)
-        self.event_handler = EventHandler(self.state, self.lifecycle)
+        self.event_handler = EventHandler(self.state, self.lifecycle, self.stdscr)
         self._setup_event_callbacks()
         self.renderer = TUIRenderer(
             self.stdscr,
@@ -70,7 +81,52 @@ class GitIgnoreTUI:
         if not self.state.templates:
             self._load_templates_async()
 
+        self._maybe_load_sidecar()
+
         logger.info("GitIgnoreTUI initialized successfully")
+
+    def _maybe_load_sidecar(self) -> None:
+        # Per-output sidecar takes precedence — it represents an explicit
+        # selection committed alongside a real `.gitignore`.
+        sidecar_path = find_sidecar()
+        if sidecar_path is not None:
+            cfg = ProjectConfig.load(sidecar_path)
+            if cfg is not None and cfg.templates:
+                self.state.selected_templates = set(cfg.templates)
+                if cfg.search_mode in {"fuzzy", "exact", "regex"}:
+                    self.state.current_search_mode = cfg.search_mode
+                self.state.set_status_message(
+                    f"✓ Loaded {len(cfg.templates)} templates from "
+                    f"{sidecar_path.name} — Press 'c' to clear"
+                )
+                self._generate_content_async()
+                logger.info(
+                    "Loaded %d templates from sidecar %s",
+                    len(cfg.templates),
+                    sidecar_path,
+                )
+                return
+
+        # No sidecar — fall back to the repo config's [selection] if present.
+        repo_path = find_repo_config()
+        if repo_path is None:
+            return
+        repo = RepoConfig.load(repo_path)
+        if repo is None or not repo.has_selection():
+            return
+        self.state.selected_templates = set(repo.selection_templates)
+        if repo.selection_search_mode:
+            self.state.current_search_mode = repo.selection_search_mode
+        self.state.set_status_message(
+            f"✓ Seeded {len(repo.selection_templates)} templates from "
+            f"{repo_path.name} — Press 'c' to clear"
+        )
+        self._generate_content_async()
+        logger.info(
+            "Seeded %d templates from repo config %s",
+            len(repo.selection_templates),
+            repo_path,
+        )
 
     def _init_ui_components(self) -> None:
         max_y, max_x = self.stdscr.getmaxyx()
@@ -151,23 +207,14 @@ class GitIgnoreTUI:
     def _load_templates_async(self) -> None:
         self.state.loading = True
         self.state.set_status_message("Loading templates...")
-
-        def on_success(templates):
-            self.state.templates = templates
-            self.state.filtered_templates = templates[:]
-            self.state.set_status_message(f"✓ Loaded {len(templates)} templates")
-
-        def on_error(error_msg):
-            self.state.set_status_message(error_msg, is_error=True)
-
-        def on_complete():
-            self.state.loading = False
-
-        self.lifecycle.load_templates_async(on_success, on_error, on_complete)
+        self.lifecycle.load_templates_async(self.updates)
 
     def _generate_content_async(self) -> None:
         if not self.state.selected_templates:
-            self.state.generated_content = "# No templates selected\n# Select templates from the Available Templates panel"
+            self.state.generated_content = (
+                "# No templates selected\n"
+                "# Select templates from the Available Templates panel"
+            )
             return
 
         self.state.generation_in_progress = True
@@ -175,30 +222,51 @@ class GitIgnoreTUI:
         self.state.set_status_message(
             f"Generating content for {len(selected_list)} templates..."
         )
+        self.lifecycle.generate_content_async(selected_list, self.updates)
 
-        def on_success(content, from_cache):
-            self.state.generated_content = content
-            cache_info = " (cached)" if from_cache else ""
-            self.state.set_status_message(
-                f"✓ Generated content for {len(selected_list)} templates{cache_info}"
-            )
+    def _drain_updates(self) -> None:
+        """Apply all pending state updates from background threads.
 
-        def on_error(error_msg):
-            self.state.generated_content = f"# Error generating content: {error_msg}\n# Selected templates: {selected_list}"
-            self.state.set_status_message(error_msg, is_error=True)
+        Called from the main loop between renders. All `state.X = Y` mutation
+        for cross-thread data lives here so the render path sees a consistent
+        snapshot.
+        """
+        while True:
+            try:
+                update = self.updates.get_nowait()
+            except queue.Empty:
+                return
 
-        def on_complete():
-            self.state.generation_in_progress = False
-
-        self.lifecycle.generate_content_async(
-            selected_list, on_success, on_error, on_complete
-        )
+            match update:
+                case TemplatesLoaded(templates=templates):
+                    self.state.templates = templates
+                    self.state.filtered_templates = templates[:]
+                    self.state.set_status_message(f"✓ Loaded {len(templates)} templates")
+                case TemplatesLoadFailed(message=msg):
+                    self.state.set_status_message(msg, is_error=True)
+                case ContentGenerated(content=content, from_cache=from_cache, selected_count=n):
+                    self.state.generated_content = content
+                    cache_info = " (cached)" if from_cache else ""
+                    self.state.set_status_message(
+                        f"✓ Generated content for {n} templates{cache_info}"
+                    )
+                case ContentGenerationFailed(message=msg, selected_templates=selected):
+                    self.state.generated_content = (
+                        f"# Error generating content: {msg}\n"
+                        f"# Selected templates: {selected}"
+                    )
+                    self.state.set_status_message(msg, is_error=True)
+                case LoadCompleted():
+                    self.state.loading = False
+                case GenerationCompleted():
+                    self.state.generation_in_progress = False
 
     def run(self) -> int:
         logger.info("Starting TUI main loop")
 
         try:
             while self.state.running:
+                self._drain_updates()
                 self.state.clear_status_message()
                 self.renderer.render()
 

@@ -1,23 +1,33 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import argparse
 import logging
 import sys
-from typing import List, Optional
+from pathlib import Path
 
-from .. import __version__, get_version_string
 from ..core.api import GitIgnoreAPI
 from ..core.config import Config
+from ..core.repo_config import find_repo_config
 
 logger = logging.getLogger(__name__)
 
 
 class BaseCLI:
-    def __init__(self):
-        self.config = Config()
+    def __init__(
+        self,
+        config_path: Path | None = None,
+        no_cache: bool = False,
+    ):
+        repo_path = find_repo_config()
+        self.config = Config(
+            config_path=config_path,
+            repo_config_path=repo_path,
+        )
+        self.repo_config_path = repo_path
+        self.no_cache = no_cache
         self.api = GitIgnoreAPI()
+        self.api.force_refresh_default = no_cache
 
     def setup_logging(self, verbose: bool = False):
         level = logging.DEBUG if verbose else logging.INFO
@@ -28,7 +38,7 @@ class BaseCLI:
     def check_terminal_requirements(self) -> bool:
         try:
             import curses
-            stdscr = curses.initscr()
+            curses.initscr()
             curses.endwin()
             return True
         except ImportError:
@@ -61,35 +71,6 @@ class CLICommand:
 
     def execute(self, args: argparse.Namespace) -> int:
         raise NotImplementedError
-
-
-def create_base_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="igntui",
-        description="Interactive TUI for generating .gitignore files from gitignore.io templates",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  igntui                    # Launch interactive TUI
-  igntui list               # List available templates  
-  igntui generate python    # Generate .gitignore for Python
-  igntui test               # Test API connection
-  
-For more information, visit: https://github.com/toptal/gitignore.io
-        """,
-    )
-
-    parser.add_argument("--version", action="version", version=get_version_string())
-
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose output"
-    )
-
-    parser.add_argument(
-        "--no-color", action="store_true", help="Disable colored output"
-    )
-
-    return parser
 
 
 def safe_exit(code: int = 0) -> None:

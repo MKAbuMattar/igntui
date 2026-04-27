@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-\
 
 
 import argparse
 from pathlib import Path
-from typing import Optional
 
 from .. import __description__, __version__, get_version_string
 
@@ -111,6 +109,16 @@ def create_command_parser(
         action="store_true",
         help="Force overwrite without confirmation",
     )
+    generate_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print resolved content to stdout without writing any file",
+    )
+    generate_parser.add_argument(
+        "--no-sidecar",
+        action="store_true",
+        help="Do not write igntui.cfg.toml alongside the output file",
+    )
 
     cache_parser = subparsers.add_parser(
         "cache", help="Manage cache", description="Manage template and API cache"
@@ -119,7 +127,10 @@ def create_command_parser(
         dest="cache_action", title="cache actions", help="Cache action to perform"
     )
 
-    cache_subparsers.add_parser("clear", help="Clear all cache")
+    cache_clear_parser = cache_subparsers.add_parser("clear", help="Clear all cache")
+    cache_clear_parser.add_argument(
+        "--force", action="store_true", help="Skip confirmation prompt"
+    )
     cache_subparsers.add_parser("stats", help="Show cache statistics")
     cache_subparsers.add_parser("info", help="Show cache information")
 
@@ -135,6 +146,16 @@ def create_command_parser(
         help="Connection timeout in seconds (default: 10)",
     )
 
+    completion_parser = subparsers.add_parser(
+        "completion",
+        help="Emit shell completion script",
+        description="Print a shell completion script to stdout. "
+        'Install with `eval "$(igntui completion bash)"` (or zsh / fish).',
+    )
+    completion_parser.add_argument(
+        "shell", choices=["bash", "zsh", "fish"], help="Target shell"
+    )
+
     return base_parser
 
 
@@ -146,6 +167,7 @@ def get_command_instance(command_name: str, cli_instance):
         TestCommand,
         TUICommand,
     )
+    from .commands.completion_cmd import CompletionCommand
 
     commands = {
         "list": ListCommand,
@@ -153,6 +175,7 @@ def get_command_instance(command_name: str, cli_instance):
         "tui": TUICommand,
         "cache": CacheCommand,
         "test": TestCommand,
+        "completion": CompletionCommand,
     }
 
     command_class = commands.get(command_name)

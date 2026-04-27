@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
+import hashlib
 import json
 import logging
-import os
+import re
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from threading import RLock
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class CacheEntry:
     timestamp: float
     ttl: int
     access_count: int = 0
-    last_access: Optional[float] = None
+    last_access: float | None = None
 
     def is_expired(self) -> bool:
         return time.time() > (self.timestamp + self.ttl)
@@ -34,7 +34,7 @@ class CacheManager:
     def __init__(self, cache_dir: str, default_ttl: int = 3600):
         self.cache_dir = Path(cache_dir)
         self.default_ttl = default_ttl
-        self._memory_cache: Dict[str, CacheEntry] = {}
+        self._memory_cache: dict[str, CacheEntry] = {}
         self._lock = RLock()
 
         self._stats = {
@@ -48,11 +48,28 @@ class CacheManager:
         }
 
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+        self._purge_legacy_content_keys()
         self._load_persistent_cache()
 
-        logger.debug(f"Initialized cache manager with directory: {self.cache_dir}")
+        logger.debug("Initialized cache manager with directory: %s", self.cache_dir)
 
-    def get(self, key: str) -> Optional[Any]:
+    def _purge_legacy_content_keys(self) -> None:
+        # Pre-Phase-2.1 keys used `hash() % 1000000` (6 decimal digits, non-stable
+        # across processes). New keys are 16 hex chars from sha256. Anything that
+        # matches the old shape is dead weight — drop it.
+        legacy_re = re.compile(r"^gitignore_content_\d{6}$")
+        purged = 0
+        for cache_file in self.cache_dir.glob("gitignore_content_*.cache"):
+            if legacy_re.match(cache_file.stem):
+                try:
+                    cache_file.unlink()
+                    purged += 1
+                except OSError:
+                    pass
+        if purged:
+            logger.info("Purged %d legacy content cache entries", purged)
+
+    def get(self, key: str) -> Any | None:
         with self._lock:
             if key in self._memory_cache:
                 entry = self._memory_cache[key]
@@ -66,7 +83,7 @@ class CacheManager:
 
                 entry.touch()
                 self._stats["hits"] += 1
-                logger.debug(f"Cache hit for key: {key}")
+                logger.debug("Cache hit for key: %s", key)
                 return entry.data
 
             disk_entry = self._load_disk_cache(key)
@@ -74,7 +91,7 @@ class CacheManager:
                 self._memory_cache[key] = disk_entry
                 disk_entry.touch()
                 self._stats["hits"] += 1
-                logger.debug(f"Disk cache hit for key: {key}")
+                logger.debug("Disk cache hit for key: %s", key)
                 return disk_entry.data
             elif disk_entry:
                 self._delete_disk_cache(key)
@@ -83,7 +100,7 @@ class CacheManager:
             self._stats["misses"] += 1
             return None
 
-    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
+    def set(self, key: str, value: Any, ttl: int | None = None) -> None:
         ttl = ttl or self.default_ttl
 
         with self._lock:
@@ -93,7 +110,7 @@ class CacheManager:
             self._save_disk_cache(key, entry)
             self._stats["sets"] += 1
 
-            logger.debug(f"Cached value for key: {key} (TTL: {ttl}s)")
+            logger.debug("Cached value for key: %s (TTL: %ds)", key, ttl)
 
     def delete(self, key: str) -> bool:
         with self._lock:
@@ -108,7 +125,7 @@ class CacheManager:
 
             if deleted:
                 self._stats["deletes"] += 1
-                logger.debug(f"Deleted cache entry: {key}")
+                logger.debug("Deleted cache entry: %s", key)
 
             return deleted
 
@@ -125,8 +142,12 @@ class CacheManager:
                     pass
 
             total_cleared = memory_count + disk_count
-            logger.info(f"Cleared {total_cleared} cache entries")
+            logger.info("Cleared %d cache entries", total_cleared)
             return total_cleared
+
+    # Backwards-compatible alias used by `igntui cache clear`.
+    def clear_all(self) -> int:
+        return self.clear()
 
     def cleanup_expired(self) -> int:
         with self._lock:
@@ -153,11 +174,11 @@ class CacheManager:
             self._stats["evictions"] += total_cleaned
 
             if total_cleaned > 0:
-                logger.info(f"Cleaned up {total_cleaned} expired cache entries")
+                logger.info("Cleaned up %d expired cache entries", total_cleaned)
 
             return total_cleaned
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         with self._lock:
             total_requests = self._stats["hits"] + self._stats["misses"]
             hit_rate = self._stats["hits"] / max(1, total_requests)
@@ -189,24 +210,24 @@ class CacheManager:
                     cache_file.unlink()
 
             if loaded_count > 0:
-                logger.info(f"Loaded {loaded_count} cache entries from disk")
+                logger.info("Loaded %d cache entries from disk", loaded_count)
 
         except Exception as e:
-            logger.warning(f"Failed to load persistent cache: {e}")
+            logger.warning("Failed to load persistent cache: %s", e)
 
-    def _load_disk_cache(self, key: str) -> Optional[CacheEntry]:
+    def _load_disk_cache(self, key: str) -> CacheEntry | None:
         cache_file = self.cache_dir / f"{key}.cache"
 
         try:
             if cache_file.exists():
-                with open(cache_file, "r", encoding="utf-8") as f:
+                with open(cache_file, encoding="utf-8") as f:
                     data = json.load(f)
 
                 self._stats["disk_reads"] += 1
                 return CacheEntry(**data)
 
         except (json.JSONDecodeError, TypeError, KeyError, OSError) as e:
-            logger.warning(f"Failed to load cache file {cache_file}: {e}")
+            logger.warning("Failed to load cache file %s: %s", cache_file, e)
             try:
                 cache_file.unlink()
             except OSError:
@@ -224,7 +245,7 @@ class CacheManager:
             self._stats["disk_writes"] += 1
 
         except (OSError, TypeError) as e:
-            logger.warning(f"Failed to save cache file {cache_file}: {e}")
+            logger.warning("Failed to save cache file %s: %s", cache_file, e)
 
     def _delete_disk_cache(self, key: str) -> bool:
         cache_file = self.cache_dir / f"{key}.cache"
@@ -245,17 +266,17 @@ class TemplateCache:
         self._template_list_key = "gitignore_templates_list"
         self._template_content_prefix = "gitignore_content_"
 
-    def get_template_list(self) -> Optional[List[str]]:
+    def get_template_list(self) -> list[str] | None:
         return self.cache_manager.get(self._template_list_key)
 
-    def set_template_list(self, templates: List[str]) -> None:
+    def set_template_list(self, templates: list[str]) -> None:
         self.cache_manager.set(self._template_list_key, templates)
 
-    def get_template_content(self, technologies: List[str]) -> Optional[str]:
+    def get_template_content(self, technologies: list[str]) -> str | None:
         key = self._make_content_key(technologies)
         return self.cache_manager.get(key)
 
-    def set_template_content(self, technologies: List[str], content: str) -> None:
+    def set_template_content(self, technologies: list[str], content: str) -> None:
         key = self._make_content_key(technologies)
         self.cache_manager.set(key, content)
 
@@ -278,7 +299,8 @@ class TemplateCache:
 
         return invalidated
 
-    def _make_content_key(self, technologies: List[str]) -> str:
-        sorted_techs = sorted([tech.lower().strip() for tech in technologies])
+    def _make_content_key(self, technologies: list[str]) -> str:
+        sorted_techs = sorted({tech.lower().strip() for tech in technologies if tech.strip()})
         tech_string = ",".join(sorted_techs)
-        return f"{self._template_content_prefix}{hash(tech_string) % 1000000:06d}"
+        digest = hashlib.sha256(tech_string.encode("utf-8")).hexdigest()[:16]
+        return f"{self._template_content_prefix}{digest}"

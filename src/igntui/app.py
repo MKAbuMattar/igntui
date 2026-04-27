@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
 import sys
-from typing import Optional
 
 
 def run_tui(show_splash: bool = True) -> int:

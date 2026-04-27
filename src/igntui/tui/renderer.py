@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
@@ -20,7 +19,10 @@ class TUIRenderer:
 
     def render(self) -> None:
         try:
-            self.stdscr.clear()
+            # erase() is non-destructive — curses' double-buffer diffs against
+            # the previous frame so unchanged cells aren't redrawn. clear() forces
+            # a full repaint every tick which causes visible flicker.
+            self.stdscr.erase()
             max_y, max_x = self.stdscr.getmaxyx()
 
             left_width = max_x // 3

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import curses
-from typing import Set
 
 from .base_panel import BasePanel
 
@@ -11,7 +9,7 @@ from .base_panel import BasePanel
 class SelectedPanel(BasePanel):
     def __init__(self, stdscr, y: int, x: int, height: int, width: int):
         super().__init__(stdscr, y, x, height, width, "Selected Templates")
-        self.selected_templates: Set[str] = set()
+        self.selected_templates: set[str] = set()
         self.selected_index = 0
         self.selected_scroll = 0
 

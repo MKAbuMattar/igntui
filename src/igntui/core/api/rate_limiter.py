@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import logging
 import time
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 

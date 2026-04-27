@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 from .components import (
-    SplashScreen,
-    BasePanel,
-    SearchPanel,
-    TemplatesPanel,
-    SelectedPanel,
-    ContentPanel,
-    StatusBar,
     BaseDialog,
+    BasePanel,
+    ConfirmDialog,
+    ContentPanel,
+    ExportDialog,
     HelpDialog,
     SaveDialog,
-    ExportDialog,
-    ConfirmDialog,
+    SearchPanel,
+    SelectedPanel,
+    SplashScreen,
+    StatusBar,
+    TemplatesPanel,
 )
 
 __all__ = [

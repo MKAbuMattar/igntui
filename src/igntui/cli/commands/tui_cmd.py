@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
 import argparse
@@ -27,7 +26,7 @@ class TUICommand(CLICommand):
             return 1
         except Exception as e:
             print(f"Error launching TUI: {e}")
-            if hasattr(args, "verbose") and args.verbose:
+            if args.verbose:
                 import traceback
 
                 traceback.print_exc()

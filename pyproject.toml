@@ -1,6 +1,6 @@
 [project]
 name = "igntui"
-version = "0.0.1"
+version = "0.1.0"
 description = "Interactive Terminal User Interface for GitIgnore template generation"
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -10,22 +10,20 @@ authors = [
 maintainers = [
     { name = "Mohammad Abu Mattar", email = "mohammad.khaled@outlook.com" }
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
-    "urllib3>=2.0.0",
     "windows-curses>=2.4.1; sys_platform == 'win32'",
     "pyfiglet>=1.0.2",
+    "tomli>=2.0.0; python_version < '3.11'",
+    "tomli-w>=1.0.0",
 ]
 keywords = ["gitignore", "tui", "terminal", "git", "templates", "cli"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console :: Curses",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -62,7 +60,7 @@ test = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
-    "responses>=0.23.0",
+    "freezegun>=1.4.0",
 ]
 windows = [
     "windows-curses>=2.4.1; sys_platform == 'win32'",
@@ -75,7 +73,7 @@ build-backend = "uv_build"
 # Ruff configuration
 [tool.ruff]
 line-length = 100
-target-version = "py38"
+target-version = "py310"
 
 # Enable specific rule sets
 [tool.ruff.lint]
@@ -84,7 +82,7 @@ select = [
     "W",   # pycodestyle warnings
     "F",   # pyflakes
     "I",   # isort
-    "B",   # flake8-bugbear
+    "B",   # flake8-bugbear (includes B904 — raise X from err)
     "C4",  # flake8-comprehensions
     "UP",  # pyupgrade
 ]
@@ -92,6 +90,11 @@ ignore = [
     "E501",  # line too long (handled by formatter)
     "B008",  # do not perform function calls in argument defaults
     "C901",  # function is too complex
+    "E402",  # module-level import not at top — needed for tomllib version-guarded import
+    "W291",  # trailing whitespace (cosmetic)
+    "W293",  # blank line contains whitespace (cosmetic)
+    "C408",  # unnecessary dict() call (style)
+    "C414",  # unnecessary list() within sorted (style)
 ]
 
 # Exclude directories
@@ -100,7 +103,7 @@ ignore = [
 
 # MyPy configuration
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false  # Set to true when ready for full type checking
@@ -111,6 +114,42 @@ ignore_missing_imports = true
 module = ["curses", "curses.*", "windows_curses", "windows_curses.*"]
 ignore_missing_imports = true
 ignore_errors = true
+
+# Type checking with ty (https://docs.astral.sh/ty/)
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.ty.src]
+include = ["src/igntui"]
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --strict-markers"
+markers = [
+    "integration: tests that hit the network or filesystem extensively",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src/igntui"]
+omit = [
+    "*/tests/*",
+    "*/__main__.py",
+    "*/tui/curses_setup.py",
+    "*/tui/renderer.py",
+    "*/ui/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+show_missing = true
 
 [dependency-groups]
 dev = []

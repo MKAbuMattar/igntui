@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 
-from .splash import SplashScreen
-from .base_panel import BasePanel
-from .search_panel import SearchPanel
-from .templates_panel import TemplatesPanel
-from .selected_panel import SelectedPanel
-from .content_panel import ContentPanel
-from .status_bar import StatusBar
 from .base_dialog import BaseDialog
+from .base_panel import BasePanel
+from .confirm_dialog import ConfirmDialog
+from .content_panel import ContentPanel
+from .diff_preview_dialog import DiffPreviewDialog
+from .export_dialog import ExportDialog
 from .help_dialog import HelpDialog
 from .save_dialog import SaveDialog
-from .export_dialog import ExportDialog
-from .confirm_dialog import ConfirmDialog
+from .search_panel import SearchPanel
+from .selected_panel import SelectedPanel
+from .splash import SplashScreen
+from .status_bar import StatusBar
+from .templates_panel import TemplatesPanel
 
 __all__ = [
     "SplashScreen",
@@ -28,4 +28,5 @@ __all__ = [
     "SaveDialog",
     "ExportDialog",
     "ConfirmDialog",
+    "DiffPreviewDialog",
 ]
