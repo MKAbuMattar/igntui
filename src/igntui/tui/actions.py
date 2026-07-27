@@ -109,9 +109,7 @@ class TUIActions:
 
     def export_templates(self) -> None:
         if not self.state.selected_templates:
-            self.state.set_status_message(
-                "No templates selected for export", is_error=True
-            )
+            self.state.set_status_message("No templates selected for export", is_error=True)
             return
 
         try:
@@ -146,9 +144,7 @@ class TUIActions:
             self.state.set_status_message(
                 f"✓ Exported {len(self.state.selected_templates)} templates to {export_path.name}"
             )
-            logger.info(
-                f"Exported {len(self.state.selected_templates)} templates to {export_path}"
-            )
+            logger.info(f"Exported {len(self.state.selected_templates)} templates to {export_path}")
 
         except Exception as e:
             self.state.set_status_message(f"Export failed: {e}", is_error=True)
@@ -194,9 +190,7 @@ class TUIActions:
                 except curses.error:
                     pass
 
-            self._draw_border(
-                dialog_y, dialog_x, dialog_height, dialog_width, "About igntui"
-            )
+            self._draw_border(dialog_y, dialog_x, dialog_height, dialog_width, "About igntui")
 
             info_lines = [
                 "",
@@ -245,39 +239,27 @@ class TUIActions:
             self.state.set_status_message(f"Error showing info: {e}", is_error=True)
             logger.error(f"Error showing info dialog: {e}")
 
-    def _draw_border(
-        self, y: int, x: int, height: int, width: int, title: str = ""
-    ) -> None:
+    def _draw_border(self, y: int, x: int, height: int, width: int, title: str = "") -> None:
         try:
             self.stdscr.addch(y, x, curses.ACS_ULCORNER, curses.color_pair(1))
-            self.stdscr.addch(
-                y, x + width - 1, curses.ACS_URCORNER, curses.color_pair(1)
-            )
-            self.stdscr.addch(
-                y + height - 1, x, curses.ACS_LLCORNER, curses.color_pair(1)
-            )
+            self.stdscr.addch(y, x + width - 1, curses.ACS_URCORNER, curses.color_pair(1))
+            self.stdscr.addch(y + height - 1, x, curses.ACS_LLCORNER, curses.color_pair(1))
             self.stdscr.addch(
                 y + height - 1, x + width - 1, curses.ACS_LRCORNER, curses.color_pair(1)
             )
 
             for i in range(1, width - 1):
                 self.stdscr.addch(y, x + i, curses.ACS_HLINE, curses.color_pair(1))
-                self.stdscr.addch(
-                    y + height - 1, x + i, curses.ACS_HLINE, curses.color_pair(1)
-                )
+                self.stdscr.addch(y + height - 1, x + i, curses.ACS_HLINE, curses.color_pair(1))
 
             for i in range(1, height - 1):
                 self.stdscr.addch(y + i, x, curses.ACS_VLINE, curses.color_pair(1))
-                self.stdscr.addch(
-                    y + i, x + width - 1, curses.ACS_VLINE, curses.color_pair(1)
-                )
+                self.stdscr.addch(y + i, x + width - 1, curses.ACS_VLINE, curses.color_pair(1))
 
             if title:
                 title_text = f" {title} "
                 title_x = x + (width - len(title_text)) // 2
-                self.stdscr.addstr(
-                    y, title_x, title_text, curses.color_pair(6) | curses.A_BOLD
-                )
+                self.stdscr.addstr(y, title_x, title_text, curses.color_pair(6) | curses.A_BOLD)
 
         except curses.error:
             pass

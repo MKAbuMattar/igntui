@@ -29,15 +29,10 @@ class BaseCLI:
         self.api = GitIgnoreAPI()
         self.api.force_refresh_default = no_cache
 
-    def setup_logging(self, verbose: bool = False):
-        level = logging.DEBUG if verbose else logging.INFO
-        logging.basicConfig(
-            level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-
     def check_terminal_requirements(self) -> bool:
         try:
             import curses
+
             curses.initscr()
             curses.endwin()
             return True

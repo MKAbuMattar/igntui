@@ -102,9 +102,7 @@ def test_no_migration_when_target_already_exists(tmp_path):
     UsageTracker(target).record("python")
 
     # Legacy file with conflicting content
-    legacy.write_text(
-        json.dumps({"node": {"count": 99, "last_used": 1.0}})
-    )
+    legacy.write_text(json.dumps({"node": {"count": 99, "last_used": 1.0}}))
 
     t = UsageTracker(target)
     # node should not appear; the existing TOML is the source of truth.

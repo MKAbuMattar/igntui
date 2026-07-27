@@ -29,9 +29,7 @@ class SaveDialog(BaseDialog):
                 input_x = x + 2
                 input_width = width - 4
 
-                self.stdscr.addstr(
-                    input_y, input_x, " " * input_width, curses.color_pair(3)
-                )
+                self.stdscr.addstr(input_y, input_x, " " * input_width, curses.color_pair(3))
 
                 display_path = self.file_path[: input_width - 1]
                 self.stdscr.addstr(input_y, input_x, display_path, curses.color_pair(3))
@@ -55,9 +53,7 @@ class SaveDialog(BaseDialog):
                 save_x = x + width // 2 - len(save_btn) - 2
                 cancel_x = x + width // 2 + 2
 
-                self.stdscr.addstr(
-                    button_y, save_x, save_btn, curses.color_pair(4) | curses.A_BOLD
-                )
+                self.stdscr.addstr(button_y, save_x, save_btn, curses.color_pair(4) | curses.A_BOLD)
                 self.stdscr.addstr(button_y, cancel_x, cancel_btn, curses.color_pair(7))
 
                 help_text = "Enter: Save | ESC: Cancel"
@@ -79,15 +75,13 @@ class SaveDialog(BaseDialog):
             elif key == curses.KEY_BACKSPACE or key == 127:
                 if self.cursor_pos > 0:
                     self.file_path = (
-                        self.file_path[: self.cursor_pos - 1]
-                        + self.file_path[self.cursor_pos :]
+                        self.file_path[: self.cursor_pos - 1] + self.file_path[self.cursor_pos :]
                     )
                     self.cursor_pos -= 1
             elif key == curses.KEY_DC:
                 if self.cursor_pos < len(self.file_path):
                     self.file_path = (
-                        self.file_path[: self.cursor_pos]
-                        + self.file_path[self.cursor_pos + 1 :]
+                        self.file_path[: self.cursor_pos] + self.file_path[self.cursor_pos + 1 :]
                     )
             elif key == curses.KEY_LEFT:
                 self.cursor_pos = max(0, self.cursor_pos - 1)
@@ -100,8 +94,6 @@ class SaveDialog(BaseDialog):
             elif 32 <= key <= 126:
                 char = chr(key)
                 self.file_path = (
-                    self.file_path[: self.cursor_pos]
-                    + char
-                    + self.file_path[self.cursor_pos :]
+                    self.file_path[: self.cursor_pos] + char + self.file_path[self.cursor_pos :]
                 )
                 self.cursor_pos += 1

@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest something igntui should do
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        `ROADMAP.md` has a "Rejected on purpose" section — a plugin system, a
+        Textual rewrite, a settings UI, and vendoring the template list are all
+        there with reasons. Worth a look first; if you disagree with one of them,
+        say so here and make the case.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The situation, not the solution. What did you reach for igntui to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like it to do?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface?
+      options:
+        - CLI
+        - TUI
+        - Both
+        - Configuration / file formats
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What do you do today instead?
+      description: >-
+        Existing flags, a shell alias, editing the file by hand. If there is a
+        workaround, that is useful context rather than a reason to close.

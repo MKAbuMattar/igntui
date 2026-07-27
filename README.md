@@ -207,8 +207,19 @@ path                = ".gitignore"
 preserve_user_edits = true
 ```
 
-User-added rules outside the `# >>> igntui >>>` / `# <<< igntui <<<` markers
-are preserved on every re-save.
+A generated `.gitignore` carries two marked regions: the template content between
+`# >>> igntui >>>` / `# <<< igntui <<<`, which is replaced on every re-save, and a
+custom-patterns region below it whose contents igntui carries over untouched:
+
+```gitignore
+# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+secrets.local.json
+# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+```
+
+Put your own rules there. Rules outside both regions are preserved too — the region
+just makes the safe place explicit. See
+[Managed blocks](docs/concepts/managed-blocks.md).
 
 #### Shell Completion
 
@@ -395,7 +406,7 @@ If templates won't load:
 
 1. Check internet connection
 2. Test API: `igntui test`
-3. Clear cache: `igntui cache --clear`
+3. Clear cache: `igntui cache clear` (add `--force` to skip the confirmation)
 4. Try with verbose: `igntui --verbose`
 
 ## 🧪 Development
@@ -407,46 +418,56 @@ If templates won't load:
 git clone https://github.com/MKAbuMattar/igntui.git
 cd igntui
 
-# Install dependencies
-pip install -e ".[dev]"
+# Install the project with the tools CI uses
+uv sync --extra test --extra dev
 
-# Run tests
-pytest
-
-# Format code
-black src/igntui
-isort src/igntui
-
-# Type checking
-mypy src/igntui
+# Run it
+uv run igntui
 ```
 
-### Running Tests
+Stay in the repo root when using `uv run` — from elsewhere it resolves a different
+environment and will run a globally installed `igntui` instead of your checkout.
+
+### Running the checks
+
+The same three commands CI runs. All three are clean on `main`, so anything they report came
+from your change:
 
 ```bash
-# All tests
-pytest
-
-# With coverage
-pytest --cov=igntui
-
-# Specific test file
-pytest tests/test_api.py
+uvx ruff check src tests
+uvx ty check --python .venv src/igntui
+uv run --frozen pytest -q
 ```
+
+```bash
+# With coverage
+uv run --frozen pytest --cov --cov-report=term-missing
+
+# A single file
+uv run --frozen pytest tests/core/test_api.py
+```
+
+The tests need no network and no terminal. They also cannot tell you whether the TUI renders
+correctly — see [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) for what to check by hand.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Read [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) first —
+it covers the checks, the threading rule in the TUI, and the managed-block file format.
+[`ROADMAP.md`](ROADMAP.md) lists what is queued (and what has been rejected on purpose).
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create your feature branch (`git checkout -b feat/my-change`)
+3. Commit with a [Conventional Commits](https://www.conventionalcommits.org/) message
+4. Push to the branch and open a Pull Request
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**GPL-3.0-or-later** — see the [LICENSE](LICENSE) file for the full text.
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU General Public License as published by the Free Software Foundation, either version 3 of
+the License, or (at your option) any later version.
 
 ## 👨‍💻 Author
 

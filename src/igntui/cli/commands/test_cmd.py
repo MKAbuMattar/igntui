@@ -17,16 +17,15 @@ class TestCommand(CLICommand):
 
     def execute(self, args: argparse.Namespace) -> int:
         try:
-            from ...core.api import GitIgnoreAPI
-
             print("Testing connection to gitignore.io API...")
             print(f"Timeout: {args.timeout} seconds")
             print()
 
-            api = GitIgnoreAPI()
-
+            # The CLI's own API handle, not a fresh one: building a second
+            # GitIgnoreAPI here ignored `--config` and `--no-cache`, so the
+            # command tested a different configuration than the one in use.
             print("Attempting to connect...", end="", flush=True)
-            response = api.test_connection()
+            response = self.cli.api.test_connection()
 
             if not response.success:
                 print(" FAILED")
@@ -36,15 +35,19 @@ class TestCommand(CLICommand):
             print(" SUCCESS")
             print()
 
+            # test_connection() reports the probe's timing inside `data`, not on
+            # the wrapper it returns — reading the wrapper printed 0.000s / N/A
+            # every time, which made the one command whose job is diagnosing
+            # latency useless.
+            details = response.data if isinstance(response.data, dict) else {}
+            response_time = details.get("response_time") or 0.0
+            cache_stats = details.get("cache_stats") or {}
+
             print("API Response:")
-            response_time = (
-                response.response_time if response.response_time is not None else 0.0
-            )
             print(f"  Response time: {response_time:.3f}s")
+            print(f"  Endpoint: {details.get('api_url', 'unknown')}")
             print(f"  From cache: {'Yes' if response.from_cache else 'No'}")
-            print(
-                f"  Status code: {response.status_code if response.status_code else 'N/A'}"
-            )
+            print(f"  Cached entries: {cache_stats.get('disk_entries', 0)}")
 
             print()
             print("✓ API is working correctly")

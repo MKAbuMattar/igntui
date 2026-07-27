@@ -4,9 +4,8 @@ How igntui re-saves a `.gitignore` without clobbering your hand-edits.
 
 ## OVERVIEW
 
-When [`igntui generate --output FILE`](../reference/igntui-generate.md)
-or the TUI Save dialog writes a `.gitignore`, the generated content is
-wrapped between two marker comments:
+When [`igntui generate --output FILE`](../reference/igntui-generate.md) or the TUI
+Save dialog writes a `.gitignore`, it writes **two marked regions**:
 
 ```
 # >>> igntui >>> (do not edit between these markers; managed by igntui)
@@ -17,45 +16,65 @@ __pycache__/
 ...
 # End of https://www.toptal.com/developers/gitignore/api/python
 # <<< igntui <<<
+
+# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+secrets.local.json
+*.local
+# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
 ```
 
-On a re-save, only the region **between the markers** is replaced. Anything
-above the BEGIN marker or below the END marker is preserved verbatim.
+- The **generated region** is replaced wholesale on every save. Nothing you put
+  there survives — it belongs to the template content.
+- The **custom-patterns region** is where your own rules go. igntui reads its
+  body out of the existing file and writes it back unchanged on every save.
+- Anything **outside both regions** is also preserved verbatim.
+
+The custom region is written empty on a first save, so the place to put your own
+rules is already there and labelled.
 
 ## WHY
 
 Common workflow:
 
 1. Run `igntui generate python --output .gitignore`.
-2. Add a project-specific rule by hand: `secrets.local.json`.
+2. Add a project-specific rule inside the custom-patterns region:
+   `secrets.local.json`.
 3. Re-run `igntui generate python node --output .gitignore --force` to add
    another stack.
 
-Without managed blocks, step 3 would overwrite step 2's edit. With managed
-blocks, the hand-edited rule survives because it lives outside the markers.
+Step 3 replaces the generated region and carries step 2's rule across untouched.
+Rules written outside both regions survive too — the custom region exists so
+there is one obvious, labelled place for them, and so a reader of the file knows
+which lines igntui will overwrite.
 
 ## EXACT MARKERS
 
 ```
-BEGIN_MARKER  = "# >>> igntui >>> (do not edit between these markers; managed by igntui)"
-END_MARKER    = "# <<< igntui <<<"
+BEGIN_MARKER         = "# >>> igntui >>> (do not edit between these markers; managed by igntui)"
+END_MARKER           = "# <<< igntui <<<"
+CUSTOM_BEGIN_MARKER  = "# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<"
+CUSTOM_END_MARKER    = "# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<"
 ```
 
-These strings are matched **exactly**. Don't paraphrase them.
+These strings are matched **exactly**. Don't paraphrase them — a marker igntui
+does not recognise means the next save appends a second block instead of
+replacing the first. They are pinned by tests for the same reason.
 
 ## MERGE BEHAVIOR
 
-When writing `new_content` to a file with optional existing content
-`existing`:
+When writing `new_content` to a file with optional existing content `existing`:
 
-| `existing`                                | Behavior                                                    |
-| ----------------------------------------- | ----------------------------------------------------------- |
-| `None` or empty                           | Wrap `new_content` in markers; write                        |
-| has both markers in correct order         | Replace text between markers; preserve above/below verbatim |
-| has only one marker (or END before BEGIN) | Append a fresh wrapped block at the end + log a warning     |
-| no markers                                | Append a wrapped block at the end (legacy file)             |
+| `existing`                                | Behavior                                                                     |
+| ----------------------------------------- | ---------------------------------------------------------------------------- |
+| `None` or empty                           | Write both regions; custom region empty                                      |
+| has both markers in correct order         | Replace the generated region, carry the custom region's body over, preserve above/below verbatim |
+| has a generated region but no custom one  | Add an empty custom region after it                                          |
+| has only one marker (or END before BEGIN) | Append a fresh pair of regions at the end + log a warning; nothing discarded  |
+| no markers                                | Append both regions after the existing content (legacy file)                 |
+| custom BEGIN with no matching END         | Leave those lines where they are and start a new empty custom region + warn   |
 
-Idempotent: re-saving the same content yields exactly one marker pair.
+Idempotent: re-saving yields exactly one of each marker, however many times you
+run it.
 
 ## EXAMPLE
 
@@ -68,6 +87,10 @@ build/
 # >>> igntui >>> (do not edit between these markers; managed by igntui)
 *.pyc
 # <<< igntui <<<
+
+# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+secrets.local.json
+# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
 
 # more custom rules
 *.log
@@ -83,36 +106,41 @@ build/
 *.tmp
 # <<< igntui <<<
 
+# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+secrets.local.json
+# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+
 # more custom rules
 *.log
 ```
 
-The `# my custom rule`, `build/`, `# more custom rules`, and `*.log` lines
-are untouched. The managed block contents went from `*.pyc` to `*.tmp`.
+`# my custom rule`, `build/`, `secrets.local.json`, `# more custom rules`, and
+`*.log` are all untouched. Only the generated region went from `*.pyc` to
+`*.tmp`.
 
 ## OPTING OUT
 
-To write content **without** the markers (legacy / manually-curated
-workflow), use `--append`:
+To write content **without** the markers (legacy / manually-curated workflow),
+use `--append`:
 
 ```
 $ igntui generate python --output .gitignore --append
 ✓ Appended to .gitignore
 ```
 
-`--append` writes raw content with a separator comment, and does not
-refresh the [sidecar](../files/igntui-cfg-toml.md). It is mutually
-exclusive with managed-block semantics.
+`--append` writes raw content with a separator comment, and does not refresh the
+[sidecar](../files/igntui-cfg-toml.md). It is mutually exclusive with
+managed-block semantics.
 
 ## DIFF PREVIEW (TUI)
 
-When saving from the TUI to an existing file, a `DiffPreviewDialog` shows
-a unified diff between current and proposed contents before applying the
-change. With managed blocks active, the diff is **small** — usually just
-the lines inside the marker pair — making review fast.
+When saving from the TUI to an existing file, a `DiffPreviewDialog` shows a
+unified diff between current and proposed contents before applying the change.
+With managed blocks active, the diff is **small** — usually just the lines inside
+the generated region — making review fast.
 
-If the diff is empty (no semantic change), the save is short-circuited
-with a status message and the file is not rewritten.
+If the diff is empty (no semantic change), the save is short-circuited with a
+status message and the file is not rewritten.
 
 ## SEE ALSO
 

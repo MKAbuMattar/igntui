@@ -115,9 +115,7 @@ def test_no_output_prints_to_stdout(capsys):
 
 def test_failure_response_returns_nonzero(capsys):
     cli = MagicMock()
-    cli.api.get_templates.return_value = APIResponse(
-        success=False, data="", error_message="boom"
-    )
+    cli.api.get_templates.return_value = APIResponse(success=False, data="", error_message="boom")
     cmd = GenerateCommand(cli)
     rc = cmd.execute(_make_args())
     out = capsys.readouterr()

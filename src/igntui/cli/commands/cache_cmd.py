@@ -16,20 +16,17 @@ class CacheCommand(CLICommand):
         subparsers = parser.add_subparsers(dest="cache_action", help="Cache action")
 
         clear_parser = subparsers.add_parser("clear", help="Clear cache")
-        clear_parser.add_argument(
-            "--force", action="store_true", help="Skip confirmation prompt"
-        )
+        clear_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
 
         subparsers.add_parser("stats", help="Show cache statistics")
         subparsers.add_parser("info", help="Show cache information")
 
     def execute(self, args: argparse.Namespace) -> int:
         try:
-            from ...core.cache import CacheManager
-            from ...core.config import config
-
-            cache_dir = config.get_cache_dir()
-            cache = CacheManager(cache_dir=str(cache_dir))
+            # The manager the rest of the session uses. Constructing a fresh one
+            # here reported the default TTL rather than the configured
+            # `api.cache_ttl`, and re-read every cache file to do it.
+            cache = self.cli.api.cache_manager
 
             if not args.cache_action or args.cache_action == "info":
                 return self._show_info(cache)

@@ -75,16 +75,12 @@ class RepoConfig:
         selection = data.get("selection", {}) or {}
         templates = selection.get("templates", [])
         if not isinstance(templates, list):
-            logger.warning(
-                "%s [selection].templates must be a list; ignoring", path
-            )
+            logger.warning("%s [selection].templates must be a list; ignoring", path)
             templates = []
 
         search_mode = selection.get("search_mode")
         if search_mode is not None and search_mode not in {"fuzzy", "exact", "regex"}:
-            logger.warning(
-                "%s [selection].search_mode=%r is invalid; ignoring", path, search_mode
-            )
+            logger.warning("%s [selection].search_mode=%r is invalid; ignoring", path, search_mode)
             search_mode = None
 
         return cls(

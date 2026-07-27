@@ -15,6 +15,27 @@ def _write_toml(path: Path, data: dict) -> None:
         tomli_w.dump(data, f)
 
 
+def test_set_does_not_leak_into_the_class_defaults(tmp_path):
+    """`set()` used to write straight into `Config.DEFAULT_CONFIG`.
+
+    The nested section dicts were shared with the class attribute, so one
+    instance's write became every later instance's starting value — and
+    `reset_to_defaults()` could never undo it.
+    """
+    original = Config.DEFAULT_CONFIG["api"]["timeout"]
+
+    first = Config(config_path=tmp_path / "absent-a.toml")
+    first.set("api", "timeout", value=original + 123)
+
+    second = Config(config_path=tmp_path / "absent-b.toml")
+
+    assert second.get("api", "timeout") == original
+    assert Config.DEFAULT_CONFIG["api"]["timeout"] == original
+
+    first.reset_to_defaults()
+    assert first.get("api", "timeout") == original
+
+
 def test_repo_config_overrides_user_config(tmp_path):
     user_path = tmp_path / "user.cfg.toml"
     repo_path = tmp_path / "repo.cfg.toml"

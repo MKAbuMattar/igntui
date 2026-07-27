@@ -1,6 +1,5 @@
 """Tests for the per-output sidecar (Phase 2.4 + Phase 6.1)."""
 
-
 from igntui.core.project_config import (
     LEGACY_SIDECAR_FILENAME,
     SCHEMA_VERSION,
@@ -60,9 +59,7 @@ def test_load_tolerates_missing_sections(tmp_path):
 
 def test_load_rejects_non_list_templates(tmp_path):
     p = tmp_path / SIDECAR_FILENAME
-    p.write_text(
-        'schema_version = 1\n[selection]\ntemplates = "python"\n'
-    )
+    p.write_text('schema_version = 1\n[selection]\ntemplates = "python"\n')
     cfg = ProjectConfig.load(p)
     assert cfg is not None
     assert cfg.templates == []  # gracefully ignored

@@ -4,15 +4,19 @@
 import curses
 import logging
 from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class EventHandler:
-    def __init__(self, state, lifecycle, stdscr=None):
+    def __init__(self, state, lifecycle, stdscr: Any = None):
         self.state = state
         self.lifecycle = lifecycle
-        self.stdscr = stdscr
+        # A curses window has no public type; `Any` keeps the mouse helpers
+        # (which are only reached after `_handle_mouse` proves it is not None)
+        # from tripping the type checker on every `stdscr.` access.
+        self.stdscr: Any = stdscr
         self.on_quit: Callable[[], None] | None = None
         self.on_help: Callable[[], None] | None = None
         self.on_info: Callable[[], None] | None = None
@@ -160,8 +164,8 @@ class EventHandler:
         if key in (8, 127, curses.KEY_BACKSPACE):
             if self.state.cursor_position > 0:
                 self.state.filter_text = (
-                    self.state.filter_text[:self.state.cursor_position - 1] +
-                    self.state.filter_text[self.state.cursor_position:]
+                    self.state.filter_text[: self.state.cursor_position - 1]
+                    + self.state.filter_text[self.state.cursor_position :]
                 )
                 self.state.cursor_position -= 1
                 self._apply_filter()
@@ -170,8 +174,8 @@ class EventHandler:
         elif key == curses.KEY_DC:
             if self.state.cursor_position < len(self.state.filter_text):
                 self.state.filter_text = (
-                    self.state.filter_text[:self.state.cursor_position] +
-                    self.state.filter_text[self.state.cursor_position + 1:]
+                    self.state.filter_text[: self.state.cursor_position]
+                    + self.state.filter_text[self.state.cursor_position + 1 :]
                 )
                 self._apply_filter()
                 self.state.adjust_template_selection_bounds()
@@ -180,7 +184,9 @@ class EventHandler:
             self.state.cursor_position = max(0, self.state.cursor_position - 1)
 
         elif key == curses.KEY_RIGHT:
-            self.state.cursor_position = min(len(self.state.filter_text), self.state.cursor_position + 1)
+            self.state.cursor_position = min(
+                len(self.state.filter_text), self.state.cursor_position + 1
+            )
 
         elif key == curses.KEY_HOME:
             self.state.cursor_position = 0
@@ -204,9 +210,9 @@ class EventHandler:
         elif 32 <= key <= 126:
             char = chr(key)
             self.state.filter_text = (
-                self.state.filter_text[:self.state.cursor_position] +
-                char +
-                self.state.filter_text[self.state.cursor_position:]
+                self.state.filter_text[: self.state.cursor_position]
+                + char
+                + self.state.filter_text[self.state.cursor_position :]
             )
             self.state.cursor_position += 1
             self._apply_filter()
@@ -271,9 +277,7 @@ class EventHandler:
         elif self.state.current_panel == 2:
             selected_count = self.state.get_selection_count()
             if selected_count > 0:
-                self.state.selected_index = min(
-                    selected_count - 1, self.state.selected_index + 1
-                )
+                self.state.selected_index = min(selected_count - 1, self.state.selected_index + 1)
         elif self.state.current_panel == 3:
             content_lines = len(self.state.generated_content.split("\n"))
             self.state.content_scroll = min(
@@ -298,9 +302,7 @@ class EventHandler:
         elif self.state.current_panel == 2:
             selected_count = self.state.get_selection_count()
             if selected_count > 0:
-                self.state.selected_index = min(
-                    selected_count - 1, self.state.selected_index + 10
-                )
+                self.state.selected_index = min(selected_count - 1, self.state.selected_index + 10)
         elif self.state.current_panel == 3:
             self.state.content_scroll += 10
 
@@ -399,9 +401,7 @@ class EventHandler:
                 return
             visible = self._templates_visible_count()
             max_scroll = max(0, len(display) - visible)
-            new_scroll = max(
-                0, min(max_scroll, self.state.template_scroll + direction)
-            )
+            new_scroll = max(0, min(max_scroll, self.state.template_scroll + direction))
             self.state.template_scroll = new_scroll
             sel = self.state.template_selected
             if sel < new_scroll:
@@ -414,9 +414,7 @@ class EventHandler:
                 return
             visible = self._selected_visible_count()
             max_scroll = max(0, count - visible)
-            new_scroll = max(
-                0, min(max_scroll, self.state.selected_scroll + direction)
-            )
+            new_scroll = max(0, min(max_scroll, self.state.selected_scroll + direction))
             self.state.selected_scroll = new_scroll
             idx = self.state.selected_index
             if idx < new_scroll:
@@ -450,9 +448,7 @@ class EventHandler:
     def _handle_selection(self) -> None:
         if self.state.current_panel == 1:
             display_templates = self.state.get_display_templates()
-            if display_templates and self.state.template_selected < len(
-                display_templates
-            ):
+            if display_templates and self.state.template_selected < len(display_templates):
                 template = display_templates[self.state.template_selected]
                 was_selected = template in self.state.selected_templates
                 self.state.toggle_template_selection(template)
@@ -474,9 +470,7 @@ class EventHandler:
                 self.state.set_status_message(f"Removed: {template_to_remove}")
 
                 if self.state.selected_index >= self.state.get_selection_count():
-                    self.state.selected_index = max(
-                        0, self.state.get_selection_count() - 1
-                    )
+                    self.state.selected_index = max(0, self.state.get_selection_count() - 1)
 
                 if self.on_generate:
                     self.on_generate()

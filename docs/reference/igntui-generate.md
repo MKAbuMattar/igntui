@@ -23,10 +23,12 @@ either prints the result to stdout or writes it to a file.
 When writing to a file (`--output`), `igntui generate` performs two
 additional actions by default:
 
-1. **Wraps content in managed-block markers**
-   (`# >>> igntui >>>` … `# <<< igntui <<<`). On re-save, only the managed
-   block is replaced; user edits outside the markers are preserved.
-   See [Managed blocks](../concepts/managed-blocks.md).
+1. **Writes two marked regions**: the generated content between
+   `# >>> igntui >>>` … `# <<< igntui <<<`, then a custom-patterns region
+   (`# >>> Start of custom patterns … <<<` … `# >>> End of custom patterns … <<<`)
+   for your own rules. On re-save only the generated region is replaced; the
+   custom region's contents are carried over verbatim, as is anything outside
+   both regions. See [Managed blocks](../concepts/managed-blocks.md).
 2. **Writes a sidecar** [`.igntui.cfg.toml`](../files/igntui-cfg-toml.md)
    alongside the output file, pinning the template list. Subsequent runs
    of `igntui` (TUI mode) in the same directory auto-load the sidecar.

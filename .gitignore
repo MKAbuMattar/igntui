@@ -289,3 +289,10 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,python,visualstudiocode
 # <<< igntui <<<
+
+# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+
+# serena cache/configuration files
+.serena
+
+# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<

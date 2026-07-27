@@ -1,0 +1,64 @@
+name: Bug report
+description: Something in the CLI or the core behaves incorrectly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For anything about how the **TUI looks or responds**, use the
+        "TUI / rendering problem" form instead — it asks for the terminal details
+        that make those reports actionable.
+
+  - type: input
+    id: version
+    attributes:
+      label: igntui version
+      description: Output of `igntui --version` (it includes Python and OS).
+      placeholder: igntui/0.1.1 Python/3.13.1 Linux/6.8.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command you ran
+      description: The exact command, including flags.
+      render: shell
+      placeholder: igntui generate python node --output .gitignore
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: Paste the output. If it errored, re-run with `--verbose` and paste that.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration
+      description: >-
+        Any `~/.igntui.cfg.toml`, `.igntui.repo.cfg.toml`, or `.igntui.cfg.toml`
+        sidecar in play, plus any `IGNTUI_*` environment variables. Redact
+        anything private.
+      render: toml
+
+  - type: checkboxes
+    id: isolation
+    attributes:
+      label: Narrowing it down
+      options:
+        - label: It still happens with `--no-cache`
+        - label: It still happens after `igntui cache clear`
+        - label: The file I was writing to already contained an igntui managed block

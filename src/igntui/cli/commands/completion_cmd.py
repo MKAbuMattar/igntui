@@ -100,6 +100,7 @@ complete -c igntui -l version -d "Show version"
 complete -c igntui -l verbose -d "Verbose output"
 complete -c igntui -l no-cache -d "Disable caching"
 complete -c igntui -l config -d "Custom config file" -r
+complete -c igntui -l log-level -d "Set logging level" -x -a "DEBUG INFO WARNING ERROR CRITICAL"
 
 complete -c igntui -n "__fish_seen_subcommand_from tui" -l no-splash -d "Skip splash"
 complete -c igntui -n "__fish_seen_subcommand_from list" -l filter -d "Filter pattern" -r

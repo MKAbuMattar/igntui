@@ -2,7 +2,7 @@
 
 
 from .actions import TUIActions
-from .app import GitIgnoreTUI, main
+from .app import GitIgnoreTUI
 from .curses_setup import CursesSetup
 from .event_handler import EventHandler
 from .lifecycle import TemplateLifecycle
@@ -11,7 +11,6 @@ from .state import TUIState
 
 __all__ = [
     "GitIgnoreTUI",
-    "main",
     "TUIState",
     "CursesSetup",
     "TemplateLifecycle",

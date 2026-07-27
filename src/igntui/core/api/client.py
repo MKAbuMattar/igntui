@@ -59,9 +59,7 @@ class GitIgnoreAPI:
             logger.error("Failed to fetch template list: %s", e)
             return APIResponse(success=False, data=[], error_message=str(e))
 
-    def get_templates(
-        self, technologies: list[str], force_refresh: bool = False
-    ) -> APIResponse:
+    def get_templates(self, technologies: list[str], force_refresh: bool = False) -> APIResponse:
         force_refresh = force_refresh or self.force_refresh_default
         if not technologies:
             return APIResponse(
@@ -71,9 +69,7 @@ class GitIgnoreAPI:
 
         clean_techs = self._clean_technology_names(technologies)
         if not clean_techs:
-            return APIResponse(
-                success=False, data="", error_message="No valid templates provided"
-            )
+            return APIResponse(success=False, data="", error_message="No valid templates provided")
 
         if not force_refresh:
             cached_content = self.template_cache.get_template_content(clean_techs)
@@ -99,7 +95,7 @@ class GitIgnoreAPI:
             logger.error("Failed to fetch template content: %s", e)
 
             fallback_content = f"""# Error generating content: {e}
-# Selected templates: {', '.join(clean_techs)}
+# Selected templates: {", ".join(clean_techs)}
 #
 # This error typically means:
 # - Network connectivity issues
@@ -108,17 +104,13 @@ class GitIgnoreAPI:
 #
 # Try refreshing the template list or check your internet connection."""
 
-            return APIResponse(
-                success=False, data=fallback_content, error_message=str(e)
-            )
+            return APIResponse(success=False, data=fallback_content, error_message=str(e))
 
     def test_connection(self) -> APIResponse:
         try:
             logger.info("Testing API connectivity...")
 
-            response = self.request_handler.make_request(
-                f"{self.base_url}/list?limit=1"
-            )
+            response = self.request_handler.make_request(f"{self.base_url}/list?limit=1")
 
             if response.success:
                 test_results = {
@@ -138,17 +130,13 @@ class GitIgnoreAPI:
 
         except Exception as e:
             logger.error("API connection test failed: %s", e)
-            return APIResponse(
-                success=False, data={"status": "error"}, error_message=str(e)
-            )
+            return APIResponse(success=False, data={"status": "error"}, error_message=str(e))
 
     def get_stats(self) -> dict[str, Any]:
         request_stats = self.request_handler.get_stats()
         total_requests = request_stats["requests_made"]
         avg_response_time = (
-            request_stats["total_response_time"] / total_requests
-            if total_requests > 0
-            else 0.0
+            request_stats["total_response_time"] / total_requests if total_requests > 0 else 0.0
         )
 
         cache_stats = self.cache_manager.get_stats()
@@ -168,17 +156,13 @@ class GitIgnoreAPI:
                     self.stats["cache_hits"]
                     / max(1, self.stats["cache_hits"] + self.stats["cache_misses"])
                 ),
-                "total_cache_operations": self.stats["cache_hits"]
-                + self.stats["cache_misses"],
+                "total_cache_operations": self.stats["cache_hits"] + self.stats["cache_misses"],
             },
         }
 
     def clear_cache(self) -> None:
         self.cache_manager.clear()
         logger.info("Cleared all API cache data")
-
-    def invalidate_template(self, template_name: str) -> int:
-        return self.template_cache.invalidate_template_content(template_name)
 
     def _parse_template_list(self, response_text: str) -> list[str]:
         all_templates = []

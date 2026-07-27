@@ -48,9 +48,7 @@ def test_load_success_posts_loaded_then_completed():
 
 def test_load_failure_posts_failed_then_completed():
     api = MagicMock()
-    api.list_templates.return_value = APIResponse(
-        success=False, data=[], error_message="boom"
-    )
+    api.list_templates.return_value = APIResponse(success=False, data=[], error_message="boom")
     lc = TemplateLifecycle(api, SearchManager())
 
     q: queue.Queue[StateUpdate] = queue.Queue()
@@ -63,9 +61,7 @@ def test_load_failure_posts_failed_then_completed():
 
 def test_generate_success_posts_content_then_completed():
     api = MagicMock()
-    api.get_templates.return_value = APIResponse(
-        success=True, data="GENERATED", from_cache=True
-    )
+    api.get_templates.return_value = APIResponse(success=True, data="GENERATED", from_cache=True)
     lc = TemplateLifecycle(api, SearchManager())
 
     q: queue.Queue[StateUpdate] = queue.Queue()

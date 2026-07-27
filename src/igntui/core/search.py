@@ -47,15 +47,11 @@ class SearchEngine(ABC):
         }
 
     @abstractmethod
-    def search(
-        self, items: list[str], query: str, max_results: int = 100
-    ) -> SearchResults:
+    def search(self, items: list[str], query: str, max_results: int = 100) -> SearchResults:
         pass
 
     def get_stats(self) -> dict[str, Any]:
-        avg_search_time = self.stats["total_search_time"] / max(
-            1, self.stats["searches_performed"]
-        )
+        avg_search_time = self.stats["total_search_time"] / max(1, self.stats["searches_performed"])
 
         return {
             "searches_performed": self.stats["searches_performed"],
@@ -69,15 +65,12 @@ class FuzzySearchEngine(SearchEngine):
         super().__init__()
         self.case_sensitive = case_sensitive
 
-    def search(
-        self, items: list[str], query: str, max_results: int = 100
-    ) -> SearchResults:
+    def search(self, items: list[str], query: str, max_results: int = 100) -> SearchResults:
         start_time = time.time()
 
         if not query.strip():
             results = [
-                SearchResult(item, 1.0, [], SearchMode.FUZZY)
-                for item in items[:max_results]
+                SearchResult(item, 1.0, [], SearchMode.FUZZY) for item in items[:max_results]
             ]
         else:
             scored_results = []
@@ -88,9 +81,7 @@ class FuzzySearchEngine(SearchEngine):
                 score, positions = self._fuzzy_match(search_query, search_item)
 
                 if score > 0:
-                    scored_results.append(
-                        SearchResult(item, score, positions, SearchMode.FUZZY)
-                    )
+                    scored_results.append(SearchResult(item, score, positions, SearchMode.FUZZY))
 
             scored_results.sort(key=lambda x: (-x.score, x.item.lower()))
             results = scored_results[:max_results]
@@ -113,9 +104,7 @@ class FuzzySearchEngine(SearchEngine):
             total_items=len(items),
         )
 
-    def _fuzzy_match(
-        self, query: str, text: str
-    ) -> tuple[float, list[tuple[int, int]]]:
+    def _fuzzy_match(self, query: str, text: str) -> tuple[float, list[tuple[int, int]]]:
         if not query:
             return 1.0, []
 
@@ -146,9 +135,7 @@ class FuzzySearchEngine(SearchEngine):
             return 0.0, []
 
         match_ratio = matches / len(query)
-        length_penalty = 1.0 - (
-            abs(len(text) - len(query)) / max(len(text), len(query))
-        )
+        length_penalty = 1.0 - (abs(len(text) - len(query)) / max(len(text), len(query)))
 
         start_bonus = 1.0
         if positions and positions[0][0] == 0:
@@ -164,15 +151,12 @@ class ExactSearchEngine(SearchEngine):
         super().__init__()
         self.case_sensitive = case_sensitive
 
-    def search(
-        self, items: list[str], query: str, max_results: int = 100
-    ) -> SearchResults:
+    def search(self, items: list[str], query: str, max_results: int = 100) -> SearchResults:
         start_time = time.time()
 
         if not query.strip():
             results = [
-                SearchResult(item, 1.0, [], SearchMode.EXACT)
-                for item in items[:max_results]
+                SearchResult(item, 1.0, [], SearchMode.EXACT) for item in items[:max_results]
             ]
         else:
             results = []
@@ -196,9 +180,7 @@ class ExactSearchEngine(SearchEngine):
                     if search_query == search_item:
                         score = 1.0
 
-                    results.append(
-                        SearchResult(item, score, positions, SearchMode.EXACT)
-                    )
+                    results.append(SearchResult(item, score, positions, SearchMode.EXACT))
 
                 if len(results) >= max_results:
                     break
@@ -230,15 +212,12 @@ class RegexSearchEngine(SearchEngine):
         self.case_sensitive = case_sensitive
         self._compiled_patterns = {}
 
-    def search(
-        self, items: list[str], query: str, max_results: int = 100
-    ) -> SearchResults:
+    def search(self, items: list[str], query: str, max_results: int = 100) -> SearchResults:
         start_time = time.time()
 
         if not query.strip():
             results = [
-                SearchResult(item, 1.0, [], SearchMode.REGEX)
-                for item in items[:max_results]
+                SearchResult(item, 1.0, [], SearchMode.REGEX) for item in items[:max_results]
             ]
         else:
             results = []
@@ -251,14 +230,10 @@ class RegexSearchEngine(SearchEngine):
 
                     if matches:
                         positions = [(match.start(), match.end()) for match in matches]
-                        total_match_length = sum(
-                            end - start for start, end in positions
-                        )
+                        total_match_length = sum(end - start for start, end in positions)
                         score = total_match_length / len(item)
 
-                        results.append(
-                            SearchResult(item, score, positions, SearchMode.REGEX)
-                        )
+                        results.append(SearchResult(item, score, positions, SearchMode.REGEX))
 
                     if len(results) >= max_results:
                         break

@@ -69,8 +69,6 @@ class ContentPanel(BasePanel):
             try:
                 info_x = self.x + len(title) + 2
                 if info_x + len(scroll_info) < self.x + self.width - 1:
-                    self.stdscr.addstr(
-                        self.y, info_x, scroll_info, curses.color_pair(1)
-                    )
+                    self.stdscr.addstr(self.y, info_x, scroll_info, curses.color_pair(1))
             except curses.error:
                 pass

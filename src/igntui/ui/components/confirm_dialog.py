@@ -24,9 +24,7 @@ class ConfirmDialog(BaseDialog):
     def show(self) -> bool:
         lines = self.message.split("\n")
         content_width = max(len(line) for line in lines) + 4
-        content_width = max(
-            content_width, len(self.confirm_text) + len(self.cancel_text) + 10
-        )
+        content_width = max(content_width, len(self.confirm_text) + len(self.cancel_text) + 10)
         width = min(60, max(30, content_width))
         height = len(lines) + 6
 
@@ -68,9 +66,7 @@ class ConfirmDialog(BaseDialog):
 
                 help_text = "Tab: Navigate | Enter: Select | ESC: Cancel"
                 help_x = x + (width - len(help_text)) // 2
-                self.stdscr.addstr(
-                    y + height - 2, help_x, help_text, curses.color_pair(1)
-                )
+                self.stdscr.addstr(y + height - 2, help_x, help_text, curses.color_pair(1))
 
             except curses.error:
                 pass
@@ -89,11 +85,7 @@ class ConfirmDialog(BaseDialog):
                 self.selected_button = 0
             elif key == curses.KEY_RIGHT:
                 self.selected_button = 1
-            elif key in [ord("y"), ord("Y")] and self.confirm_text.lower().startswith(
-                "y"
-            ):
+            elif key in [ord("y"), ord("Y")] and self.confirm_text.lower().startswith("y"):
                 return True
-            elif key in [ord("n"), ord("N")] and self.cancel_text.lower().startswith(
-                "n"
-            ):
+            elif key in [ord("n"), ord("N")] and self.cancel_text.lower().startswith("n"):
                 return False

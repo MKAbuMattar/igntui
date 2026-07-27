@@ -4,6 +4,107 @@ All notable changes to igntui are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.2.0] — 2026-07-27
+
+### Added
+
+- **A custom-patterns region in generated `.gitignore` files.** Alongside the
+  managed block that holds template content, igntui now writes a second marked
+  region:
+
+  ```gitignore
+  # >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+  # >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+  ```
+
+  Its contents are read out of the existing file and written back verbatim on
+  every save, so project-specific rules have one obvious, labelled home instead
+  of relying on "anywhere outside the markers". Rules outside both regions are
+  still preserved. A file written by an earlier version gains an empty custom
+  region on its next save; nothing is discarded and the block cannot be
+  duplicated across repeated saves.
+
+### Fixed
+
+- **`--log-level` was parsed and then ignored**, and the `[logging]` config
+  section had no reader at all. Both did nothing: file logging, rotation,
+  `IGNTUI_LOG_LEVEL`, and the level itself. The implementation already existed in
+  `cli/setup.py` and nothing called it — `main()` and `tui_main()` call it now.
+- **`Config.set()` wrote into the class-level defaults.** The nested section
+  dicts were shared with `Config.DEFAULT_CONFIG`, so one instance's write became
+  the starting value for every instance built afterwards in the same process, and
+  `reset_to_defaults()` could never undo it.
+- **`igntui test` always reported `Response time: 0.000s` and `Status code: N/A`.**
+  The timing lives in the response payload, not on the wrapper the command was
+  reading. It now reports the real latency, the endpoint, and how many entries are
+  cached.
+- **The GPL licence text shipped in neither the wheel nor the sdist.** The SPDX
+  metadata field was set, but the only thing that would have included the file was
+  a `[tool.hatch.build]` table that this project's build backend never reads.
+- **The README said MIT.** The LICENSE file, the badge, the package metadata, and
+  the changelog all say GPL-3.0-or-later.
+- Three type errors outside `core/`: an implicit shadow of `run_tui` in
+  `__init__.py`, a bare `Optional` annotation in `tui/curses_setup.py` (which
+  annotates nothing), and a possibly-`None` `stdscr` in the mouse handler.
+- README: the development commands referenced `black`, `isort` and `mypy` — none
+  of which CI runs — and a test path that does not exist; troubleshooting
+  suggested `igntui cache --clear` instead of `igntui cache clear`.
+- **`--config` and `--no-cache` never reached `igntui test`.** The command built
+  its own `GitIgnoreAPI` instead of using the session's, so it tested a different
+  configuration than the one in effect.
+- **`igntui cache info` reported the wrong TTL.** It built its own
+  `CacheManager`, which defaults to 3600 regardless of `api.cache_ttl` — and
+  re-read every cache file from disk to do it.
+- **The fish completion was missing `--log-level`**, which bash and zsh both
+  offered. Found by a new test that compares each emitted script against the real
+  argparse tree.
+
+### Removed
+
+- `src/igntui/utils/` — 287 lines of logging and performance-metric machinery that
+  nothing imported, and the only module in the package at 0% coverage.
+- `TemplateCache.invalidate_template_content()` and
+  `GitIgnoreAPI.invalidate_template()`. Content cache keys have been sha256
+  prefixes since 0.0.2, so matching a template name against a key could only ever
+  hit by accident — and a short hex-ish name like `cafe` would delete unrelated
+  entries. Neither had any caller. `igntui cache clear` is the honest operation.
+- A second, unused `main()` in `tui/app.py` that duplicated `app.py:run_tui()`
+  with different exit handling, plus `check_curses_availability()`, which was
+  exported and never called.
+- `MANIFEST.in`, which the `uv_build` backend does not read.
+
+### Added for contributors
+
+- `AGENTS.md` and `CLAUDE.md` cover the module layout, the queue-based threading
+  model in the TUI, the config cascade, the managed-block format, and how to
+  verify a change you cannot see in a diff.
+- `ROADMAP.md` — what is queued, with the evidence for each item, plus what has
+  been rejected on purpose.
+- `scripts/release_version.py` owns the two files that carry the version, and CI
+  now fails if they disagree. `.github/workflows/release.yml` publishes to PyPI
+  from a `release/<version>` branch with a labelled pull request: preparing is
+  repeatable, merging is the one irreversible step.
+- CI type-checks all of `src/igntui` instead of only `core/`, which is what
+  surfaced the three errors above, and gates `ruff format --check` now that the
+  tree is formatted consistently (43 of 76 files disagreed with it before).
+- Coverage 46% → 66%, aimed at the half that had none: `cli/parser.py` 14% → 100%,
+  `completion_cmd.py` 0% → 93%, `tui/event_handler.py` 7% → 63%, `tui/state.py`
+  54% → 84%, plus the `list` / `cache` / `test` command output paths and their exit
+  codes. 201 tests, up from 96.
+- Community health files: `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
+  a pull request template, issue forms, `CODEOWNERS`, and `dependabot.yml`. Bug
+  reports and TUI problems are separate forms because they need different
+  evidence: "it looks wrong" is unactionable without the terminal emulator,
+  `$TERM`, size, and locale, so that form asks for all four.
+- `py.typed`, so the annotations are visible to anything installing this package.
+- Dead configuration removed from `pyproject.toml`: the `[tool.hatch.*]` tables
+  (inert under `uv_build`), `[tool.isort]` (which set a line length contradicting
+  ruff's), and the `black` / `isort` / `flake8` / `mypy` / `hatch` / `pre-commit`
+  dev dependencies that nothing invoked. The `uv_build` upper bound was widened so
+  a current uv no longer warns on every build.
+
 ## [0.1.1] — 2026-04-27
 
 ### Changed
@@ -184,6 +285,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
 
 - Initial release.
 
+[0.2.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.2.0
 [0.1.1]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.1.0
 [0.0.2]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.0.2

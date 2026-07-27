@@ -22,9 +22,7 @@ class SelectedPanel(BasePanel):
             visible_count = self.height - 2
             if len(selected_list) > visible_count:
                 first_visible = self.selected_scroll + 1
-                last_visible = min(
-                    self.selected_scroll + visible_count, len(selected_list)
-                )
+                last_visible = min(self.selected_scroll + visible_count, len(selected_list))
                 scroll_info = f" ({first_visible}-{last_visible}/{len(selected_list)})"
                 if len(title) + len(scroll_info) > self.width - 6:
                     scroll_info = f" ({first_visible}-{last_visible})"
