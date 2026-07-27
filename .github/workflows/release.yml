@@ -226,5 +226,10 @@ jobs:
             ```
 
             [PyPI](https://pypi.org/project/igntui/${{ steps.version.outputs.version }}/)
-          files: dist/*
+          # Explicit, not `dist/*`: uv writes a `dist/.gitignore` containing `*`,
+          # which the glob picked up and GitHub attached as `default.gitignore`
+          # (asset names cannot start with a dot). One stray byte per release.
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
           make_latest: true
