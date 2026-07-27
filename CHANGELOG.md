@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-07-27
+
 ### Added
 
 - **A custom-patterns region in generated `.gitignore` files.** Alongside the
@@ -86,8 +88,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   repeatable, merging is the one irreversible step.
 - CI type-checks all of `src/igntui` instead of only `core/`, which is what
   surfaced the three errors above, and gates `ruff format --check` now that the
-  tree is formatted consistently (43 of 73 files disagreed with it before).
-- Coverage 46% → 62%, aimed at the half that had none: `cli/parser.py` 14% → 100%,
+  tree is formatted consistently (43 of 76 files disagreed with it before).
+- Coverage 46% → 66%, aimed at the half that had none: `cli/parser.py` 14% → 100%,
   `completion_cmd.py` 0% → 93%, `tui/event_handler.py` 7% → 63%, `tui/state.py`
   54% → 84%, plus the `list` / `cache` / `test` command output paths and their exit
   codes. 201 tests, up from 96.
@@ -283,6 +285,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
 
 - Initial release.
 
+[0.2.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.2.0
 [0.1.1]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.1.0
 [0.0.2]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.0.2
