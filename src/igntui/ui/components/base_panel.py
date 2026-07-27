@@ -5,9 +5,7 @@ import curses
 
 
 class BasePanel:
-    def __init__(
-        self, stdscr, y: int, x: int, height: int, width: int, title: str = ""
-    ):
+    def __init__(self, stdscr, y: int, x: int, height: int, width: int, title: str = ""):
         self.stdscr = stdscr
         self.y = y
         self.x = x
@@ -26,15 +24,11 @@ class BasePanel:
             self.stdscr.addch(self.y, self.x, "┌", border_attr)
             self.stdscr.addch(self.y, self.x + self.width - 1, "┐", border_attr)
             self.stdscr.addch(self.y + self.height - 1, self.x, "└", border_attr)
-            self.stdscr.addch(
-                self.y + self.height - 1, self.x + self.width - 1, "┘", border_attr
-            )
+            self.stdscr.addch(self.y + self.height - 1, self.x + self.width - 1, "┘", border_attr)
 
             for i in range(1, self.width - 1):
                 self.stdscr.addch(self.y, self.x + i, "─", border_attr)
-                self.stdscr.addch(
-                    self.y + self.height - 1, self.x + i, "─", border_attr
-                )
+                self.stdscr.addch(self.y + self.height - 1, self.x + i, "─", border_attr)
 
             for i in range(1, self.height - 1):
                 self.stdscr.addch(self.y + i, self.x, "│", border_attr)
@@ -66,8 +60,7 @@ class BasePanel:
         bar_height = height
         thumb_height = max(1, int((visible_items / total_items) * bar_height))
         thumb_position = int(
-            (scroll_position / max(1, total_items - visible_items))
-            * (bar_height - thumb_height)
+            (scroll_position / max(1, total_items - visible_items)) * (bar_height - thumb_height)
         )
 
         for i in range(bar_height):

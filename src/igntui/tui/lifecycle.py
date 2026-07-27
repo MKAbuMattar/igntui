@@ -100,9 +100,7 @@ class TemplateLifecycle:
         except Exception as e:
             logger.error("Error filtering templates: %s", e, exc_info=True)
             filter_lower = filter_text.lower()
-            return self._pin_recents(
-                [t for t in templates if filter_lower in t.lower()]
-            )
+            return self._pin_recents([t for t in templates if filter_lower in t.lower()])
 
     def _pin_recents(self, items: list[str]) -> list[str]:
         """Reorder so recent templates surface at the top of the filter result."""

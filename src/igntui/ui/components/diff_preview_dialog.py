@@ -129,6 +129,8 @@ class DiffPreviewDialog(BaseDialog):
     def _draw_help(self, y: int, x: int, width: int) -> None:
         help_text = "↑↓ scroll · PgUp/PgDn · y/n · Tab+Enter · Esc cancels"
         try:
-            self.stdscr.addstr(y, x + (width - len(help_text)) // 2, help_text, curses.color_pair(1))
+            self.stdscr.addstr(
+                y, x + (width - len(help_text)) // 2, help_text, curses.color_pair(1)
+            )
         except curses.error:
             pass

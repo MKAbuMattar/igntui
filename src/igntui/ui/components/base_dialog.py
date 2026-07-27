@@ -22,9 +22,7 @@ class BaseDialog:
         for row in range(max_y):
             for col in range(max_x):
                 try:
-                    self.stdscr.addch(
-                        row, col, " ", curses.color_pair(1) | curses.A_DIM
-                    )
+                    self.stdscr.addch(row, col, " ", curses.color_pair(1) | curses.A_DIM)
                 except curses.error:
                     pass
 
@@ -66,8 +64,6 @@ class BaseDialog:
             if title:
                 title_text = f" {title} "
                 title_x = x + (width - len(title_text)) // 2
-                self.stdscr.addstr(
-                    y, title_x, title_text, curses.color_pair(2) | curses.A_BOLD
-                )
+                self.stdscr.addstr(y, title_x, title_text, curses.color_pair(2) | curses.A_BOLD)
         except curses.error:
             pass

@@ -22,7 +22,9 @@ class StatusBar:
         active_panel = panel_names[current_panel]
 
         if current_panel == 0:
-            controls = f"[{active_panel}] Mode:{current_search_mode.upper()} | F1-F3:Switch | Ctrl+U:Clear"
+            controls = (
+                f"[{active_panel}] Mode:{current_search_mode.upper()} | F1-F3:Switch | Ctrl+U:Clear"
+            )
         elif current_panel == 1:
             controls = f"[{active_panel}] Space:Select | a:All | x:Clear | F5:Refresh"
         elif current_panel == 2:
@@ -42,9 +44,7 @@ class StatusBar:
             if message_len > available_space // 2:
                 max_msg_len = available_space // 2
                 message = (
-                    message[: max_msg_len - 3] + "..."
-                    if len(message) > max_msg_len
-                    else message
+                    message[: max_msg_len - 3] + "..." if len(message) > max_msg_len else message
                 )
 
             remaining_space = available_space - len(message) - 3

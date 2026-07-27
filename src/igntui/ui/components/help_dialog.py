@@ -109,21 +109,14 @@ class HelpDialog(BaseDialog):
                 for i in range(content_height):
                     try:
                         if i == 0 and self.scroll_position > 0:
-                            self.stdscr.addch(
-                                y + 2 + i, scrollbar_x, "▲", curses.color_pair(1)
-                            )
+                            self.stdscr.addch(y + 2 + i, scrollbar_x, "▲", curses.color_pair(1))
                         elif (
                             i == content_height - 1
-                            and self.scroll_position + content_height
-                            < len(self.help_content)
+                            and self.scroll_position + content_height < len(self.help_content)
                         ):
-                            self.stdscr.addch(
-                                y + 2 + i, scrollbar_x, "▼", curses.color_pair(1)
-                            )
+                            self.stdscr.addch(y + 2 + i, scrollbar_x, "▼", curses.color_pair(1))
                         else:
-                            self.stdscr.addch(
-                                y + 2 + i, scrollbar_x, "│", curses.color_pair(1)
-                            )
+                            self.stdscr.addch(y + 2 + i, scrollbar_x, "│", curses.color_pair(1))
                     except curses.error:
                         pass
 
@@ -150,9 +143,7 @@ class HelpDialog(BaseDialog):
                 self.scroll_position = max(0, self.scroll_position - content_height)
             elif key == curses.KEY_NPAGE:
                 max_scroll = max(0, len(self.help_content) - content_height)
-                self.scroll_position = min(
-                    max_scroll, self.scroll_position + content_height
-                )
+                self.scroll_position = min(max_scroll, self.scroll_position + content_height)
             elif key == curses.KEY_HOME:
                 self.scroll_position = 0
             elif key == curses.KEY_END:

@@ -3,8 +3,6 @@
 Locks in the Phase 2.1 fix (sha256 keys + cross-process disk hits).
 """
 
-
-
 from igntui.core.cache import CacheManager, TemplateCache
 
 
@@ -94,7 +92,9 @@ def test_legacy_content_keys_purged_on_init(tmp_cache_dir):
     legacy = tmp_cache_dir / "gitignore_content_123456.cache"
     legacy.write_text('{"data":"x","timestamp":0,"ttl":0,"access_count":0,"last_access":null}')
     sha_keyed = tmp_cache_dir / "gitignore_content_abcdef0123456789.cache"
-    sha_keyed.write_text('{"data":"y","timestamp":0,"ttl":99999999999,"access_count":0,"last_access":null}')
+    sha_keyed.write_text(
+        '{"data":"y","timestamp":0,"ttl":99999999999,"access_count":0,"last_access":null}'
+    )
 
     CacheManager(str(tmp_cache_dir))
 

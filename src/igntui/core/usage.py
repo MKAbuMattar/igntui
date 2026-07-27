@@ -77,8 +77,7 @@ class UsageTracker:
             with open(self.path, "wb") as f:
                 tomli_w.dump(payload, f)
             logger.info(
-                "Migrated usage data to %s. The legacy %s is no longer read; "
-                "you may delete it.",
+                "Migrated usage data to %s. The legacy %s is no longer read; you may delete it.",
                 self.path,
                 legacy,
             )

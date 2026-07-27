@@ -48,8 +48,7 @@ class ProjectConfig:
         schema = data.get("schema_version", 1)
         if schema > SCHEMA_VERSION:
             logger.warning(
-                "%s schema_version=%d is newer than this igntui supports (%d); "
-                "loading best-effort",
+                "%s schema_version=%d is newer than this igntui supports (%d); loading best-effort",
                 path,
                 schema,
                 SCHEMA_VERSION,

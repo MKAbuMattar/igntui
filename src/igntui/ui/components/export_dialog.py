@@ -11,9 +11,7 @@ class ExportDialog(BaseDialog):
     def __init__(self, stdscr, default_path: str = ""):
         super().__init__(stdscr, "Export .gitignore Content")
         if not default_path:
-            self.file_path = os.path.join(
-                os.path.expanduser("~"), "gitignore_export.txt"
-            )
+            self.file_path = os.path.join(os.path.expanduser("~"), "gitignore_export.txt")
         else:
             self.file_path = default_path
         self.cursor_pos = len(self.file_path)
@@ -43,9 +41,7 @@ class ExportDialog(BaseDialog):
                 input_x = x + 2
                 input_width = width - 4
 
-                self.stdscr.addstr(
-                    input_y, input_x, " " * input_width, curses.color_pair(3)
-                )
+                self.stdscr.addstr(input_y, input_x, " " * input_width, curses.color_pair(3))
 
                 display_path = self.file_path
                 if len(display_path) > input_width - 1:
@@ -63,9 +59,7 @@ class ExportDialog(BaseDialog):
                 if len(self.file_path) > input_width - 1:
                     visible_start = max(0, len(self.file_path) - (input_width - 4))
                     cursor_display_pos = self.cursor_pos - visible_start + 3
-                    cursor_display_pos = max(
-                        3, min(cursor_display_pos, input_width - 1)
-                    )
+                    cursor_display_pos = max(3, min(cursor_display_pos, input_width - 1))
 
                 if cursor_display_pos < len(display_path):
                     cursor_char = display_path[cursor_display_pos]
@@ -109,15 +103,13 @@ class ExportDialog(BaseDialog):
             elif key == curses.KEY_BACKSPACE or key == 127:
                 if self.cursor_pos > 0:
                     self.file_path = (
-                        self.file_path[: self.cursor_pos - 1]
-                        + self.file_path[self.cursor_pos :]
+                        self.file_path[: self.cursor_pos - 1] + self.file_path[self.cursor_pos :]
                     )
                     self.cursor_pos -= 1
             elif key == curses.KEY_DC:
                 if self.cursor_pos < len(self.file_path):
                     self.file_path = (
-                        self.file_path[: self.cursor_pos]
-                        + self.file_path[self.cursor_pos + 1 :]
+                        self.file_path[: self.cursor_pos] + self.file_path[self.cursor_pos + 1 :]
                     )
             elif key == curses.KEY_LEFT:
                 self.cursor_pos = max(0, self.cursor_pos - 1)
@@ -130,8 +122,6 @@ class ExportDialog(BaseDialog):
             elif 32 <= key <= 126:
                 char = chr(key)
                 self.file_path = (
-                    self.file_path[: self.cursor_pos]
-                    + char
-                    + self.file_path[self.cursor_pos :]
+                    self.file_path[: self.cursor_pos] + char + self.file_path[self.cursor_pos :]
                 )
                 self.cursor_pos += 1

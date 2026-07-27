@@ -69,9 +69,7 @@ class GenerateCommand(CLICommand):
             output_file = args.output
 
             if output_file.exists() and not args.append and not args.force:
-                response_text = input(
-                    f"File '{output_file}' exists. Overwrite? (y/N): "
-                )
+                response_text = input(f"File '{output_file}' exists. Overwrite? (y/N): ")
                 if response_text.lower() not in ("y", "yes"):
                     print("Operation cancelled")
                     return 1

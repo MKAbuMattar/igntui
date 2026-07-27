@@ -25,13 +25,9 @@ For more information, visit: https://github.com/toptal/gitignore.io
         """,
     )
 
-    parser.add_argument(
-        "--version", "-v", action="version", version=get_version_string()
-    )
+    parser.add_argument("--version", "-v", action="version", version=get_version_string())
 
-    parser.add_argument(
-        "--verbose", action="store_true", help="Enable verbose/debug output"
-    )
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose/debug output")
 
     parser.add_argument(
         "--log-level",
@@ -40,13 +36,9 @@ For more information, visit: https://github.com/toptal/gitignore.io
         help="Set specific logging level",
     )
 
-    parser.add_argument(
-        "--config", "-c", type=Path, help="Path to custom configuration file"
-    )
+    parser.add_argument("--config", "-c", type=Path, help="Path to custom configuration file")
 
-    parser.add_argument(
-        "--no-cache", action="store_true", help="Disable caching for this session"
-    )
+    parser.add_argument("--no-cache", action="store_true", help="Disable caching for this session")
 
     return parser
 
@@ -66,9 +58,7 @@ def create_command_parser(
         help="Launch interactive TUI (default)",
         description="Launch the interactive Terminal User Interface",
     )
-    tui_parser.add_argument(
-        "--no-splash", action="store_true", help="Skip the splash screen"
-    )
+    tui_parser.add_argument("--no-splash", action="store_true", help="Skip the splash screen")
 
     list_parser = subparsers.add_parser(
         "list",
@@ -78,9 +68,7 @@ def create_command_parser(
     list_parser.add_argument(
         "--filter", "-f", metavar="PATTERN", help="Filter templates by pattern"
     )
-    list_parser.add_argument(
-        "--count", "-c", action="store_true", help="Show count only"
-    )
+    list_parser.add_argument("--count", "-c", action="store_true", help="Show count only")
 
     generate_parser = subparsers.add_parser(
         "generate",
@@ -128,9 +116,7 @@ def create_command_parser(
     )
 
     cache_clear_parser = cache_subparsers.add_parser("clear", help="Clear all cache")
-    cache_clear_parser.add_argument(
-        "--force", action="store_true", help="Skip confirmation prompt"
-    )
+    cache_clear_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
     cache_subparsers.add_parser("stats", help="Show cache statistics")
     cache_subparsers.add_parser("info", help="Show cache information")
 
@@ -152,9 +138,7 @@ def create_command_parser(
         description="Print a shell completion script to stdout. "
         'Install with `eval "$(igntui completion bash)"` (or zsh / fish).',
     )
-    completion_parser.add_argument(
-        "shell", choices=["bash", "zsh", "fish"], help="Target shell"
-    )
+    completion_parser.add_argument("shell", choices=["bash", "zsh", "fish"], help="Target shell")
 
     return base_parser
 

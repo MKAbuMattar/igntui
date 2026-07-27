@@ -29,9 +29,7 @@ class TemplatesPanel(BasePanel):
                 last_visible = min(
                     self.template_scroll + visible_count, len(self.filtered_templates)
                 )
-                scroll_info = (
-                    f" ({first_visible}-{last_visible}/{len(self.filtered_templates)})"
-                )
+                scroll_info = f" ({first_visible}-{last_visible}/{len(self.filtered_templates)})"
                 if len(title) + len(scroll_info) > self.width - 6:
                     scroll_info = f" ({first_visible}-{last_visible})"
                     if len(title) + len(scroll_info) > self.width - 6:
@@ -58,9 +56,7 @@ class TemplatesPanel(BasePanel):
 
     def _draw_list_view(self, y: int, x: int, height: int, width: int):
         if self.filter_text:
-            count_text = (
-                f"[{len(self.filtered_templates)}/{len(self.templates)} templates]"
-            )
+            count_text = f"[{len(self.filtered_templates)}/{len(self.templates)} templates]"
             search_info = f" '{self.filter_text}' ({self.current_search_mode})"
         else:
             count_text = f"[{len(self.filtered_templates)} templates]"
@@ -69,9 +65,7 @@ class TemplatesPanel(BasePanel):
         try:
             self.stdscr.addstr(y, x + 1, count_text, curses.color_pair(1))
             if search_info and len(count_text + search_info) < width - 4:
-                self.stdscr.addstr(
-                    y, x + 1 + len(count_text), search_info, curses.color_pair(2)
-                )
+                self.stdscr.addstr(y, x + 1 + len(count_text), search_info, curses.color_pair(2))
             y += 1
             height -= 1
         except curses.error:
@@ -80,7 +74,9 @@ class TemplatesPanel(BasePanel):
         if not self.filtered_templates:
             try:
                 if self.filter_text:
-                    no_match_text = f"No matches for '{self.filter_text}' in {self.current_search_mode} mode"
+                    no_match_text = (
+                        f"No matches for '{self.filter_text}' in {self.current_search_mode} mode"
+                    )
                     help_text = "Try F1 (fuzzy), F2 (exact), or F3 (regex)"
                     self.stdscr.addstr(
                         y + height // 2,
@@ -97,9 +93,7 @@ class TemplatesPanel(BasePanel):
                         )
                 else:
                     no_match_text = "No templates found"
-                    self.stdscr.addstr(
-                        y + height // 2, x + 2, no_match_text, curses.color_pair(7)
-                    )
+                    self.stdscr.addstr(y + height // 2, x + 2, no_match_text, curses.color_pair(7))
             except curses.error:
                 pass
             return

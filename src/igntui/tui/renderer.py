@@ -32,12 +32,8 @@ class TUIRenderer:
             templates_height = max_y - bottom_height - search_height - 1
             self._render_search_panel(0, 0, search_height, left_width)
             self._render_templates_panel(search_height, 0, templates_height, left_width)
-            self._render_content_panel(
-                0, left_width, max_y - bottom_height - 1, right_width
-            )
-            self._render_selected_panel(
-                max_y - bottom_height - 1, 0, bottom_height, max_x
-            )
+            self._render_content_panel(0, left_width, max_y - bottom_height - 1, right_width)
+            self._render_selected_panel(max_y - bottom_height - 1, 0, bottom_height, max_x)
             self._render_status_bar()
             self.stdscr.refresh()
 
@@ -66,9 +62,7 @@ class TUIRenderer:
                 self.templates_panel.is_active = self.state.current_panel == 1
                 self.templates_panel.loading = self.state.loading
                 self.templates_panel.filter_text = self.state.filter_text
-                self.templates_panel.current_search_mode = (
-                    self.state.current_search_mode
-                )
+                self.templates_panel.current_search_mode = self.state.current_search_mode
 
                 self.templates_panel.draw()
             except Exception as e:
@@ -91,9 +85,7 @@ class TUIRenderer:
                 self.content_panel.generated_content = self.state.generated_content
                 self.content_panel.content_scroll = self.state.content_scroll
                 self.content_panel.is_active = self.state.current_panel == 3
-                self.content_panel.generation_in_progress = (
-                    self.state.generation_in_progress
-                )
+                self.content_panel.generation_in_progress = self.state.generation_in_progress
                 self.content_panel.draw()
             except Exception as e:
                 logger.error(f"Error rendering content panel: {e}")
@@ -103,8 +95,6 @@ class TUIRenderer:
             try:
                 self.status_bar.status_message = self.state.status_message
                 self.status_bar.error_message = self.state.error_message
-                self.status_bar.draw(
-                    self.state.current_panel, self.state.current_search_mode
-                )
+                self.status_bar.draw(self.state.current_panel, self.state.current_search_mode)
             except Exception as e:
                 logger.error(f"Error rendering status bar: {e}")

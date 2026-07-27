@@ -36,7 +36,7 @@ class SearchPanel(BasePanel):
                 self.stdscr.addstr(inner_y, inner_x, display_text, attr)
             else:
                 visible_start = max(0, cursor_position + len(prompt) - max_display_len + 1)
-                visible_text = display_text[visible_start:visible_start + max_display_len]
+                visible_text = display_text[visible_start : visible_start + max_display_len]
                 self.stdscr.addstr(inner_y, inner_x, visible_text, attr)
 
             if self.is_active:
@@ -47,8 +47,14 @@ class SearchPanel(BasePanel):
 
                 if inner_x <= cursor_x < inner_x + inner_width - 1:
                     try:
-                        char_at_cursor = search_text[cursor_position] if cursor_position < len(search_text) else " "
-                        self.stdscr.addstr(inner_y, cursor_x, char_at_cursor, attr | curses.A_REVERSE)
+                        char_at_cursor = (
+                            search_text[cursor_position]
+                            if cursor_position < len(search_text)
+                            else " "
+                        )
+                        self.stdscr.addstr(
+                            inner_y, cursor_x, char_at_cursor, attr | curses.A_REVERSE
+                        )
                     except curses.error:
                         pass
 
@@ -56,11 +62,7 @@ class SearchPanel(BasePanel):
                 mode_help = "F1:Fuzzy F2:Exact F3:Regex"
                 if len(mode_help) < inner_width - 1:
                     try:
-                        mode_attr = (
-                            curses.color_pair(1)
-                            if self.is_active
-                            else curses.color_pair(5)
-                        )
+                        mode_attr = curses.color_pair(1) if self.is_active else curses.color_pair(5)
                         self.stdscr.addstr(inner_y + 1, inner_x, mode_help, mode_attr)
                     except curses.error:
                         pass

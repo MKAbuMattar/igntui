@@ -80,9 +80,7 @@ class SplashScreen:
             sub_y = logo_start_y + logo_height + 1
             sub_x = max(0, (max_x - len(subtitle)) // 2)
             try:
-                self.stdscr.addstr(
-                    sub_y, sub_x, subtitle, curses.color_pair(6) | curses.A_BOLD
-                )
+                self.stdscr.addstr(sub_y, sub_x, subtitle, curses.color_pair(6) | curses.A_BOLD)
             except curses.error:
                 pass
 
@@ -118,28 +116,20 @@ class SplashScreen:
             filled = int(progress_width * progress)
 
             try:
-                self.stdscr.addstr(
-                    progress_y, progress_x - 1, "[", curses.color_pair(1)
-                )
+                self.stdscr.addstr(progress_y, progress_x - 1, "[", curses.color_pair(1))
                 self.stdscr.addstr(
                     progress_y, progress_x + progress_width, "]", curses.color_pair(1)
                 )
 
                 for i in range(progress_width):
                     if i < filled:
-                        self.stdscr.addch(
-                            progress_y, progress_x + i, "█", curses.color_pair(4)
-                        )
+                        self.stdscr.addch(progress_y, progress_x + i, "█", curses.color_pair(4))
                     else:
-                        self.stdscr.addch(
-                            progress_y, progress_x + i, "░", curses.color_pair(1)
-                        )
+                        self.stdscr.addch(progress_y, progress_x + i, "░", curses.color_pair(1))
 
                 percent = f"{int(progress * 100)}%"
                 percent_x = max(0, (max_x - len(percent)) // 2)
-                self.stdscr.addstr(
-                    progress_y + 1, percent_x, percent, curses.color_pair(8)
-                )
+                self.stdscr.addstr(progress_y + 1, percent_x, percent, curses.color_pair(8))
             except curses.error:
                 pass
 
@@ -147,9 +137,7 @@ class SplashScreen:
             footer = "by Mohammad Abu Mattar • github.com/MKAbuMattar"
             footer_x = max(0, (max_x - len(footer)) // 2)
             try:
-                self.stdscr.addstr(
-                    footer_y, footer_x, footer, curses.color_pair(1) | curses.A_DIM
-                )
+                self.stdscr.addstr(footer_y, footer_x, footer, curses.color_pair(1) | curses.A_DIM)
             except curses.error:
                 pass
 
@@ -172,9 +160,7 @@ class SplashScreen:
                 )
                 continue_msg = "Press any key to continue anyway..."
                 x_pos = max(0, (max_x - len(continue_msg)) // 2)
-                self.stdscr.addstr(
-                    max_y // 2 + 2, x_pos, continue_msg, curses.color_pair(8)
-                )
+                self.stdscr.addstr(max_y // 2 + 2, x_pos, continue_msg, curses.color_pair(8))
             except curses.error:
                 pass
             self.stdscr.refresh()
