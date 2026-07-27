@@ -35,13 +35,24 @@ jobs:
       - name: Lint with ruff
         # Use uvx (isolated tool run) — doesn't depend on project venv state
         # and doesn't trigger a re-sync.
-        run: uvx ruff check src tests
+        run: uvx ruff check src tests scripts
 
-      - name: Type-check core with ty
-        # ty is alpha (https://docs.astral.sh/ty/) — Phase 7 wires this
-        # in as a required step now that core/ is clean. Re-evaluate as
-        # ty matures; promote scope from `core/` to `src/` over time.
-        run: uvx ty check --python .venv src/igntui/core
+      # The tree was black-formatted at a different width and `ruff format` was
+      # configured but never run, so 43 of 73 files disagreed with it. Now that
+      # the reformat has landed, this keeps it from drifting again.
+      - name: Check formatting
+        run: uvx ruff format --check src tests scripts
+
+      - name: Type-check with ty
+        # ty is alpha (https://docs.astral.sh/ty/) but this is a required step.
+        # Scope was `src/igntui/core` while the rest of the tree had
+        # diagnostics; those are fixed, so the whole package is checked now.
+        run: uvx ty check --python .venv src/igntui
+
+      # Two files carry the version and they drift silently: the mismatch only
+      # shows up as a mislabelled release on PyPI.
+      - name: Versions agree
+        run: uv run --frozen python scripts/release_version.py assert-consistent
 
       - name: Run tests with coverage
         # --frozen tells uv to use the existing venv as-is; no resolution.
