@@ -7,6 +7,7 @@ v0.0.x JSON file `~/.igntui.json` by reading it and writing TOML in place;
 the legacy file is left on disk for the user to delete.
 """
 
+import copy
 import json
 import logging
 import os
@@ -111,7 +112,11 @@ class Config:
         # descent in `get`/`set`/`_load_env_overrides` doesn't fight the
         # type checker. The TypedDict serves as documentation + the source
         # of truth for the section names.
-        self._config: dict[str, Any] = {**self.DEFAULT_CONFIG}
+        # deepcopy, not `{**DEFAULT_CONFIG}`: a shallow copy shares the nested
+        # section dicts with the class attribute, so `set()` wrote straight into
+        # the defaults — leaking into every later instance and making
+        # `reset_to_defaults()` a no-op.
+        self._config: dict[str, Any] = copy.deepcopy(dict(self.DEFAULT_CONFIG))
         self._migrate_legacy_user_config_if_present()
         self._load_user_config()
         self._load_repo_config()
@@ -135,8 +140,7 @@ class Config:
             with open(self.config_path, "wb") as f:
                 tomli_w.dump(data, f)
             logger.info(
-                "Migrated user config to %s. The legacy %s is no longer read; "
-                "you may delete it.",
+                "Migrated user config to %s. The legacy %s is no longer read; you may delete it.",
                 self.config_path,
                 legacy,
             )
@@ -174,11 +178,7 @@ class Config:
         def merge_dict(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
             result: dict[str, Any] = dict(base)
             for key, value in override.items():
-                if (
-                    key in result
-                    and isinstance(result[key], dict)
-                    and isinstance(value, dict)
-                ):
+                if key in result and isinstance(result[key], dict) and isinstance(value, dict):
                     result[key] = merge_dict(result[key], value)
                 else:
                     result[key] = value
@@ -254,7 +254,7 @@ class Config:
             logger.error("Failed to save configuration: %s", e)
 
     def reset_to_defaults(self) -> None:
-        self._config = {**self.DEFAULT_CONFIG}
+        self._config = copy.deepcopy(dict(self.DEFAULT_CONFIG))
         logger.info("Reset configuration to defaults")
 
     def get_cache_dir(self) -> Path:
