@@ -54,13 +54,8 @@ def setup_logging(verbose: bool = False, log_level: str | None = None) -> None:
     logger.debug(f"Logging configured at {logging.getLevelName(level)} level")
 
 
-def check_curses_availability() -> bool:
-    import importlib.util
-
-    return importlib.util.find_spec("curses") is not None
-
-
 def print_curses_error() -> None:
+    """Explain a missing curses module. Used by the TUI entry point."""
     print("Error: curses module not available.")
     print("On Windows, install: pip install windows-curses")
     print("On Linux/Mac, curses should be included with Python.")

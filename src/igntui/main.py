@@ -9,6 +9,7 @@ from .cli import (
     create_command_parser,
     get_command_instance,
     safe_exit,
+    setup_logging,
 )
 
 
@@ -22,8 +23,9 @@ def main() -> int:
         no_cache=args.no_cache,
     )
 
-    if args.verbose:
-        cli.setup_logging(verbose=True)
+    # `--log-level` used to be parsed and then ignored, and the `[logging]`
+    # section of the config had no reader at all. Both are honored here.
+    setup_logging(verbose=args.verbose, log_level=args.log_level)
 
     command = args.command
 
@@ -68,16 +70,11 @@ def tui_main() -> None:
     from . import get_version_string
 
     parser.add_argument("--version", "-V", action="version", version=get_version_string())
-    parser.add_argument(
-        "--no-splash", action="store_true", help="Skip the splash screen"
-    )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose/debug output"
-    )
+    parser.add_argument("--no-splash", action="store_true", help="Skip the splash screen")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose/debug output")
     args = parser.parse_args()
 
-    if args.verbose:
-        BaseCLI().setup_logging(verbose=True)
+    setup_logging(verbose=args.verbose)
 
     try:
         from .app import run_tui
