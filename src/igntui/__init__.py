@@ -3,6 +3,7 @@
 
 import platform
 import sys
+from collections.abc import Callable
 
 __version__ = "0.1.1"
 __author__ = "Mohammad Abu Mattar"
@@ -13,9 +14,7 @@ provided by gitignore.io with advanced search, caching, and performance features
 
 
 def get_version_string() -> str:
-    python_version = (
-        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-    )
+    python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     os_name = platform.system()
     os_version = platform.release()
     return f"igntui/{__version__} Python/{python_version} {os_name}/{os_version}"
@@ -27,9 +26,13 @@ from .core.config import config
 from .core.search import SearchManager, SearchMode
 from .main import cli_main, tui_main
 
+# `run_tui` is annotated so the ImportError fallback is an explicit rebind of a
+# declared name rather than an implicit shadow of the imported function.
+run_tui: Callable[..., int] | None
 try:
-    from .app import run_tui
+    from .app import run_tui as _run_tui
 
+    run_tui = _run_tui
     TUI_AVAILABLE = True
 except ImportError:
     run_tui = None

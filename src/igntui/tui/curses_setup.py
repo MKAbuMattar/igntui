@@ -2,7 +2,7 @@
 
 
 import curses
-from typing import Optional
+from typing import Any
 
 
 class CursesSetup:
@@ -26,9 +26,7 @@ class CursesSetup:
 
         if config.get("ui", "mouse_support", default=True):
             try:
-                curses.mousemask(
-                    curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
-                )
+                curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
             except curses.error:
                 pass  # terminal doesn't support mouse — graceful degrade
 
@@ -41,9 +39,7 @@ class CursesSetup:
         curses.use_default_colors()
         curses.init_pair(CursesSetup.COLOR_BORDER, curses.COLOR_CYAN, -1)
         curses.init_pair(CursesSetup.COLOR_HIGHLIGHT, curses.COLOR_YELLOW, -1)
-        curses.init_pair(
-            CursesSetup.COLOR_SELECTED, curses.COLOR_BLACK, curses.COLOR_CYAN
-        )
+        curses.init_pair(CursesSetup.COLOR_SELECTED, curses.COLOR_BLACK, curses.COLOR_CYAN)
         curses.init_pair(CursesSetup.COLOR_SUCCESS, curses.COLOR_GREEN, -1)
         curses.init_pair(CursesSetup.COLOR_STATUS_BAR, curses.COLOR_GREEN, -1)
         curses.init_pair(CursesSetup.COLOR_TITLE, curses.COLOR_MAGENTA, -1)
@@ -55,7 +51,7 @@ class CursesSetup:
         return curses.color_pair(color_id)
 
     @staticmethod
-    def cleanup(stdscr: Optional = None) -> None:
+    def cleanup(stdscr: Any = None) -> None:
         try:
             if stdscr:
                 stdscr.keypad(False)
