@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/MKAbuMattar/igntui/security/advisories/new
+    about: Report security issues privately — do not open a public issue.
+  - name: Missing or wrong gitignore template
+    url: https://github.com/toptal/gitignore.io
+    about: >-
+      Templates come from gitignore.io. Issues with the template content itself
+      belong upstream, not here.
+  - name: Documentation
+    url: https://github.com/MKAbuMattar/igntui/tree/main/docs
+    about: Per-command reference, file formats, and the caching and managed-block concepts.

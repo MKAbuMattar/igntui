@@ -1,0 +1,64 @@
+name: TUI / rendering problem
+description: The interface looks wrong, is cut off, or does not respond to input
+labels: [bug, tui]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        "It looks wrong" is unactionable without knowing the terminal. The panels
+        clip rather than raising an error, so layout problems are silent — these
+        four fields are what make the report reproducible.
+
+  - type: input
+    id: version
+    attributes:
+      label: igntui version
+      description: Output of `igntui --version`.
+    validations:
+      required: true
+
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal emulator and OS
+      placeholder: Windows Terminal on Windows 11 / iTerm2 on macOS 15 / GNOME Terminal
+    validations:
+      required: true
+
+  - type: input
+    id: term_env
+    attributes:
+      label: $TERM and terminal size
+      description: Run `echo "$TERM $(tput cols)x$(tput lines)"`.
+      placeholder: xterm-256color 80x24
+    validations:
+      required: true
+
+  - type: input
+    id: locale
+    attributes:
+      label: Locale
+      description: Run `locale | head -1`. Box-drawing and figlet output depend on it.
+      placeholder: LANG=en_US.UTF-8
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: >-
+        Which panel or dialog, and what you see versus what you expected. A
+        screenshot or a copy-paste of the screen helps more than a description.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: narrowing
+    attributes:
+      label: Narrowing it down
+      options:
+        - label: It also happens at 80×24 or larger
+        - label: It also happens with `mouse_support = false`
+        - label: It also happens with `--no-splash`
+        - label: It also happens on the `gitignore-tui` entry point

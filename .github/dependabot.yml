@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Actions only. Three runtime dependencies, one of them platform gated, and
+  # `uv.lock` is committed — a pip ecosystem entry would mostly generate noise.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies

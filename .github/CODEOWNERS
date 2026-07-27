@@ -1,0 +1,3 @@
+# Required for the "require review from Code Owners" branch protection setting to
+# match anything. Without this file that setting reviews nobody.
+* @MKAbuMattar
