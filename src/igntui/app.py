@@ -18,8 +18,9 @@ def run_tui(show_splash: bool = True) -> int:
 
     except ImportError as e:
         if "curses" in str(e):
-            print("Error: curses module not available.")
-            print("On Windows, install: pip install windows-curses")
+            from .cli.setup import print_curses_error
+
+            print_curses_error()
             return 1
         else:
             raise

@@ -280,24 +280,12 @@ class TemplateCache:
         key = self._make_content_key(technologies)
         self.cache_manager.set(key, content)
 
-    def invalidate_template_content(self, template_name: str) -> int:
-        invalidated = 0
-
-        for cache_file in self.cache_manager.cache_dir.glob(
-            f"{self._template_content_prefix}*.cache"
-        ):
-            key = cache_file.stem
-
-            if template_name.lower() in key.lower():
-                if self.cache_manager.delete(key):
-                    invalidated += 1
-
-        if invalidated > 0:
-            logger.info(
-                f"Invalidated {invalidated} cache entries for template: {template_name}"
-            )
-
-        return invalidated
+    # No per-template invalidation helper: content keys are sha256 prefixes, so a
+    # template name cannot be recovered from one. The version that tried matched
+    # `name in key`, which could only ever hit by accident — and would delete
+    # unrelated entries for a short hex-ish name like `ade` or `cafe`. Clearing
+    # the whole content cache (`igntui cache clear`) is the honest operation; a
+    # real implementation needs a stored name -> digest index.
 
     def _make_content_key(self, technologies: list[str]) -> str:
         sorted_techs = sorted({tech.lower().strip() for tech in technologies if tech.strip()})

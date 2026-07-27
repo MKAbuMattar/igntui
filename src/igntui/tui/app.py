@@ -54,9 +54,7 @@ class GitIgnoreTUI:
                 success = splash.show(load_callback=self._load_templates_sync)
                 self.state.loading = False
                 if success and self.state.templates:
-                    logger.info(
-                        f"Splash loaded {len(self.state.templates)} templates successfully"
-                    )
+                    logger.info(f"Splash loaded {len(self.state.templates)} templates successfully")
             except Exception as e:
                 logger.warning(f"Could not show splash screen: {e}")
                 self.state.loading = False
@@ -212,16 +210,13 @@ class GitIgnoreTUI:
     def _generate_content_async(self) -> None:
         if not self.state.selected_templates:
             self.state.generated_content = (
-                "# No templates selected\n"
-                "# Select templates from the Available Templates panel"
+                "# No templates selected\n# Select templates from the Available Templates panel"
             )
             return
 
         self.state.generation_in_progress = True
         selected_list = self.state.get_selected_templates_list()
-        self.state.set_status_message(
-            f"Generating content for {len(selected_list)} templates..."
-        )
+        self.state.set_status_message(f"Generating content for {len(selected_list)} templates...")
         self.lifecycle.generate_content_async(selected_list, self.updates)
 
     def _drain_updates(self) -> None:
@@ -252,8 +247,7 @@ class GitIgnoreTUI:
                     )
                 case ContentGenerationFailed(message=msg, selected_templates=selected):
                     self.state.generated_content = (
-                        f"# Error generating content: {msg}\n"
-                        f"# Selected templates: {selected}"
+                        f"# Error generating content: {msg}\n# Selected templates: {selected}"
                     )
                     self.state.set_status_message(msg, is_error=True)
                 case LoadCompleted():
@@ -294,21 +288,6 @@ class GitIgnoreTUI:
             CursesSetup.cleanup(self.stdscr)
 
 
-def main() -> int:
-    try:
-        exit_code = curses.wrapper(lambda stdscr: GitIgnoreTUI(stdscr).run())
-        print("\n✓ igntui closed successfully")
-        return exit_code
-    except KeyboardInterrupt:
-        print("\n✓ igntui interrupted by user")
-        return 0
-    except Exception as e:
-        print(f"\n✗ Error running igntui: {e}")
-        logger.error(f"Fatal error: {e}", exc_info=True)
-        return 1
-
-
-if __name__ == "__main__":
-    import sys
-
-    sys.exit(main())
+# There is deliberately no `main()` / `__main__` block here. The curses.wrapper
+# boundary lives in `igntui/app.py:run_tui()`, which is what both console scripts
+# resolve through; a second copy here drifted from it and was never called.

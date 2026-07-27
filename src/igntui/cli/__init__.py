@@ -10,14 +10,13 @@ from .commands import (
     TUICommand,
 )
 from .parser import create_base_parser, create_command_parser, get_command_instance
-from .setup import check_curses_availability, print_curses_error, setup_logging
+from .setup import print_curses_error, setup_logging
 
 __all__ = [
     "BaseCLI",
     "CLICommand",
     "safe_exit",
     "setup_logging",
-    "check_curses_availability",
     "print_curses_error",
     "create_base_parser",
     "create_command_parser",
