@@ -93,6 +93,8 @@ def test_cache_actions_are_registered(parser):
     for action in ("clear", "stats", "info"):
         assert parser.parse_args(["cache", action]).cache_action == action
     assert parser.parse_args(["cache", "clear", "--force"]).force is True
+    assert parser.parse_args(["cache", "clear", "--expired"]).expired is True
+    assert parser.parse_args(["cache", "clear"]).expired is False
 
 
 def test_no_command_leaves_command_unset(parser):

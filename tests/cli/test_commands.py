@@ -198,3 +198,41 @@ def test_cache_clear_without_force_asks_first(cache_cli, capsys, tmp_path, monke
 def test_unknown_cache_action_is_a_failure(cache_cli, capsys):
     assert CacheCommand(cache_cli).execute(args(cache_action="nope")) == 1
     assert "nope" in capsys.readouterr().out
+
+
+def test_cache_clear_expired_keeps_valid_entries(cache_cli, capsys, tmp_path):
+    """`--expired` is the on-demand replacement for the old startup sweep."""
+    manager = cache_cli.api.cache_manager
+    manager.set("keep-me", "v")
+    manager.set("stale", "v", ttl=-1)
+
+    assert (
+        CacheCommand(cache_cli).execute(args(cache_action="clear", force=False, expired=True)) == 0
+    )
+
+    out = capsys.readouterr().out
+    assert "1 expired" in out
+    assert manager.get("keep-me") == "v"
+    assert len(list(tmp_path.glob("*.cache"))) == 1
+
+
+def test_cache_clear_expired_says_so_when_there_is_nothing_to_do(cache_cli, capsys):
+    cache_cli.api.cache_manager.set("keep-me", "v")
+
+    CacheCommand(cache_cli).execute(args(cache_action="clear", force=False, expired=True))
+
+    assert "No expired entries" in capsys.readouterr().out
+
+
+def test_cache_clear_expired_does_not_prompt(cache_cli, capsys, monkeypatch):
+    """It removes only what is already dead, so there is nothing to confirm."""
+
+    def refuse(*_):
+        raise AssertionError("--expired must not prompt")
+
+    monkeypatch.setattr("builtins.input", refuse)
+    cache_cli.api.cache_manager.set("stale", "v", ttl=-1)
+
+    assert (
+        CacheCommand(cache_cli).execute(args(cache_action="clear", force=False, expired=True)) == 0
+    )

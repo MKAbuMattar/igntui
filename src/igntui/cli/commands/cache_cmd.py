@@ -17,6 +17,11 @@ class CacheCommand(CLICommand):
 
         clear_parser = subparsers.add_parser("clear", help="Clear cache")
         clear_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
+        clear_parser.add_argument(
+            "--expired",
+            action="store_true",
+            help="Remove only entries past their TTL, keeping everything still valid",
+        )
 
         subparsers.add_parser("stats", help="Show cache statistics")
         subparsers.add_parser("info", help="Show cache information")
@@ -33,6 +38,8 @@ class CacheCommand(CLICommand):
             elif args.cache_action == "stats":
                 return self._show_stats(cache)
             elif args.cache_action == "clear":
+                if getattr(args, "expired", False):
+                    return self._clear_expired(cache)
                 return self._clear_cache(cache, args.force)
             else:
                 print(f"Unknown cache action: {args.cache_action}")
@@ -83,6 +90,21 @@ class CacheCommand(CLICommand):
                 value = value.strftime("%Y-%m-%d %H:%M:%S")
             print(f"  {key}: {value}")
 
+        return 0
+
+    def _clear_expired(self, cache: "CacheManager") -> int:
+        """Sweep only what is past its TTL.
+
+        Nothing prunes expired files on its own any more: reading every entry at
+        startup to find them cost every command ~19 ms over a realistic cache.
+        Re-requesting a template set overwrites its stale entry in place, so this
+        is for sets that were cached once and never asked for again.
+        """
+        removed = cache.cleanup_expired()
+        if removed:
+            print(f"Removed {removed} expired {'entry' if removed == 1 else 'entries'}")
+        else:
+            print("No expired entries")
         return 0
 
     def _clear_cache(self, cache: "CacheManager", force: bool = False) -> int:

@@ -83,6 +83,13 @@ def test_cache_actions_are_offered(subparsers, capsys):
             assert action in out, f"{shell} completion is missing cache {action}"
 
 
+def test_cache_clear_flags_are_offered(capsys):
+    for shell in SHELLS:
+        out = emit(shell, capsys)
+        for flag in ("force", "expired"):
+            assert flag in out, f"{shell} completion is missing cache clear --{flag}"
+
+
 def test_zsh_script_declares_itself_compdef(capsys):
     """Without #compdef on the first line, zsh will not load it from $fpath."""
     assert emit("zsh", capsys).lstrip().startswith("#compdef igntui")

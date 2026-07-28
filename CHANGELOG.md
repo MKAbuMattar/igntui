@@ -6,6 +6,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **The cache no longer reads itself into memory at startup.** `CacheManager`
+  opened and parsed every `.cache` file in its constructor, and every command
+  paid for it because `GitIgnoreAPI` builds a manager before doing anything.
+  Measured over a realistic cache — 300 content blobs, 3.5 MiB — that was
+  **~19 ms down to ~0.9 ms**. Nothing is lost: a read already fell back to disk
+  and promoted what it found, so the eager pass bought latency and nothing else.
+
+  One behaviour does change. That pass also deleted expired files, and nothing
+  sweeps them automatically now. In practice a stale entry is short-lived — a
+  content key is a hash of its template set, so requesting the same set again
+  overwrites it in place — and only sets cached once and never asked for again
+  linger.
+
+### Added
+
+- **`igntui cache clear --expired`** removes only entries past their TTL and
+  keeps everything still valid, so the next run is not forced back to the
+  network. This is the on-demand replacement for the startup sweep, and it gives
+  `CacheManager.cleanup_expired()` — which had no callers at all — a home.
+
 ## [0.2.0] — 2026-07-27
 
 ### Added
