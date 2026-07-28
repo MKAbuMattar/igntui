@@ -8,7 +8,8 @@ igntui caches every API response on disk and in memory. Two cache categories:
 
 - **Template list** — one entry under key `gitignore_templates_list`,
   populated by [`igntui list`](../reference/igntui-list.md) and the TUI
-  startup load.
+  startup load. Nothing is read into memory when a process starts; the first
+  lookup pulls what it needs off disk and keeps it for the rest of the run.
 - **Template content blobs** — one entry per unique template combination,
   populated by [`igntui generate`](../reference/igntui-generate.md) and the
   TUI's content panel.
@@ -58,12 +59,23 @@ This guarantees:
 Default TTL: `api.cache_ttl = 3600` seconds (1 hour). Override in
 [`~/.igntui.cfg.toml`](../files/user-config.md) or via `IGNTUI_CACHE_TTL`.
 
-| Trigger                          | Behavior                                |
-| -------------------------------- | --------------------------------------- |
-| Read finds entry within TTL      | Hit; `last_access` updated              |
-| Read finds expired entry         | Evict (delete from memory + disk); miss |
-| Startup `_load_persistent_cache` | Expired files deleted at load time      |
-| `igntui cache clear`             | Delete every `*.cache` file             |
+| Trigger                        | Behavior                                |
+| ------------------------------ | --------------------------------------- |
+| Read finds entry within TTL    | Hit; `last_access` updated              |
+| Read finds expired entry       | Evict (delete from memory + disk); miss |
+| `igntui cache clear --expired` | Delete every `*.cache` file past its TTL |
+| `igntui cache clear`           | Delete every `*.cache` file             |
+
+**Nothing sweeps expired files on its own.** Construction used to read every
+entry and delete the expired ones, but that cost every command the time to
+open and parse the whole cache — around 19 ms over 300 content blobs — for no
+benefit, since a read already falls back to disk on its own. Startup is lazy
+now, and expired files are removed when something touches them, or on demand
+with `igntui cache clear --expired`.
+
+In practice a stale entry is short-lived anyway: a content key is a hash of its
+template set, so asking for the same set again overwrites the expired entry in
+place. Only sets that were cached once and never requested again linger.
 
 There is no LRU / size-based eviction — the cache grows linearly with the
 number of unique combinations the user has generated, plus the one

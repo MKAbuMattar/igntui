@@ -49,8 +49,19 @@ class CacheManager:
 
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._purge_legacy_content_keys()
-        self._load_persistent_cache()
 
+        # Deliberately not reading the cache into memory here. `get()` already
+        # falls back to disk and promotes what it finds, so an eager load bought
+        # nothing except latency — and every command pays it, because
+        # GitIgnoreAPI constructs a manager on the way to doing anything. Over a
+        # realistic cache (300 content blobs, ~3.5 MiB) it measured ~19 ms of
+        # open + json.loads before the process could start its actual work.
+        #
+        # The eager pass also deleted expired files. Losing that is nearly free:
+        # a content key is a hash of its template set, so re-requesting the same
+        # set overwrites the stale entry in place, and `get()` deletes any
+        # expired entry it touches. Only sets never asked for again linger, and
+        # `igntui cache clear --expired` sweeps those.
         logger.debug("Initialized cache manager with directory: %s", self.cache_dir)
 
     def _purge_legacy_content_keys(self) -> None:
@@ -195,25 +206,6 @@ class CacheManager:
                 "default_ttl": self.default_ttl,
                 **self._stats,
             }
-
-    def _load_persistent_cache(self) -> None:
-        try:
-            loaded_count = 0
-            for cache_file in self.cache_dir.glob("*.cache"):
-                key = cache_file.stem
-                entry = self._load_disk_cache(key)
-
-                if entry and not entry.is_expired():
-                    self._memory_cache[key] = entry
-                    loaded_count += 1
-                elif entry:
-                    cache_file.unlink()
-
-            if loaded_count > 0:
-                logger.info("Loaded %d cache entries from disk", loaded_count)
-
-        except Exception as e:
-            logger.warning("Failed to load persistent cache: %s", e)
 
     def _load_disk_cache(self, key: str) -> CacheEntry | None:
         cache_file = self.cache_dir / f"{key}.cache"

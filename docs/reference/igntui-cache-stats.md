@@ -25,7 +25,7 @@ on disk, use [`igntui cache info`](igntui-cache-info.md).
 | ---------------- | ------------------------------------------ |
 | `hit_rate`       | hits / (hits + misses) — float in `[0, 1]` |
 | `total_requests` | hits + misses                              |
-| `memory_entries` | entries currently in the in-memory cache   |
+| `memory_entries` | entries promoted into memory so far this process (starts at 0 — nothing is preloaded) |
 | `disk_entries`   | `.cache` files in the cache directory      |
 | `cache_dir`      | absolute path to the cache directory       |
 | `default_ttl`    | TTL applied to fresh writes (seconds)      |
@@ -48,7 +48,7 @@ $ igntui cache stats
 Cache Statistics:
   hit_rate: 0.0
   total_requests: 0
-  memory_entries: 4
+  memory_entries: 0
   disk_entries: 4
   cache_dir: /home/alice/.cache/igntui
   default_ttl: 3600

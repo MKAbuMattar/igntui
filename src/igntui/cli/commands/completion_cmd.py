@@ -34,7 +34,7 @@ _igntui_complete() {
         tui)       COMPREPLY=( $(compgen -W "--no-splash" -- "$cur") ); return ;;
         list)      COMPREPLY=( $(compgen -W "--filter --count" -- "$cur") ); return ;;
         generate)  COMPREPLY=( $(compgen -W "--output --append --force --dry-run --no-sidecar" -- "$cur") ); return ;;
-        cache)     COMPREPLY=( $(compgen -W "info stats clear --force" -- "$cur") ); return ;;
+        cache)     COMPREPLY=( $(compgen -W "info stats clear --force --expired" -- "$cur") ); return ;;
         test)      COMPREPLY=( $(compgen -W "--timeout" -- "$cur") ); return ;;
         completion) COMPREPLY=( $(compgen -W "bash zsh fish" -- "$cur") ); return ;;
         "")        COMPREPLY=( $(compgen -W "$subcommands $global_flags" -- "$cur") ); return ;;
@@ -73,7 +73,10 @@ _igntui() {
                     '--force[overwrite without prompt]' \\
                     '--dry-run[print without writing]' \\
                     '--no-sidecar[skip igntui.cfg.toml]' ;;
-                cache)     _values 'cache action' info stats clear ;;
+                cache)     _arguments \\
+                    '1:action:(info stats clear)' \\
+                    '--force[skip confirmation]' \\
+                    '--expired[only entries past their TTL]' ;;
                 test)      _arguments '--timeout[seconds]:seconds:' ;;
                 completion) _values 'shell' bash zsh fish ;;
             esac
@@ -110,6 +113,8 @@ complete -c igntui -n "__fish_seen_subcommand_from generate" -l dry-run -d "Prin
 complete -c igntui -n "__fish_seen_subcommand_from generate" -l no-sidecar -d "Skip sidecar"
 complete -c igntui -n "__fish_seen_subcommand_from generate" -l force -d "Overwrite without prompt"
 complete -c igntui -n "__fish_seen_subcommand_from cache" -a "info stats clear"
+complete -c igntui -n "__fish_seen_subcommand_from cache" -l force -d "Skip confirmation"
+complete -c igntui -n "__fish_seen_subcommand_from cache" -l expired -d "Only expired entries"
 complete -c igntui -n "__fish_seen_subcommand_from completion" -a "bash zsh fish"
 """
 

@@ -7,7 +7,7 @@
 ## SYNOPSIS
 
 ```
-igntui [global-options] cache clear [--force]
+igntui [global-options] cache clear [--force] [--expired]
 ```
 
 ## DESCRIPTION
@@ -19,12 +19,27 @@ every `*.cache` file in the cache directory.
 After clearing, the next run of [`igntui list`](igntui-list.md) or
 [`igntui generate`](igntui-generate.md) will hit the API.
 
+With `--expired`, only entries past their TTL are removed and everything
+still valid is kept, so the next run is not forced back to the network.
+
 ## OPTIONS
 
 ### `--force`
 
 (boolean) Skip the interactive confirmation prompt. Default: prompt with
 `Clear cache? This will remove all cached data. (y/N):`.
+
+### `--expired`
+
+(boolean) Remove only entries whose TTL has passed. Implies no prompt —
+there is nothing to confirm, since everything it deletes is already dead.
+
+Nothing sweeps expired files automatically: doing it at startup meant every
+command paid to read the whole cache first. See
+[Caching](../concepts/caching.md) for why, and note that a stale entry is
+usually overwritten in place the next time the same template set is
+requested — this flag is for sets that were cached once and never asked for
+again.
 
 ## EXAMPLES
 
@@ -43,9 +58,18 @@ $ igntui cache clear --force
 Cache cleared successfully
 ```
 
+**Sweep only what has expired, keeping valid entries:**
+
+```
+$ igntui cache clear --expired
+Removed 3 expired entries
+```
+
 ## OUTPUT
 
-On success: a single line `Cache cleared successfully`.
+On success: a single line `Cache cleared successfully`, or with `--expired`,
+`Removed N expired entries` (`No expired entries` when there was nothing to
+do).
 
 ## EXIT CODES
 

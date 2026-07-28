@@ -117,6 +117,11 @@ def create_command_parser(
 
     cache_clear_parser = cache_subparsers.add_parser("clear", help="Clear all cache")
     cache_clear_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
+    cache_clear_parser.add_argument(
+        "--expired",
+        action="store_true",
+        help="Remove only entries past their TTL, keeping everything still valid",
+    )
     cache_subparsers.add_parser("stats", help="Show cache statistics")
     cache_subparsers.add_parser("info", help="Show cache information")
 

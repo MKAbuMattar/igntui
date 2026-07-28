@@ -107,3 +107,64 @@ def test_template_list_round_trip(tmp_cache_dir):
     tc = TemplateCache(cache)
     tc.set_template_list(["python", "node", "go"])
     assert tc.get_template_list() == ["python", "node", "go"]
+
+
+def test_construction_does_not_read_the_cache_into_memory(tmp_cache_dir):
+    """Startup is lazy: reading every entry cost every command real time.
+
+    A CacheManager over a populated directory used to open and json.loads each
+    file in __init__, which measured ~19 ms over 300 content blobs — paid by
+    every command, because GitIgnoreAPI builds a manager before doing anything.
+    """
+    seed = CacheManager(str(tmp_cache_dir))
+    for i in range(5):
+        seed.set(f"key-{i}", f"value-{i}")
+
+    fresh = CacheManager(str(tmp_cache_dir))
+
+    assert fresh.get_stats()["memory_entries"] == 0
+    assert fresh.get_stats()["disk_entries"] == 5
+
+
+def test_lazy_start_still_serves_and_promotes_disk_entries(tmp_cache_dir):
+    """Nothing is lost by not preloading: get() reads disk and caches the hit."""
+    CacheManager(str(tmp_cache_dir)).set("k", "v")
+
+    fresh = CacheManager(str(tmp_cache_dir))
+    assert fresh.get("k") == "v"
+    assert fresh.get_stats()["memory_entries"] == 1
+
+    # Second read is served from memory, not disk.
+    reads_before = fresh.get_stats()["disk_reads"]
+    assert fresh.get("k") == "v"
+    assert fresh.get_stats()["disk_reads"] == reads_before
+
+
+def test_expired_entry_is_dropped_on_read_not_at_startup(tmp_cache_dir):
+    CacheManager(str(tmp_cache_dir)).set("stale", "v", ttl=-1)
+
+    fresh = CacheManager(str(tmp_cache_dir))
+    # Still on disk — construction no longer sweeps.
+    assert fresh.get_stats()["disk_entries"] == 1
+
+    assert fresh.get("stale") is None
+    assert list(tmp_cache_dir.glob("*.cache")) == []
+
+
+def test_cleanup_expired_sweeps_without_a_preloaded_memory_cache(tmp_cache_dir):
+    """What `igntui cache clear --expired` calls, on a cold manager."""
+    seed = CacheManager(str(tmp_cache_dir))
+    seed.set("fresh-1", "v")
+    seed.set("stale-1", "v", ttl=-1)
+    seed.set("stale-2", "v", ttl=-1)
+
+    cold = CacheManager(str(tmp_cache_dir))
+    assert cold.cleanup_expired() == 2
+
+    assert cold.get("fresh-1") == "v"
+    assert cold.get("stale-1") is None
+    assert len(list(tmp_cache_dir.glob("*.cache"))) == 1
+
+
+def test_cleanup_expired_on_an_empty_cache_is_a_no_op(tmp_cache_dir):
+    assert CacheManager(str(tmp_cache_dir)).cleanup_expired() == 0
