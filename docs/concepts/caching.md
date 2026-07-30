@@ -100,6 +100,16 @@ is a concern.
 
 A miss in memory promotes the disk hit into memory.
 
+## WRITES ARE ATOMIC
+
+An entry is written to a temporary file in the cache directory and then renamed
+over its target. A reader — including a second igntui process running at the
+same time — sees either the previous entry or the new one, never a half-written
+file, and an interrupted or failed write leaves the previous entry intact.
+
+A corrupt `.cache` file is still handled if one appears by other means: the read
+logs a warning, deletes the file, and reports a miss.
+
 ## BYPASSING THE CACHE
 
 | How                                                           | Scope                                        |

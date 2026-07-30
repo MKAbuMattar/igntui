@@ -168,3 +168,48 @@ def test_cleanup_expired_sweeps_without_a_preloaded_memory_cache(tmp_cache_dir):
 
 def test_cleanup_expired_on_an_empty_cache_is_a_no_op(tmp_cache_dir):
     assert CacheManager(str(tmp_cache_dir)).cleanup_expired() == 0
+
+
+def test_failed_write_leaves_the_previous_entry_intact(tmp_cache_dir):
+    """Atomic swap: a serialisation failure must not destroy what was there.
+
+    An in-place write truncated the file first and only then discovered the
+    value was unserialisable, losing a good entry to a bad write.
+    """
+    cache = CacheManager(str(tmp_cache_dir))
+    cache.set("k", "good value")
+
+    cache.set("k", {"unserialisable": object()})
+
+    fresh = CacheManager(str(tmp_cache_dir))
+    assert fresh.get("k") == "good value"
+
+
+def test_failed_write_leaves_no_temp_files_behind(tmp_cache_dir):
+    cache = CacheManager(str(tmp_cache_dir))
+    cache.set("k", {"unserialisable": object()})
+
+    assert list(tmp_cache_dir.glob("*.tmp")) == []
+
+
+def test_successful_write_leaves_no_temp_files_behind(tmp_cache_dir):
+    cache = CacheManager(str(tmp_cache_dir))
+    for i in range(3):
+        cache.set(f"k{i}", "v")
+
+    assert list(tmp_cache_dir.glob("*.tmp")) == []
+    assert len(list(tmp_cache_dir.glob("*.cache"))) == 3
+
+
+def test_overwriting_a_key_never_exposes_a_partial_file(tmp_cache_dir):
+    """Every rewrite of the same key must land as valid JSON, start to finish."""
+    import json
+
+    cache = CacheManager(str(tmp_cache_dir))
+    cache_file = tmp_cache_dir / "k.cache"
+
+    for i in range(20):
+        cache.set("k", f"value-{i}" * 200)
+        # Read the raw file the way a second process would.
+        payload = json.loads(cache_file.read_text(encoding="utf-8"))
+        assert payload["data"] == f"value-{i}" * 200

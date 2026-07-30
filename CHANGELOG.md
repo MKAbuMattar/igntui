@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **A failed cache write no longer destroys the entry it was replacing.**
+  `_save_disk_cache` opened the target file with `"w"` — truncating it — and only
+  then serialised the value. A crash, a full disk, or an unserialisable value
+  left truncated JSON where a good entry had been; the next read logged a
+  warning, deleted the file, and reported a miss. Writes now go to a temporary
+  file in the same directory and are renamed into place, so a reader (including
+  a second igntui process running at the same time) sees either the previous
+  entry or the new one, never half of either.
+
 ## [0.3.0] — 2026-07-28
 
 ### Changed

@@ -4,7 +4,9 @@
 import hashlib
 import json
 import logging
+import os
 import re
+import tempfile
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -228,16 +230,38 @@ class CacheManager:
         return None
 
     def _save_disk_cache(self, key: str, entry: CacheEntry) -> None:
+        """Write an entry to disk atomically.
+
+        Writing in place meant a crash, a full disk, or two processes saving the
+        same key could leave truncated JSON behind. That was survivable — a read
+        catches the JSONDecodeError and unlinks the file — but the entry was lost
+        and the failure was silent. Writing a temp file in the same directory and
+        renaming makes the swap atomic on POSIX and Windows: a reader sees either
+        the old entry or the new one, never half of either.
+        """
         cache_file = self.cache_dir / f"{key}.cache"
+        tmp_path: str | None = None
 
         try:
-            with open(cache_file, "w", encoding="utf-8") as f:
+            # Same directory, so os.replace is a rename rather than a cross-device copy.
+            fd, tmp_path = tempfile.mkstemp(dir=self.cache_dir, suffix=".tmp")
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
                 json.dump(asdict(entry), f, separators=(",", ":"))
+            os.replace(tmp_path, cache_file)
+            tmp_path = None
 
             self._stats["disk_writes"] += 1
 
         except (OSError, TypeError) as e:
             logger.warning("Failed to save cache file %s: %s", cache_file, e)
+        finally:
+            # A serialisation failure leaves the temp file behind; the previous
+            # good entry is still in place, which is the point.
+            if tmp_path is not None:
+                try:
+                    os.unlink(tmp_path)
+                except OSError:
+                    pass
 
     def _delete_disk_cache(self, key: str) -> bool:
         cache_file = self.cache_dir / f"{key}.cache"
