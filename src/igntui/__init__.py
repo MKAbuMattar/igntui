@@ -5,7 +5,7 @@ import platform
 import sys
 from collections.abc import Callable
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __author__ = "Mohammad Abu Mattar"
 __email__ = "mohammad.khaled@outlook.com"
 __description__ = """A professional TUI application for generating .gitignore files from templates
