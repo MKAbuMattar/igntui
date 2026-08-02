@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-08-02
+
 ### Added
 
 - **Python 3.14 is supported, tested and declared.** The test suite already
@@ -339,6 +341,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
 
 - Initial release.
 
+[0.4.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.4.0
 [0.3.1]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.3.1
 [0.3.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.3.0
 [0.2.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.2.0
