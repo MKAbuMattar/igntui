@@ -6,6 +6,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Python 3.14 is supported, tested and declared.** The test suite already
+  passed on it — 214/214 — but nothing claimed it and CI never checked. It is in
+  the CI matrix and the classifiers now, so the claim is backed by a run.
+
+### Changed
+
+- **`windows-curses` floor raised to 2.4.2.** That is the first release with
+  cp314 wheels. The floor matters on Windows specifically: an older pin can
+  resolve to a version with no wheel for the running interpreter, and that fails
+  at install time rather than degrading.
+
+  No upper bound was added. `windows-curses` 2.4.2 ships wheels for cp39 through
+  cp314, so there is no gap for any Python igntui supports — capping the marker
+  would create exactly the failure it was meant to prevent.
+
 ## [0.3.1] — 2026-07-30
 
 ### Fixed
