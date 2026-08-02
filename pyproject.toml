@@ -16,7 +16,10 @@ maintainers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "windows-curses>=2.4.1; sys_platform == 'win32'",
+    # 2.4.2 is the first release with cp314 wheels. The floor matters on
+    # Windows: an older pin can resolve to a version with no wheel for the
+    # running interpreter, which fails at install time rather than degrading.
+    "windows-curses>=2.4.2; sys_platform == 'win32'",
     "pyfiglet>=1.0.2",
     "tomli-w>=1.0.0",
 ]
@@ -30,6 +33,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Version Control :: Git",
     "Topic :: Terminals",
@@ -63,7 +67,7 @@ test = [
     "freezegun>=1.4.0",
 ]
 windows = [
-    "windows-curses>=2.4.1; sys_platform == 'win32'",
+    "windows-curses>=2.4.2; sys_platform == 'win32'",
 ]
 
 [build-system]
