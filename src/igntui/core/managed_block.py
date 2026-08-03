@@ -7,13 +7,14 @@ A file written by igntui carries two marked regions:
     ...generated template content...
     # <<< igntui <<<
 
-    # >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+    # >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
     ...your own rules...
-    # >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+    # >>> End of custom patterns (edit freely; igntui preserves this block) <<<
 
-The first region is rewritten on every save. The second is never touched: its
-body is read out of the existing file and put back verbatim, so rules you add
-there survive regeneration. Anything outside both regions is also preserved.
+The first region is rewritten on every save — do not put your own rules there.
+The second is yours: its body is read out of the existing file and put back
+verbatim, so anything you add survives regeneration. Text outside both regions
+is preserved too.
 """
 
 import logging
@@ -24,11 +25,26 @@ BEGIN_MARKER = "# >>> igntui >>> (do not edit between these markers; managed by 
 END_MARKER = "# <<< igntui <<<"
 
 CUSTOM_BEGIN_MARKER = (
-    "# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<"
+    "# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<"
 )
-CUSTOM_END_MARKER = (
-    "# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<"
+CUSTOM_END_MARKER = "# >>> End of custom patterns (edit freely; igntui preserves this block) <<<"
+
+# Custom-block markers written by earlier versions, still recognised on read.
+# 0.2.0 through 0.4.0 shipped a pair that said "do not edit between these
+# markers" on the one region the user is meant to edit. Files carrying it are
+# rewritten with the current wording, body intact — dropping this tuple would
+# make the next save append a second block instead of replacing the first.
+LEGACY_CUSTOM_MARKER_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<",
+        "# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<",
+    ),
 )
+
+
+def _custom_marker_pairs() -> tuple[tuple[str, str], ...]:
+    """Current pair first, then anything older, for read paths."""
+    return ((CUSTOM_BEGIN_MARKER, CUSTOM_END_MARKER), *LEGACY_CUSTOM_MARKER_PAIRS)
 
 
 def wrap(content: str, custom: str = "") -> str:
@@ -50,25 +66,30 @@ def wrap(content: str, custom: str = "") -> str:
 def extract_custom(existing: str | None) -> str:
     """Read back whatever the user put in the custom-patterns block.
 
+    Recognises the current marker wording and every older one, so a file written
+    by a previous release keeps its rules when it is rewritten.
+
     Returns "" when the file has no custom block yet, or when the markers are
     present but out of order (in which case nothing can be safely carried over).
     """
     if not existing:
         return ""
 
-    begin = existing.find(CUSTOM_BEGIN_MARKER)
-    if begin == -1:
-        return ""
-    body_start = begin + len(CUSTOM_BEGIN_MARKER)
-    end = existing.find(CUSTOM_END_MARKER, body_start)
-    if end == -1:
-        logger.warning(
-            "custom-patterns block has no closing marker; its contents are left "
-            "where they are rather than being moved into a new block"
-        )
-        return ""
+    for begin_marker, end_marker in _custom_marker_pairs():
+        begin = existing.find(begin_marker)
+        if begin == -1:
+            continue
+        body_start = begin + len(begin_marker)
+        end = existing.find(end_marker, body_start)
+        if end == -1:
+            logger.warning(
+                "custom-patterns block has no closing marker; its contents are left "
+                "where they are rather than being moved into a new block"
+            )
+            return ""
+        return existing[body_start:end].strip("\n")
 
-    return existing[body_start:end].strip("\n")
+    return ""
 
 
 def _strip_block(text: str, begin_marker: str, end_marker: str) -> str:
@@ -80,6 +101,15 @@ def _strip_block(text: str, begin_marker: str, end_marker: str) -> str:
     if end == -1:
         return text
     return text[:begin].rstrip("\n") + "\n\n" + text[end + len(end_marker) :].lstrip("\n")
+
+
+def _strip_custom_block(text: str) -> str:
+    """Remove the custom-patterns region whichever wording it was written with."""
+    for begin_marker, end_marker in _custom_marker_pairs():
+        stripped = _strip_block(text, begin_marker, end_marker)
+        if stripped != text:
+            return stripped
+    return text
 
 
 def merge(existing: str | None, new_content: str) -> str:
@@ -107,9 +137,7 @@ def merge(existing: str | None, new_content: str) -> str:
         before = existing[:begin_idx].rstrip("\n")
         # The old custom block is dropped from the tail because its body has
         # already been read out and is being re-emitted inside `wrapped`.
-        after = _strip_block(existing[after_start:], CUSTOM_BEGIN_MARKER, CUSTOM_END_MARKER).strip(
-            "\n"
-        )
+        after = _strip_custom_block(existing[after_start:]).strip("\n")
 
         parts = []
         if before:
@@ -125,5 +153,5 @@ def merge(existing: str | None, new_content: str) -> str:
             "managed-block markers in existing file are malformed; appending a fresh block"
         )
 
-    trimmed = _strip_block(existing, CUSTOM_BEGIN_MARKER, CUSTOM_END_MARKER).rstrip("\n")
+    trimmed = _strip_custom_block(existing).rstrip("\n")
     return f"{trimmed}\n\n{wrapped}" if trimmed else wrapped

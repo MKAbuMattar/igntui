@@ -64,9 +64,9 @@ Do not mutate `TUIState` from a worker thread. That bug has been fixed once alre
 ...generated content, replaced on every save...
 # <<< igntui <<<
 
-# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
 ...your own rules, carried over verbatim...
-# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> End of custom patterns (edit freely; igntui preserves this block) <<<
 ```
 
 Those exact strings are already in files people have committed. If you change one, the next
