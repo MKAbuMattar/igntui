@@ -17,10 +17,10 @@ __pycache__/
 # End of https://www.toptal.com/developers/gitignore/api/python
 # <<< igntui <<<
 
-# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
 secrets.local.json
 *.local
-# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> End of custom patterns (edit freely; igntui preserves this block) <<<
 ```
 
 - The **generated region** is replaced wholesale on every save. Nothing you put
@@ -52,8 +52,8 @@ which lines igntui will overwrite.
 ```
 BEGIN_MARKER         = "# >>> igntui >>> (do not edit between these markers; managed by igntui)"
 END_MARKER           = "# <<< igntui <<<"
-CUSTOM_BEGIN_MARKER  = "# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<"
-CUSTOM_END_MARKER    = "# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<"
+CUSTOM_BEGIN_MARKER  = "# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<"
+CUSTOM_END_MARKER    = "# >>> End of custom patterns (edit freely; igntui preserves this block) <<<"
 ```
 
 These strings are matched **exactly**. Don't paraphrase them — a marker igntui
@@ -88,9 +88,9 @@ build/
 *.pyc
 # <<< igntui <<<
 
-# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
 secrets.local.json
-# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> End of custom patterns (edit freely; igntui preserves this block) <<<
 
 # more custom rules
 *.log
@@ -106,9 +106,9 @@ build/
 *.tmp
 # <<< igntui <<<
 
-# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
 secrets.local.json
-# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> End of custom patterns (edit freely; igntui preserves this block) <<<
 
 # more custom rules
 *.log

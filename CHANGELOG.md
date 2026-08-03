@@ -6,6 +6,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The custom-patterns markers told you not to edit the block that is yours.**
+  Through 0.4.0 they read `(do not edit between these markers; managed by
+  igntui)` — copied from the generated region, where it is true. On the custom
+  region it is the opposite of the truth, and it discouraged people from using
+  the one place in the file that survives regeneration. They now read:
+
+  ```gitignore
+  # >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
+  # >>> End of custom patterns (edit freely; igntui preserves this block) <<<
+  ```
+
+  The old wording is still recognised on read, so a `.gitignore` written by
+  0.2.0 through 0.4.0 is rewritten with the new markers on its next save and
+  your rules come across untouched. Nothing is duplicated and nothing is lost.
+
+  The generated region's markers are unchanged — "do not edit" is accurate
+  there, since that block is replaced on every save.
+
 ## [0.4.0] — 2026-08-02
 
 ### Added
@@ -74,6 +94,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   # >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
   # >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
   ```
+
+  (That wording was wrong and is corrected in 0.5.0 — the block is yours to
+  edit. Files carrying it are upgraded in place.)
 
   Its contents are read out of the existing file and written back verbatim on
   every save, so project-specific rules have one obvious, labelled home instead

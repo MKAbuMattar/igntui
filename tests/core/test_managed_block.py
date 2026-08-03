@@ -5,6 +5,7 @@ from igntui.core.managed_block import (
     CUSTOM_BEGIN_MARKER,
     CUSTOM_END_MARKER,
     END_MARKER,
+    LEGACY_CUSTOM_MARKER_PAIRS,
     extract_custom,
     merge,
     wrap,
@@ -75,11 +76,22 @@ def test_markers_are_the_documented_text():
     )
     assert END_MARKER == "# <<< igntui <<<"
     assert CUSTOM_BEGIN_MARKER == (
-        "# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<"
+        "# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<"
     )
     assert CUSTOM_END_MARKER == (
-        "# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<"
+        "# >>> End of custom patterns (edit freely; igntui preserves this block) <<<"
     )
+
+
+def test_custom_markers_invite_editing():
+    """The custom block is the one region the user owns.
+
+    Through 0.4.0 it said "do not edit between these markers" — the opposite of
+    its purpose, telling people not to use the block that exists for them.
+    """
+    for marker in (CUSTOM_BEGIN_MARKER, CUSTOM_END_MARKER):
+        assert "do not edit" not in marker
+        assert "edit freely" in marker
 
 
 def test_wrap_emits_both_regions_custom_empty():
@@ -143,3 +155,44 @@ def test_merge_malformed_markers_appends_fresh():
     assert "NEW" in out
     # The fresh block introduces ONE more BEGIN marker on top of the malformed one.
     assert out.count(BEGIN_MARKER) >= 2
+
+
+def test_old_custom_wording_is_rewritten_and_rules_survive():
+    """A .gitignore written by 0.2.0-0.4.0 upgrades in place.
+
+    The old pair said "do not edit between these markers". Failing to recognise
+    it would leave that block orphaned and append a second one below it.
+    """
+    old_begin, old_end = LEGACY_CUSTOM_MARKER_PAIRS[0]
+    existing = (
+        f"# mine\nbuild/\n\n"
+        f"{BEGIN_MARKER}\nOLD GENERATED\n{END_MARKER}\n\n"
+        f"{old_begin}\nsecrets.local\n*.pem\n{old_end}\n"
+    )
+
+    out = merge(existing, "NEW GENERATED")
+
+    assert "secrets.local" in out and "*.pem" in out
+    assert old_begin not in out and old_end not in out
+    assert out.count(CUSTOM_BEGIN_MARKER) == 1
+    assert out.count(CUSTOM_END_MARKER) == 1
+    assert "OLD GENERATED" not in out and "NEW GENERATED" in out
+    assert "# mine" in out and "build/" in out
+
+
+def test_extract_custom_reads_the_old_wording():
+    old_begin, old_end = LEGACY_CUSTOM_MARKER_PAIRS[0]
+    assert extract_custom(f"{old_begin}\nnode_modules/\n{old_end}\n") == "node_modules/"
+
+
+def test_upgrading_twice_does_not_duplicate_anything():
+    old_begin, old_end = LEGACY_CUSTOM_MARKER_PAIRS[0]
+    text = f"{BEGIN_MARKER}\nG\n{END_MARKER}\n\n{old_begin}\nkeep-me\n{old_end}\n"
+
+    for _ in range(3):
+        text = merge(text, "G")
+
+    assert text.count(CUSTOM_BEGIN_MARKER) == 1
+    assert text.count(CUSTOM_END_MARKER) == 1
+    assert text.count("keep-me") == 1
+    assert old_begin not in text

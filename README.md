@@ -212,9 +212,9 @@ A generated `.gitignore` carries two marked regions: the template content betwee
 custom-patterns region below it whose contents igntui carries over untouched:
 
 ```gitignore
-# >>> Start of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
 secrets.local.json
-# >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
+# >>> End of custom patterns (edit freely; igntui preserves this block) <<<
 ```
 
 Put your own rules there. Rules outside both regions are preserved too — the region
