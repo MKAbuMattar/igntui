@@ -48,7 +48,7 @@ Exits with the code of the implicit `tui` invocation.
 
 | Code | Cause                                                   |
 | ---- | ------------------------------------------------------- |
-| `0`  | Cache cleared (or user declined the prompt)             |
+| `0`  | Cache cleared                                           |
 | `1`  | User cancelled at the prompt, or filesystem write error |
 
 ### `igntui test`

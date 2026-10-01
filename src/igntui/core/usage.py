@@ -39,6 +39,8 @@ class UsageTracker:
         self._load()
 
     def record(self, template: str) -> None:
+        if not config.get("behavior", "save_usage_stats", default=True):
+            return
         entry = self._entries.setdefault(template, _Entry())
         entry.count += 1
         entry.last_used = time.time()

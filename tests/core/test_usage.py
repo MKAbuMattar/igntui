@@ -108,3 +108,21 @@ def test_no_migration_when_target_already_exists(tmp_path):
     # node should not appear; the existing TOML is the source of truth.
     assert "node" not in t.top(10)
     assert "python" in t.top(10)
+
+
+def test_record_writes_nothing_when_usage_stats_are_off(tmp_path, monkeypatch):
+    from igntui.core import usage as usage_mod
+
+    real_get = usage_mod.config.get
+    monkeypatch.setattr(
+        usage_mod.config,
+        "get",
+        lambda section, key, default=None: (
+            False
+            if (section, key) == ("behavior", "save_usage_stats")
+            else real_get(section, key, default=default)
+        ),
+    )
+    path = tmp_path / "usage.toml"
+    UsageTracker(path=path).record("python")
+    assert not path.exists()

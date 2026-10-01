@@ -25,7 +25,7 @@ class TestCommand(CLICommand):
             # GitIgnoreAPI here ignored `--config` and `--no-cache`, so the
             # command tested a different configuration than the one in use.
             print("Attempting to connect...", end="", flush=True)
-            response = self.cli.api.test_connection()
+            response = self.cli.api.test_connection(timeout=args.timeout)
 
             if not response.success:
                 print(" FAILED")
