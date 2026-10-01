@@ -357,7 +357,7 @@ class EventHandler:
         # In the Templates panel, also pick the row under the cursor and toggle
         # selection on a click.
         if panel == 1 and panel_top is not None:
-            row = my - panel_top - 1  # account for 1-line border
+            row = my - panel_top - 2  # border row, then the count header
             display = self.state.get_display_templates()
             if 0 <= row:
                 target = self.state.template_scroll + row

@@ -280,3 +280,19 @@ def test_unhandled_key_keeps_the_loop_running(handler):
 def test_mouse_event_without_a_screen_is_ignored(handler):
     """stdscr is Optional; the mouse path must not raise when it is None."""
     assert handler.handle_input(curses.KEY_MOUSE) is True
+
+
+def test_click_toggles_the_row_under_the_cursor(handler, monkeypatch):
+    """Templates panel: border at row 3, count header at 4, first item at 5."""
+
+    class Screen:
+        def getmaxyx(self):
+            return (24, 80)
+
+    handler.stdscr = Screen()
+    handler.state.template_scroll = 2
+    monkeypatch.setattr(curses, "getmouse", lambda: (0, 1, 5, 0, curses.BUTTON1_CLICKED))
+
+    assert handler.handle_input(curses.KEY_MOUSE) is True
+    assert handler.state.template_selected == 2
+    assert handler.state.selected_templates == {TEMPLATES[2]}

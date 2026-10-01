@@ -65,6 +65,9 @@ class TUIRenderer:
                 self.templates_panel.current_search_mode = self.state.current_search_mode
 
                 self.templates_panel.draw()
+                # draw() scrolls to keep the cursor visible; the mouse handler
+                # maps clicks through state, so it needs the same offset.
+                self.state.template_scroll = self.templates_panel.template_scroll
             except Exception as e:
                 logger.error(f"Error rendering templates panel: {e}")
 
