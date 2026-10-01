@@ -1,6 +1,6 @@
 """Keyboard handling: the biggest module in the tree, and the least covered.
 
-`handle_input` is a pure function of (key, state) plus optional callbacks — no
+`handle_input` is a pure function of (key, state) plus optional callbacks, with no
 curses calls on any path except the mouse one. So the keymap is testable without
 a terminal, which matters because a broken binding is invisible: the TUI keeps
 running and simply stops responding to that key.

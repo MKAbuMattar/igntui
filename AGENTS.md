@@ -1,4 +1,4 @@
-# AGENTS.md — igntui
+# AGENTS.md for igntui
 
 Instructions for AI agents working in this repo. Human contributors: see `README.md`,
 `docs/`, and `.github/CONTRIBUTING.md`.
@@ -19,28 +19,28 @@ else is stdlib.
 
 ## Layout
 
-- `src/igntui/main.py` — `main()` for the CLI, `tui_main()` for `gitignore-tui`. Argument
+- `src/igntui/main.py`: `main()` for the CLI, `tui_main()` for `gitignore-tui`. Argument
   parsing, logging setup, dispatch, top-level error handling.
-- `src/igntui/app.py` — `run_tui()`: the `curses.wrapper` boundary. **This is the entry point
-  the package uses.** (`tui/app.py` has a second, unused `main()` — see `ROADMAP.md` item 8.)
-- `src/igntui/cli/` — `parser.py` builds the argparse tree and maps command names to classes;
+- `src/igntui/app.py` holds `run_tui()`, the `curses.wrapper` boundary. **This is the entry point
+  the package uses.** (`tui/app.py` has a second, unused `main()`; see `ROADMAP.md` item 8.)
+- `src/igntui/cli/`: `parser.py` builds the argparse tree and maps command names to classes;
   `base.py` holds `BaseCLI` (config + API handle) and the `CLICommand` interface;
   `setup.py` owns logging configuration; `commands/` is one file per subcommand.
-- `src/igntui/core/` — everything with no terminal in it:
-  - `config.py` — the config cascade and the `config` singleton.
-  - `cache.py` — `CacheManager` (memory + disk, sha256-keyed) and `TemplateCache`.
-  - `api/` — `client.py` (template list/content, cache-aware), `request_handler.py`
+- `src/igntui/core/` holds everything with no terminal in it:
+  - `config.py`: the config cascade and the `config` singleton.
+  - `cache.py`: `CacheManager` (memory + disk, sha256-keyed) and `TemplateCache`.
+  - `api/`: `client.py` (template list/content, cache-aware), `request_handler.py`
     (urllib, retries, rate limit), `response.py` (frozen `APIResponse`), `errors.py`.
-  - `search.py` — fuzzy / exact / regex matching over template names.
-  - `managed_block.py` — the marker format written into `.gitignore`.
-  - `project_config.py` / `repo_config.py` / `usage.py` — the three TOML files on disk.
-- `src/igntui/tui/` — `app.py` (`GitIgnoreTUI`, the main loop), `state.py` (`TUIState`
+  - `search.py`: fuzzy / exact / regex matching over template names.
+  - `managed_block.py`: the marker format written into `.gitignore`.
+  - `project_config.py` / `repo_config.py` / `usage.py`: the three TOML files on disk.
+- `src/igntui/tui/`: `app.py` (`GitIgnoreTUI`, the main loop), `state.py` (`TUIState`
   dataclass), `event_handler.py` (keys and mouse), `actions.py` (save/export/dialogs),
   `renderer.py`, `lifecycle.py` (background API work), `updates.py` (the update messages),
   `curses_setup.py` (colour pairs).
-- `src/igntui/ui/components/` — one class per panel or dialog. Pure drawing.
-- `docs/` — user-facing reference, kept per command and per file format.
-- `scripts/release_version.py` — version bookkeeping; CI runs `assert-consistent`.
+- `src/igntui/ui/components/`: one class per panel or dialog. Pure drawing.
+- `docs/`: user-facing reference, kept per command and per file format.
+- `scripts/release_version.py`: version bookkeeping; CI runs `assert-consistent`.
 
 ## The five things that will bite you
 
@@ -53,12 +53,12 @@ worker thread reintroduces a bug that was already fixed once.
 **2. `config` is a module-level singleton with import-time side effects.**
 `core/config.py` ends with `config = Config()`. Importing it reads `~/.igntui.cfg.toml`,
 migrates a legacy JSON file if present, and applies env overrides. Anything that needs an
-isolated config in a test must construct `Config(config_path=...)` explicitly — and note that
+isolated config in a test must construct `Config(config_path=...)` explicitly. Note that
 `get_cache_dir()` calls `mkdir`, so it touches the filesystem.
 
 **3. `Config.DEFAULT_CONFIG` is class-level nested state.**
 `__init__` and `reset_to_defaults` `deepcopy` it on purpose. A shallow `{**DEFAULT_CONFIG}`
-shares the section dicts, and `set()` then writes into the class attribute — leaking into
+shares the section dicts, and `set()` then writes into the class attribute, which leaks into
 every later instance. There is a regression test; keep the deepcopy.
 
 **4. The managed block is a file format, and it is in users' repos.**
@@ -70,8 +70,8 @@ replacing the first. Tests pin the exact strings.
 
 **5. The cache key is a sha256 prefix, not a name.**
 `TemplateCache._make_content_key` sorts and lowercases the template list, then hashes it.
-Cache filenames are therefore stable across processes but say nothing about their contents —
-which is why the name-matching invalidation helper does not work (`ROADMAP.md` item 7).
+Cache filenames are therefore stable across processes but say nothing about their contents.
+That is why the name-matching invalidation helper does not work (`ROADMAP.md` item 7).
 
 ## Config cascade
 
@@ -80,7 +80,7 @@ DEFAULT_CONFIG → ~/.igntui.cfg.toml → .igntui.repo.cfg.toml → IGNTUI_* env
 ```
 
 The per-output sidecar (`.igntui.cfg.toml` next to the generated file) overlays *selection*
-state — templates and search mode — on top of that. It does not override config knobs.
+state, meaning templates and search mode, on top of that. It does not override config knobs.
 `docs/files/` documents each file; keep those pages in step with the code.
 
 ## Working commands
@@ -97,7 +97,7 @@ state — templates and search mode — on top of that. It does not override con
 | `uv run python scripts/release_version.py status` | This checkout's version vs PyPI. |
 | `grep -rnE '(#\|//) ?ponytail:' .` | Deferred-shortcut ledger. |
 
-`uv run` outside the project directory resolves a *different* environment — it will happily
+`uv run` outside the project directory resolves a *different* environment. It will happily
 run a globally installed `igntui` and make it look like your change did nothing. Stay in the
 repo root.
 
@@ -111,7 +111,7 @@ What tests cannot cover: the draw path (`ui/`, `tui/renderer.py`, `tui/curses_se
 excluded from coverage for this reason) and the mouse handling. **Verifying a TUI change means
 running it in a terminal**, and the pull request template asks which one you used.
 
-For a TUI change, check at 80×24 and again at something small like 45×13 — the panels
+For a TUI change, check at 80×24 and again at something small like 45×13. The panels
 degrade rather than raising, so a broken layout is silent. Check with the mouse both enabled
 and disabled (`ui.mouse_support`).
 

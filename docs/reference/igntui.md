@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui` — interactive TUI and CLI for generating `.gitignore` files
+`igntui` is an interactive TUI and CLI for generating `.gitignore` files.
 
 ## SYNOPSIS
 
@@ -15,10 +15,10 @@ igntui                                    # equivalent to: igntui tui
 
 `igntui` is a single-binary tool with two modes:
 
-- **Interactive TUI** — a curses-based interface with searchable templates,
+- **Interactive TUI**: a curses-based interface with searchable templates,
   multi-selection, live preview, and save-to-file. Launched by running
   `igntui` with no subcommand, or explicitly via [`igntui tui`](igntui-tui.md).
-- **Non-interactive CLI** — five subcommands (`list`, `generate`, `cache`,
+- **Non-interactive CLI**: five subcommands (`list`, `generate`, `cache`,
   `test`, `completion`) for scripting and shell pipelines.
 
 When invoked with no subcommand, `igntui` defaults to TUI mode (with splash).
@@ -27,7 +27,7 @@ Use `--no-splash` (TUI mode) or any explicit subcommand to bypass the splash.
 The companion script `gitignore-tui` is a shortcut that always launches the
 TUI; it accepts a smaller set of flags (see [`igntui tui`](igntui-tui.md)).
 
-## SYNOPSIS — Available Commands
+## SYNOPSIS: Available Commands
 
 | Command                              | Purpose                       |
 | ------------------------------------ | ----------------------------- |

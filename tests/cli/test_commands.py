@@ -1,7 +1,7 @@
 """The command classes: what they print and what they return.
 
 Each one is `execute(args) -> int` over an injected `cli` object, so a fake CLI
-and a fake API cover them with no network. Exit codes matter — they are
+and a fake API cover them with no network. Exit codes matter: they are
 documented in `docs/concepts/return-codes.md` and scripts depend on them.
 """
 

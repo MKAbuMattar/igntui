@@ -26,7 +26,7 @@ def test_top_orders_by_count_then_recency(tmp_path):
     # b has count 2, then a/c have count 1; among ties, more recent wins
     top = t.top(3)
     assert top[0] == "b"
-    # c was recorded after a → c before a
+    # c was recorded after a, so c sorts before a
     assert top.index("c") < top.index("a")
 
 
@@ -94,7 +94,7 @@ def test_legacy_json_is_migrated_to_toml(tmp_path):
 
 
 def test_no_migration_when_target_already_exists(tmp_path):
-    """If TOML already exists, the legacy file is ignored — no double-migration."""
+    """If TOML already exists, the legacy file is ignored, so nothing migrates twice."""
     target = tmp_path / USAGE_FILENAME
     legacy = tmp_path / LEGACY_USAGE_FILENAME
 

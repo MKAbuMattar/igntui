@@ -54,11 +54,11 @@ class GenerateCommand(CLICommand):
                 if args.output:
                     size = len(content.encode("utf-8"))
                     print(
-                        f"# (dry-run — would write {size} bytes to {args.output})",
+                        f"# (dry-run: would write {size} bytes to {args.output})",
                         file=sys.stderr,
                     )
                 else:
-                    print("# (dry-run — no file written)", file=sys.stderr)
+                    print("# (dry-run: no file written)", file=sys.stderr)
                 print(content)
                 return 0
 

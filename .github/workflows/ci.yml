@@ -16,7 +16,7 @@ jobs:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
     # Pin Python at the job level so every `uv` invocation (sync, run, tool)
     # picks the same interpreter. Without this, `uv run` falls back to the
-    # system Python and rebuilds the venv without extras → ruff/pytest go
+    # system Python and rebuilds the venv without extras, so ruff/pytest go
     # missing on the next step.
     env:
       UV_PYTHON: ${{ matrix.python-version }}
@@ -33,7 +33,7 @@ jobs:
         run: uv sync --extra test --extra dev
 
       - name: Lint with ruff
-        # Use uvx (isolated tool run) — doesn't depend on project venv state
+        # Use uvx (isolated tool run). It doesn't depend on project venv state
         # and doesn't trigger a re-sync.
         run: uvx ruff check src tests scripts
 

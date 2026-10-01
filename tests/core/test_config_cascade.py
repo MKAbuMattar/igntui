@@ -19,7 +19,7 @@ def test_set_does_not_leak_into_the_class_defaults(tmp_path):
     """`set()` used to write straight into `Config.DEFAULT_CONFIG`.
 
     The nested section dicts were shared with the class attribute, so one
-    instance's write became every later instance's starting value — and
+    instance's write became every later instance's starting value, and
     `reset_to_defaults()` could never undo it.
     """
     original = Config.DEFAULT_CONFIG["api"]["timeout"]
@@ -67,8 +67,8 @@ def test_env_overrides_repo_config(tmp_path):
 
 
 def test_repo_config_does_not_leak_selection_into_config(tmp_path):
-    """`[selection]` from repo config is not merged into the runtime config —
-    it's read separately by the TUI/CLI sidecar-seeding path."""
+    """`[selection]` from repo config is not merged into the runtime config.
+    It's read separately by the TUI/CLI sidecar-seeding path."""
     repo_path = tmp_path / "repo.cfg.toml"
     _write_toml(
         repo_path,

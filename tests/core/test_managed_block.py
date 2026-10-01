@@ -86,7 +86,7 @@ def test_markers_are_the_documented_text():
 def test_custom_markers_invite_editing():
     """The custom block is the one region the user owns.
 
-    Through 0.4.0 it said "do not edit between these markers" — the opposite of
+    Through 0.4.0 it said "do not edit between these markers", the opposite of
     its purpose, telling people not to use the block that exists for them.
     """
     for marker in (CUSTOM_BEGIN_MARKER, CUSTOM_END_MARKER):

@@ -53,7 +53,7 @@ class UsageTracker:
         return [name for name, _ in items[:n]]
 
     def _migrate_legacy_if_present(self) -> None:
-        """Convert ~/.igntui_usage.json → ~/.igntui.usage.toml (one-shot)."""
+        """Convert ~/.igntui_usage.json to ~/.igntui.usage.toml (one-shot)."""
         if self.path.exists():
             return
         legacy = self.path.parent / LEGACY_USAGE_FILENAME

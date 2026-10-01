@@ -3,7 +3,7 @@
 ## Supported versions
 
 Fixes land on the latest release published to [PyPI](https://pypi.org/project/igntui/). There
-are no maintained release branches — please upgrade before reporting.
+are no maintained release branches, so please upgrade before reporting.
 
 ```bash
 pipx upgrade igntui    # or: pip install --upgrade igntui
@@ -16,7 +16,7 @@ Report privately through
 Please don't open a public issue for a suspected vulnerability.
 
 Expect an acknowledgement within a few days. Because this is maintained in spare time, a fix
-may take longer — you'll be told where it stands.
+may take longer. You'll be told where it stands.
 
 ## Realistic scope
 
@@ -35,7 +35,7 @@ could matter:
   igntui read or write outside it, or trust a file in it that it should not, is in scope.
 - **Config and sidecar parsing.** `~/.igntui.cfg.toml`, `.igntui.repo.cfg.toml`, the per-output
   sidecar, and `~/.igntui.usage.toml` are all parsed with `tomllib`. The repo config is
-  team-shared, so it is the one an attacker is most likely to influence — it can set `api.base_url`,
+  team-shared, so it is the one an attacker is most likely to influence. It can set `api.base_url`,
   which redirects where templates are fetched from.
 - **Terminal escape sequence injection.** Template content comes from a remote API and is
   rendered in a curses pane and written to disk. A response that can emit attacker-controlled
@@ -45,7 +45,7 @@ could matter:
 
 ## Out of scope
 
-- Garbled rendering in a terminal below the size the panels can lay out. That is a bug — please
+- Garbled rendering in a terminal below the size the panels can lay out. That is a bug, so please
   file it as a TUI problem.
 - The animation or splash screen leaving the terminal in an odd state after an abnormal exit.
   Also a bug, also a regular issue.

@@ -24,7 +24,7 @@ secrets.local.json
 ```
 
 - The **generated region** is replaced wholesale on every save. Nothing you put
-  there survives — it belongs to the template content.
+  there survives, because it belongs to the template content.
 - The **custom-patterns region** is where your own rules go. igntui reads its
   body out of the existing file and writes it back unchanged on every save.
 - Anything **outside both regions** is also preserved verbatim.
@@ -43,7 +43,7 @@ Common workflow:
    another stack.
 
 Step 3 replaces the generated region and carries step 2's rule across untouched.
-Rules written outside both regions survive too — the custom region exists so
+Rules written outside both regions survive too. The custom region exists so
 there is one obvious, labelled place for them, and so a reader of the file knows
 which lines igntui will overwrite.
 
@@ -56,7 +56,7 @@ CUSTOM_BEGIN_MARKER  = "# >>> Start of custom patterns (edit freely; igntui pres
 CUSTOM_END_MARKER    = "# >>> End of custom patterns (edit freely; igntui preserves this block) <<<"
 ```
 
-These strings are matched **exactly**. Don't paraphrase them — a marker igntui
+These strings are matched **exactly**. Don't paraphrase them, because a marker igntui
 does not recognise means the next save appends a second block instead of
 replacing the first. They are pinned by tests for the same reason.
 
@@ -136,8 +136,8 @@ managed-block semantics.
 
 When saving from the TUI to an existing file, a `DiffPreviewDialog` shows a
 unified diff between current and proposed contents before applying the change.
-With managed blocks active, the diff is **small** — usually just the lines inside
-the generated region — making review fast.
+With managed blocks active, the diff is **small**, usually just the lines inside
+the generated region, so review is fast.
 
 If the diff is empty (no semantic change), the save is short-circuited with a
 status message and the file is not rewritten.

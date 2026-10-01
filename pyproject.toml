@@ -51,7 +51,7 @@ igntui = "igntui.main:cli_main"
 gitignore-tui = "igntui.main:tui_main"
 
 [project.optional-dependencies]
-# Only what CI actually invokes. `black`, `isort`, `flake8`, `mypy`, `hatch` and
+# Only what CI invokes. `black`, `isort`, `flake8`, `mypy`, `hatch` and
 # `pre-commit` were declared here and never run by anything: ruff covers the
 # first three, `ty` does the type-checking, and the build backend is uv_build.
 dev = [
@@ -88,7 +88,7 @@ select = [
     "W",   # pycodestyle warnings
     "F",   # pyflakes
     "I",   # isort
-    "B",   # flake8-bugbear (includes B904 — raise X from err)
+    "B",   # flake8-bugbear (includes B904: raise X from err)
     "C4",  # flake8-comprehensions
     "UP",  # pyupgrade
 ]
@@ -96,7 +96,7 @@ ignore = [
     "E501",  # line too long (handled by formatter)
     "B008",  # do not perform function calls in argument defaults
     "C901",  # function is too complex
-    "E402",  # module-level import not at top — needed for tomllib version-guarded import
+    "E402",  # module-level import not at top, needed for tomllib version-guarded import
     "W291",  # trailing whitespace (cosmetic)
     "W293",  # blank line contains whitespace (cosmetic)
     "C408",  # unnecessary dict() call (style)
@@ -157,8 +157,8 @@ exclude_lines = [
 ]
 show_missing = true
 
-# Nothing else belongs here. The `[tool.hatch.*]` tables that used to follow —
+# Nothing else belongs here. The `[tool.hatch.*]` tables that used to follow were inert,
+# because the build backend is uv_build and CI runs ruff, ty and pytest. They held
 # build targets, metadata, an env with black/isort/mypy/twine, and `fmt`/`lint`
-# scripts pointing at them — were inert: the build backend is uv_build, and CI
-# runs ruff, ty and pytest. `[tool.isort]` also set line_length = 88 against
+# scripts pointing at them. `[tool.isort]` also set line_length = 88 against
 # ruff's 100. See AGENTS.md for the commands that are real.

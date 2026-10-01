@@ -84,7 +84,7 @@ class GitIgnoreTUI:
         logger.info("GitIgnoreTUI initialized successfully")
 
     def _maybe_load_sidecar(self) -> None:
-        # Per-output sidecar takes precedence — it represents an explicit
+        # Per-output sidecar takes precedence because it is an explicit
         # selection committed alongside a real `.gitignore`.
         sidecar_path = find_sidecar()
         if sidecar_path is not None:
@@ -95,7 +95,7 @@ class GitIgnoreTUI:
                     self.state.current_search_mode = cfg.search_mode
                 self.state.set_status_message(
                     f"✓ Loaded {len(cfg.templates)} templates from "
-                    f"{sidecar_path.name} — Press 'c' to clear"
+                    f"{sidecar_path.name}; press 'c' to clear"
                 )
                 self._generate_content_async()
                 logger.info(
@@ -105,7 +105,7 @@ class GitIgnoreTUI:
                 )
                 return
 
-        # No sidecar — fall back to the repo config's [selection] if present.
+        # No sidecar: fall back to the repo config's [selection] if present.
         repo_path = find_repo_config()
         if repo_path is None:
             return
@@ -117,7 +117,7 @@ class GitIgnoreTUI:
             self.state.current_search_mode = repo.selection_search_mode
         self.state.set_status_message(
             f"✓ Seeded {len(repo.selection_templates)} templates from "
-            f"{repo_path.name} — Press 'c' to clear"
+            f"{repo_path.name}; press 'c' to clear"
         )
         self._generate_content_async()
         logger.info(

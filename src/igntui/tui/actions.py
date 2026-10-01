@@ -68,7 +68,7 @@ class TUIActions:
             if existing is not None:
                 if existing == merged:
                     self.state.set_status_message(
-                        f"No changes — {gitignore_path.name} is already up to date"
+                        f"No changes, {gitignore_path.name} is already up to date"
                     )
                     return
                 diff_dialog = DiffPreviewDialog(
@@ -173,7 +173,7 @@ class TUIActions:
         try:
             version_string = get_version_string()
 
-            # Dim full-screen backdrop — one addstr per row instead of
+            # Dim full-screen backdrop: one addstr per row instead of
             # max_y * max_x addch calls (12000+ calls on a 200x60 terminal).
             backdrop_attr = curses.color_pair(1) | curses.A_DIM
             for y in range(max_y):
@@ -182,7 +182,7 @@ class TUIActions:
                 except curses.error:
                     pass
 
-            # Dialog background — same per-row pattern.
+            # Dialog background, same per-row pattern.
             dialog_attr = curses.color_pair(8)
             for y in range(dialog_y, dialog_y + dialog_height):
                 try:

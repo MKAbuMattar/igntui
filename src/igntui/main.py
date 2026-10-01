@@ -23,8 +23,7 @@ def main() -> int:
         no_cache=args.no_cache,
     )
 
-    # `--log-level` used to be parsed and then ignored, and the `[logging]`
-    # section of the config had no reader at all. Both are honored here.
+    # Honors both `--log-level` and the config's `[logging]` section.
     setup_logging(verbose=args.verbose, log_level=args.log_level)
 
     command = args.command

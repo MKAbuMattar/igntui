@@ -114,7 +114,7 @@ class Config:
         # of truth for the section names.
         # deepcopy, not `{**DEFAULT_CONFIG}`: a shallow copy shares the nested
         # section dicts with the class attribute, so `set()` wrote straight into
-        # the defaults — leaking into every later instance and making
+        # the defaults. That leaked into every later instance and made
         # `reset_to_defaults()` a no-op.
         self._config: dict[str, Any] = copy.deepcopy(dict(self.DEFAULT_CONFIG))
         self._migrate_legacy_user_config_if_present()
@@ -123,7 +123,7 @@ class Config:
         self._load_env_overrides()
 
     def _migrate_legacy_user_config_if_present(self) -> None:
-        """Convert ~/.igntui.json → ~/.igntui.cfg.toml (one-shot, on first launch)."""
+        """Convert ~/.igntui.json to ~/.igntui.cfg.toml (one-shot, on first launch)."""
         if self.config_path.exists():
             return
         legacy = Path.home() / LEGACY_USER_CONFIG_FILENAME

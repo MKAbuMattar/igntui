@@ -58,10 +58,10 @@ class EventHandler:
             return True
 
         # Quit / leave-search semantics:
-        # - In any panel except Search: q / Q / Esc → quit the app
+        # - In any panel except Search: q / Q / Esc quits the app
         # - In Search panel:
-        #     • Esc → exit search mode (focus Templates instead)
-        #     • q / Q → typed as letters into the search box
+        #     - Esc exits search mode (focus moves to Templates)
+        #     - q / Q are typed as letters into the search box
         if key in (ord("q"), ord("Q"), 27):
             if self.state.current_panel != 0:
                 if self.on_quit:
@@ -71,7 +71,7 @@ class EventHandler:
                 self.state.current_panel = 1
                 self.state.set_status_message("Exited search mode")
                 return True
-            # q / Q while focused on Search — fall through to typing
+            # q / Q while focused on Search: fall through to typing
             self._handle_search_input(key)
             return True
 

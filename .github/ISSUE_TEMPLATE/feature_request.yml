@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        `ROADMAP.md` has a "Rejected on purpose" section — a plugin system, a
+        `ROADMAP.md` has a "Rejected on purpose" section: a plugin system, a
         Textual rewrite, a settings UI, and vendoring the template list are all
         there with reasons. Worth a look first; if you disagree with one of them,
         say so here and make the case.

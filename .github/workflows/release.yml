@@ -11,7 +11,7 @@ name: release
 #
 # The split matters: nothing irreversible happens while the PR is open. Merging
 # is the act that publishes, so the PR diff is a preview of exactly what ships.
-# PyPI does not allow re-uploading a version — a mistaken merge burns that
+# PyPI does not allow re-uploading a version, so a mistaken merge burns that
 # number permanently, so the point of no return is one deliberate click.
 
 on:
@@ -99,7 +99,7 @@ jobs:
       - name: Smoke-test the built wheel
         run: |
           set -euo pipefail
-          # Glob, not `ls` — its output is not safe to parse.
+          # Glob, not `ls`, because its output is not safe to parse.
           wheels=(dist/*.whl)
           [ -e "${wheels[0]}" ] || { echo "::error::no wheel was built"; exit 1; }
           uvx --from "${wheels[0]}" igntui --version
@@ -124,7 +124,7 @@ jobs:
               'Prepared and verified. Both version files are bumped on this branch,',
               'lint, types and tests pass, and the built wheel installs and runs.',
               '',
-              '**Merging this pull request will publish to PyPI.** That cannot be undone —',
+              '**Merging this pull request will publish to PyPI.** That cannot be undone.',
               `PyPI does not allow re-uploading a version, so a mistake means burning \`${version}\`.`,
               '',
               'On merge: upload to PyPI &rarr; confirm PyPI serves it &rarr; tag `v' + version + '` &rarr; Release page.',
@@ -167,7 +167,7 @@ jobs:
         id: version
         run: echo "version=${GITHUB_HEAD_REF#release/}" >> "$GITHUB_OUTPUT"
 
-      # Refuses to publish if the merged tree does not actually carry the
+      # Refuses to publish if the merged tree does not carry the
       # version the branch name promises.
       - name: Confirm the merged tree is at that version
         run: python3 scripts/release_version.py assert "${{ steps.version.outputs.version }}"

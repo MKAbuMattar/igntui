@@ -19,7 +19,7 @@ class TUIRenderer:
 
     def render(self) -> None:
         try:
-            # erase() is non-destructive — curses' double-buffer diffs against
+            # erase() is non-destructive: curses' double-buffer diffs against
             # the previous frame so unchanged cells aren't redrawn. clear() forces
             # a full repaint every tick which causes visible flicker.
             self.stdscr.erase()
