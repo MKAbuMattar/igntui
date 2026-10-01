@@ -6,6 +6,50 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The TUI could save an error message over your `.gitignore`.** After a
+  failed generation the content panel holds `# Error generating content: ...`,
+  and `s` wrote that into the managed block, dropping every generated rule.
+  Save now refuses until a generation for the current selection succeeds.
+- **A slow, older generation could replace a newer one.** Toggling templates
+  quickly, or pressing `c` while a request was running, let the earlier
+  result win, so a save wrote rules for a different selection than the one
+  shown. Results that do not match the current selection are now dropped.
+- **A failed write could truncate `.gitignore` and lose the custom-patterns
+  block.** `igntui generate --output` and the TUI save now write a temp file
+  beside the target and rename it into place. File permissions and a
+  symlinked `.gitignore` are kept.
+- **`--config` and `.igntui.repo.cfg.toml` had no effect.** The values were
+  loaded into a config object that nothing read. They now reach the API,
+  logging, and usage tracking. `gitignore-tui` also reads the repo file, and
+  `igntui --no-cache tui` now bypasses the cache inside the TUI.
+- **`igntui test --timeout N` ignored N** and probed with the default timeout.
+- **`igntui list --filter X --count` exited 0 when nothing matched.** It now
+  exits 1, like the same command without `--count`.
+- **`behavior.save_usage_stats = false` was ignored**, so every selection still
+  wrote `~/.igntui.usage.toml`.
+- **Clicking a template toggled the wrong row** when the list was scrolled,
+  and was one row off even when it was not.
+- **Pressing F5 with a search filter active** showed the full template list
+  under the filter header, so `a` selected everything.
+- **"No changes, already up to date" never appeared**, because the save
+  header's timestamp always differed. Re-saving an unchanged selection now
+  skips the diff dialog.
+- **`generate --dry-run --output` reported the wrong byte count.** It now
+  reports the size of the merged file it would write.
+- After a load error on the splash screen, input polling stayed at 5 seconds
+  per key, so background updates showed up late.
+- The content panel's scroll counter was drawn over its title, and the
+  template count overflowed the Templates panel on narrow terminals.
+
+### Changed
+
+- Changelog version headers use the Keep a Changelog form `## [x.y.z] - date`.
+- Prose in the docs, README, and code comments no longer uses em dashes. A few
+  status messages changed punctuation to match, for example
+  `Loaded N templates from .igntui.cfg.toml; press 'c' to clear`.
+
 ## [0.5.0] - 2026-08-03
 
 ### Fixed
