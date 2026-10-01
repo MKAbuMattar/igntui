@@ -52,7 +52,10 @@ class GenerateCommand(CLICommand):
 
             if args.dry_run:
                 if args.output:
-                    size = len(content.encode("utf-8"))
+                    if args.append:
+                        size = len(content.encode("utf-8"))
+                    else:
+                        size = len(self._merged(args.output, content).encode("utf-8"))
                     print(
                         f"# (dry-run: would write {size} bytes to {args.output})",
                         file=sys.stderr,
@@ -82,13 +85,9 @@ class GenerateCommand(CLICommand):
                         f.write(content)
                     print(f"✓ Appended to {output_file}")
                 else:
-                    from ...core.managed_block import merge as merge_managed_block
+                    from ...core.managed_block import write_file
 
-                    existing = None
-                    if output_file.exists():
-                        existing = output_file.read_text(encoding="utf-8")
-                    merged = merge_managed_block(existing, content)
-                    output_file.write_text(merged, encoding="utf-8")
+                    write_file(output_file, self._merged(output_file, content))
                     print(f"✓ Generated {output_file}")
 
                     if not args.no_sidecar:
@@ -102,6 +101,13 @@ class GenerateCommand(CLICommand):
         except Exception as e:
             self.cli.handle_api_error(e)
             return 1
+
+    @staticmethod
+    def _merged(output_file: Path, content: str) -> str:
+        from ...core.managed_block import merge as merge_managed_block
+
+        existing = output_file.read_text(encoding="utf-8") if output_file.exists() else None
+        return merge_managed_block(existing, content)
 
     def _write_sidecar(self, output_file: Path, templates: list[str]) -> None:
         from ...core.project_config import SIDECAR_FILENAME, ProjectConfig

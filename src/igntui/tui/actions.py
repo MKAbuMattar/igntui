@@ -4,16 +4,26 @@
 import curses
 import json
 import logging
+import re
 import time
 from pathlib import Path
 
 from .. import __version__, get_version_string
 from ..core.managed_block import merge as merge_managed_block
+from ..core.managed_block import write_file
 from ..core.project_config import SIDECAR_FILENAME, ProjectConfig
 from ..ui import ExportDialog, HelpDialog, SaveDialog
 from ..ui.components import DiffPreviewDialog
 
 logger = logging.getLogger(__name__)
+
+# The save header carries a timestamp, so two saves of the same selection
+# always differ on that line. Compare without it.
+_TIMESTAMP_LINE = re.compile(r"^# Generated on: .*$", re.MULTILINE)
+
+
+def _same_ignoring_timestamp(a: str, b: str) -> bool:
+    return _TIMESTAMP_LINE.sub("", a) == _TIMESTAMP_LINE.sub("", b)
 
 
 class TUIActions:
@@ -22,12 +32,14 @@ class TUIActions:
         self.state = state
 
     def save_gitignore(self) -> None:
-        if not self.state.generated_content or self.state.generated_content.startswith(
-            "# No templates selected"
-        ):
-            self.state.set_status_message(
-                "No content to save - select templates first", is_error=True
-            )
+        if not self.state.content_ok:
+            if self.state.generation_in_progress:
+                msg = "Still generating, try again in a moment"
+            elif self.state.selected_templates:
+                msg = "Nothing to save, the last generation failed"
+            else:
+                msg = "No content to save, select templates first"
+            self.state.set_status_message(msg, is_error=True)
             return
 
         try:
@@ -66,7 +78,7 @@ class TUIActions:
             # If the file already exists, show a diff preview before writing.
             # No-op writes (managed block unchanged) short-circuit with a message.
             if existing is not None:
-                if existing == merged:
+                if _same_ignoring_timestamp(existing, merged):
                     self.state.set_status_message(
                         f"No changes, {gitignore_path.name} is already up to date"
                     )
@@ -81,8 +93,7 @@ class TUIActions:
                     self.state.set_status_message("Save cancelled")
                     return
 
-            with open(gitignore_path, "w", encoding="utf-8") as f:
-                f.write(merged)
+            write_file(gitignore_path, merged)
 
             content_size = len(self.state.generated_content)
 

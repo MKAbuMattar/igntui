@@ -59,15 +59,15 @@ class TemplateLifecycle:
             updates.put(GenerationCompleted())
             return
 
+        key = tuple(templates)
+
         def generate_content():
             try:
                 logger.info("Generating content for %d templates", len(templates))
                 response = self.api.get_templates(templates)
                 if response.success:
                     logger.info("Generated %d chars", len(response.data))
-                    updates.put(
-                        ContentGenerated(response.data, response.from_cache, len(templates))
-                    )
+                    updates.put(ContentGenerated(response.data, response.from_cache, key))
                 else:
                     msg = response.error_message or "Unknown error"
                     logger.error("Failed to generate content: %s", msg)
@@ -78,7 +78,7 @@ class TemplateLifecycle:
                 logger.error("Exception generating content: %s", e)
                 updates.put(ContentGenerationFailed(f"Error: {e}", list(templates)))
             finally:
-                updates.put(GenerationCompleted())
+                updates.put(GenerationCompleted(key))
 
         threading.Thread(target=generate_content, daemon=True).start()
 

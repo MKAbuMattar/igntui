@@ -209,12 +209,15 @@ class GitIgnoreTUI:
 
     def _generate_content_async(self) -> None:
         if not self.state.selected_templates:
+            self.state.content_ok = False
+            self.state.generation_in_progress = False
             self.state.generated_content = (
                 "# No templates selected\n# Select templates from the Available Templates panel"
             )
             return
 
         self.state.generation_in_progress = True
+        self.state.content_ok = False
         selected_list = self.state.get_selected_templates_list()
         self.state.set_status_message(f"Generating content for {len(selected_list)} templates...")
         self.lifecycle.generate_content_async(selected_list, self.updates)
@@ -232,28 +235,42 @@ class GitIgnoreTUI:
             except queue.Empty:
                 return
 
+            # Each toggle starts its own worker, so results can arrive out of
+            # order or after a clear. Only the one matching the current
+            # selection is applied.
+            current = tuple(self.state.get_selected_templates_list())
+
             match update:
                 case TemplatesLoaded(templates=templates):
                     self.state.templates = templates
-                    self.state.filtered_templates = templates[:]
+                    self.state.filtered_templates = self.lifecycle.filter_templates(
+                        templates, self.state.filter_text, self.state.current_search_mode
+                    )
                     self.state.set_status_message(f"✓ Loaded {len(templates)} templates")
                 case TemplatesLoadFailed(message=msg):
                     self.state.set_status_message(msg, is_error=True)
-                case ContentGenerated(content=content, from_cache=from_cache, selected_count=n):
+                case ContentGenerated(content=content, from_cache=from_cache, templates=templates):
+                    if templates != current:
+                        continue
                     self.state.generated_content = content
+                    self.state.content_ok = True
                     cache_info = " (cached)" if from_cache else ""
                     self.state.set_status_message(
-                        f"✓ Generated content for {n} templates{cache_info}"
+                        f"✓ Generated content for {len(templates)} templates{cache_info}"
                     )
                 case ContentGenerationFailed(message=msg, selected_templates=selected):
+                    if tuple(selected) != current:
+                        continue
                     self.state.generated_content = (
                         f"# Error generating content: {msg}\n# Selected templates: {selected}"
                     )
+                    self.state.content_ok = False
                     self.state.set_status_message(msg, is_error=True)
                 case LoadCompleted():
                     self.state.loading = False
-                case GenerationCompleted():
-                    self.state.generation_in_progress = False
+                case GenerationCompleted(templates=templates):
+                    if templates == current:
+                        self.state.generation_in_progress = False
 
     def run(self) -> int:
         logger.info("Starting TUI main loop")

@@ -18,6 +18,8 @@ is preserved too.
 """
 
 import logging
+import os
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -155,3 +157,25 @@ def merge(existing: str | None, new_content: str) -> str:
 
     trimmed = _strip_custom_block(existing).rstrip("\n")
     return f"{trimmed}\n\n{wrapped}" if trimmed else wrapped
+
+
+def write_file(path: Path, text: str) -> None:
+    """Write `text` to `path` so a failed write leaves the old file intact.
+
+    A truncated `.gitignore` loses its END marker, and the next `merge()` then
+    treats the custom-patterns block as gone. The temp file sits next to the
+    target so `os.replace` is a rename. It is opened with "x" so it gets the
+    umask's permissions rather than mkstemp's 0600, and an existing file's
+    mode is copied over. A symlinked target is resolved so the link survives.
+    """
+    target = Path(os.path.realpath(path))
+    tmp = target.with_name(f".{target.name}.{os.getpid()}.tmp")
+    try:
+        with open(tmp, "x", encoding="utf-8") as f:
+            f.write(text)
+        if target.exists():
+            os.chmod(tmp, target.stat().st_mode & 0o7777)
+        os.replace(tmp, target)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise

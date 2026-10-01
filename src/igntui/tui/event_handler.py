@@ -114,6 +114,8 @@ class EventHandler:
         elif key == ord("c"):
             self.state.clear_all_selections()
             self.state.generated_content = ""
+            self.state.content_ok = False
+            self.state.generation_in_progress = False
             self.state.set_status_message("Cleared all selections")
             return True
 
