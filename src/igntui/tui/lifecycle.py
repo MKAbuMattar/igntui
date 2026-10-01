@@ -28,7 +28,7 @@ class TemplateLifecycle:
         self.search_manager = search_manager
         self.usage = UsageTracker()
 
-    def load_templates_async(self, updates: "queue.Queue[StateUpdate]") -> None:
+    def load_templates_async(self, updates: queue.Queue[StateUpdate]) -> None:
         def load_templates():
             try:
                 logger.info("Loading templates from API")
@@ -52,7 +52,7 @@ class TemplateLifecycle:
     def generate_content_async(
         self,
         templates: list[str],
-        updates: "queue.Queue[StateUpdate]",
+        updates: queue.Queue[StateUpdate],
     ) -> None:
         if not templates:
             updates.put(ContentGenerationFailed("No templates selected", []))

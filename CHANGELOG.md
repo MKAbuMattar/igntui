@@ -48,8 +48,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- The development interpreter (`.python-version`) is now Python 3.14. Support
-  is unchanged: 3.11 through 3.14, all tested in CI.
+- **igntui now requires Python 3.14 or newer.** `requires-python` is `>=3.14`,
+  CI tests 3.14 only, and the code uses 3.14 syntax (lazy annotations,
+  unparenthesized `except A, B:`). On Python 3.11 to 3.13, pip keeps
+  installing 0.5.0. The development interpreter (`.python-version`) is 3.14.
+- The release workflow runs `scripts/release_version.py` through
+  `uv run --no-project`, so it uses Python 3.14 rather than the runner's
+  system `python3`.
+- The unused `[tool.mypy]` configuration is removed. `ty` does the type
+  checking.
 - Dependency floors match the versions tested: `pyfiglet>=1.0.4`,
   `tomli-w>=1.2.0`, and in the extras `pytest>=9.1.1`, `pytest-cov>=7.1.0`,
   `ruff>=0.16.9`. `freezegun` and `pytest-mock` are removed from the extras

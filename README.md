@@ -79,6 +79,9 @@
 
 ## Installation
 
+igntui needs Python 3.14 or newer. On an older interpreter, pip and pipx
+install the last release that supported it (0.5.0 supports 3.11 to 3.14).
+
 ### Using pip (Standard)
 
 ```bash

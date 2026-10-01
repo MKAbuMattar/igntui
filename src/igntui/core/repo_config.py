@@ -62,7 +62,7 @@ class RepoConfig:
     path: Path | None = None
 
     @classmethod
-    def load(cls, path: Path) -> "RepoConfig | None":
+    def load(cls, path: Path) -> RepoConfig | None:
         try:
             with open(path, "rb") as f:
                 data = tomllib.load(f)

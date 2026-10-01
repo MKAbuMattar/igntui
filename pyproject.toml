@@ -14,7 +14,7 @@ authors = [
 maintainers = [
     { name = "Mohammad Abu Mattar", email = "mohammad.khaled@outlook.com" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 dependencies = [
     # 2.4.2 is the first release with cp314 wheels. The floor matters on
     # Windows: an older pin can resolve to a version with no wheel for the
@@ -30,10 +30,8 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Version Control :: Git",
     "Topic :: Terminals",
@@ -76,7 +74,7 @@ build-backend = "uv_build"
 # Ruff configuration
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py314"
 
 # Enable specific rule sets
 [tool.ruff.lint]
@@ -104,23 +102,9 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]  # Allow unused imports in __init__.py
 
-# MyPy configuration
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false  # Set to true when ready for full type checking
-ignore_missing_imports = true
-
-# Per-module options
-[[tool.mypy.overrides]]
-module = ["curses", "curses.*", "windows_curses", "windows_curses.*"]
-ignore_missing_imports = true
-ignore_errors = true
-
 # Type checking with ty (https://docs.astral.sh/ty/)
 [tool.ty.environment]
-python-version = "3.11"
+python-version = "3.14"
 
 [tool.ty.src]
 include = ["src/igntui"]

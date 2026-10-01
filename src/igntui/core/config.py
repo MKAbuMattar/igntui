@@ -246,7 +246,7 @@ class Config:
             for key in keys:
                 value = value[key]
             return value
-        except (KeyError, TypeError):
+        except KeyError, TypeError:
             return default
 
     def set(self, *keys: str, value: Any) -> None:

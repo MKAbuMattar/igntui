@@ -60,10 +60,10 @@ jobs:
 
       # Rejects a malformed or backwards version before anything is written.
       - name: Check it is a legal next version
-        run: python3 scripts/release_version.py check "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py check "${{ steps.version.outputs.version }}"
 
       - name: Bump both version files and roll the changelog
-        run: python3 scripts/release_version.py apply "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py apply "${{ steps.version.outputs.version }}"
 
       - name: Push the bump back to the pull request
         run: |
@@ -170,7 +170,7 @@ jobs:
       # Refuses to publish if the merged tree does not carry the
       # version the branch name promises.
       - name: Confirm the merged tree is at that version
-        run: python3 scripts/release_version.py assert "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py assert "${{ steps.version.outputs.version }}"
 
       - name: Build
         run: uv build
@@ -192,7 +192,7 @@ jobs:
 
       # An upload can succeed and still serve nothing. Poll until it is real.
       - name: Confirm PyPI is serving it
-        run: python3 scripts/release_version.py verify "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py verify "${{ steps.version.outputs.version }}"
 
       - name: Tag the release commit
         run: |
@@ -207,7 +207,7 @@ jobs:
         run: |
           {
             echo 'body<<RELEASE_NOTES_EOF'
-            python3 scripts/release_version.py notes "${{ steps.version.outputs.version }}"
+            uv run --no-project python scripts/release_version.py notes "${{ steps.version.outputs.version }}"
             echo 'RELEASE_NOTES_EOF'
           } >> "$GITHUB_OUTPUT"
 

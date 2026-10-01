@@ -140,7 +140,7 @@ def published() -> str | None:
     try:
         with urllib.request.urlopen(PYPI_JSON, timeout=5) as response:
             return str(json.loads(response.read().decode())["info"]["version"])
-    except (urllib.error.URLError, json.JSONDecodeError, KeyError, TimeoutError):
+    except urllib.error.URLError, json.JSONDecodeError, KeyError, TimeoutError:
         return None
 
 

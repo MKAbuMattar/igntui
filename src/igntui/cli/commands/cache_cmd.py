@@ -53,7 +53,7 @@ class CacheCommand(CLICommand):
                 traceback.print_exc()
             return 1
 
-    def _show_info(self, cache: "CacheManager") -> int:
+    def _show_info(self, cache: CacheManager) -> int:
         from datetime import datetime
 
         print("Cache Information:")
@@ -81,7 +81,7 @@ class CacheCommand(CLICommand):
         print(f"  Newest entry: {newest}")
         return 0
 
-    def _show_stats(self, cache: "CacheManager") -> int:
+    def _show_stats(self, cache: CacheManager) -> int:
         stats = cache.get_stats()
 
         print("Cache Statistics:")
@@ -92,7 +92,7 @@ class CacheCommand(CLICommand):
 
         return 0
 
-    def _clear_expired(self, cache: "CacheManager") -> int:
+    def _clear_expired(self, cache: CacheManager) -> int:
         """Sweep only what is past its TTL.
 
         Nothing prunes expired files on its own any more: reading every entry at
@@ -107,7 +107,7 @@ class CacheCommand(CLICommand):
             print("No expired entries")
         return 0
 
-    def _clear_cache(self, cache: "CacheManager", force: bool = False) -> int:
+    def _clear_cache(self, cache: CacheManager, force: bool = False) -> int:
         if not force:
             response = input("Clear cache? This will remove all cached data. (y/N): ")
             if response.lower() not in ["y", "yes"]:
