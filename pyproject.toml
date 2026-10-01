@@ -20,8 +20,8 @@ dependencies = [
     # Windows: an older pin can resolve to a version with no wheel for the
     # running interpreter, which fails at install time rather than degrading.
     "windows-curses>=2.4.2; sys_platform == 'win32'",
-    "pyfiglet>=1.0.2",
-    "tomli-w>=1.0.0",
+    "pyfiglet>=1.0.4",
+    "tomli-w>=1.2.0",
 ]
 keywords = ["gitignore", "tui", "terminal", "git", "templates", "cli"]
 classifiers = [
@@ -55,16 +55,13 @@ gitignore-tui = "igntui.main:tui_main"
 # `pre-commit` were declared here and never run by anything: ruff covers the
 # first three, `ty` does the type-checking, and the build backend is uv_build.
 dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "ruff>=0.1.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.9",
 ]
 test = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "freezegun>=1.4.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
 ]
 windows = [
     "windows-curses>=2.4.2; sys_platform == 'win32'",

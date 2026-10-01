@@ -40,11 +40,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   reports the size of the merged file it would write.
 - After a load error on the splash screen, input polling stayed at 5 seconds
   per key, so background updates showed up late.
+- An HTTP error response from gitignore.io was never closed, which left its
+  socket open until garbage collection. Python 3.14 reports this as a
+  `ResourceWarning`.
 - The content panel's scroll counter was drawn over its title, and the
   template count overflowed the Templates panel on narrow terminals.
 
 ### Changed
 
+- The development interpreter (`.python-version`) is now Python 3.14. Support
+  is unchanged: 3.11 through 3.14, all tested in CI.
+- Dependency floors match the versions tested: `pyfiglet>=1.0.4`,
+  `tomli-w>=1.2.0`, and in the extras `pytest>=9.1.1`, `pytest-cov>=7.1.0`,
+  `ruff>=0.16.9`. `freezegun` and `pytest-mock` are removed from the extras
+  because no test used them.
+- `uv.lock` is regenerated. It still pinned igntui 0.1.1 and about 60 packages
+  from the old hatch, black, and mypy toolchain, so every plain `uv run`
+  rewrote it.
 - Changelog version headers use the Keep a Changelog form `## [x.y.z] - date`.
 - Prose in the docs, README, and code comments no longer uses em dashes. A few
   status messages changed punctuation to match, for example

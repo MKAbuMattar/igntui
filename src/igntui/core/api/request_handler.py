@@ -55,6 +55,8 @@ class RequestHandler:
                 )
 
         except urllib.error.HTTPError as e:
+            # The error is also the response and holds its socket open.
+            e.close()
             self.stats["errors"] += 1
 
             error_msg = f"HTTP {e.code}: {e.reason}"
