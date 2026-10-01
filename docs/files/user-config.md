@@ -2,7 +2,7 @@
 
 ## NAME
 
-`~/.igntui.cfg.toml` — user-level configuration
+`~/.igntui.cfg.toml` is the user-level configuration file.
 
 ## LOCATION
 
@@ -51,7 +51,7 @@
 The user config is loaded at startup and merged on top of `DEFAULT_CONFIG`
 defined in `core/config.py`. Missing keys fall back to defaults; unknown
 keys are preserved (ignored at read time, written back on save). The merge
-is deep — nested objects are merged recursively, not replaced.
+is deep, so nested objects are merged recursively, not replaced.
 
 After the file is read, environment variables (see
 [Environment variables](../reference/igntui.md#environment-variables))

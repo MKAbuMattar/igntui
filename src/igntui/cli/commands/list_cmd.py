@@ -30,7 +30,7 @@ class ListCommand(CLICommand):
 
             if args.count:
                 print(f"Found {len(templates)} templates")
-                return 0
+                return 1 if args.filter and not templates else 0
 
             if not templates:
                 if args.filter:

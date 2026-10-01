@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui cache clear` — delete all cached entries
+`igntui cache clear` deletes all cached entries.
 
 ## SYNOPSIS
 
@@ -12,7 +12,7 @@ igntui [global-options] cache clear [--force] [--expired]
 
 ## DESCRIPTION
 
-Removes every entry from the cache — both the in-memory layer (current
+Removes every entry from the cache: both the in-memory layer (current
 process; effectively a no-op since CLI invocations are short-lived) and
 every `*.cache` file in the cache directory.
 
@@ -31,14 +31,14 @@ still valid is kept, so the next run is not forced back to the network.
 
 ### `--expired`
 
-(boolean) Remove only entries whose TTL has passed. Implies no prompt —
+(boolean) Remove only entries whose TTL has passed. Implies no prompt, because
 there is nothing to confirm, since everything it deletes is already dead.
 
 Nothing sweeps expired files automatically: doing it at startup meant every
 command paid to read the whole cache first. See
 [Caching](../concepts/caching.md) for why, and note that a stale entry is
 usually overwritten in place the next time the same template set is
-requested — this flag is for sets that were cached once and never asked for
+requested. This flag is for sets that were cached once and never asked for
 again.
 
 ## EXAMPLES

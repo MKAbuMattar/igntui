@@ -6,13 +6,76 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [0.5.0] — 2026-08-03
+### Fixed
+
+- **The TUI could save an error message over your `.gitignore`.** After a
+  failed generation the content panel holds `# Error generating content: ...`,
+  and `s` wrote that into the managed block, dropping every generated rule.
+  Save now refuses until a generation for the current selection succeeds.
+- **A slow, older generation could replace a newer one.** Toggling templates
+  quickly, or pressing `c` while a request was running, let the earlier
+  result win, so a save wrote rules for a different selection than the one
+  shown. Results that do not match the current selection are now dropped.
+- **A failed write could truncate `.gitignore` and lose the custom-patterns
+  block.** `igntui generate --output` and the TUI save now write a temp file
+  beside the target and rename it into place. File permissions and a
+  symlinked `.gitignore` are kept.
+- **`--config` and `.igntui.repo.cfg.toml` had no effect.** The values were
+  loaded into a config object that nothing read. They now reach the API,
+  logging, and usage tracking. `gitignore-tui` also reads the repo file, and
+  `igntui --no-cache tui` now bypasses the cache inside the TUI.
+- **`igntui test --timeout N` ignored N** and probed with the default timeout.
+- **`igntui list --filter X --count` exited 0 when nothing matched.** It now
+  exits 1, like the same command without `--count`.
+- **`behavior.save_usage_stats = false` was ignored**, so every selection still
+  wrote `~/.igntui.usage.toml`.
+- **Clicking a template toggled the wrong row** when the list was scrolled,
+  and was one row off even when it was not.
+- **Pressing F5 with a search filter active** showed the full template list
+  under the filter header, so `a` selected everything.
+- **"No changes, already up to date" never appeared**, because the save
+  header's timestamp always differed. Re-saving an unchanged selection now
+  skips the diff dialog.
+- **`generate --dry-run --output` reported the wrong byte count.** It now
+  reports the size of the merged file it would write.
+- After a load error on the splash screen, input polling stayed at 5 seconds
+  per key, so background updates showed up late.
+- An HTTP error response from gitignore.io was never closed, which left its
+  socket open until garbage collection. Python 3.14 reports this as a
+  `ResourceWarning`.
+- The content panel's scroll counter was drawn over its title, and the
+  template count overflowed the Templates panel on narrow terminals.
+
+### Changed
+
+- **igntui now requires Python 3.14 or newer.** `requires-python` is `>=3.14`,
+  CI tests 3.14 only, and the code uses 3.14 syntax (lazy annotations,
+  unparenthesized `except A, B:`). On Python 3.11 to 3.13, pip keeps
+  installing 0.5.0. The development interpreter (`.python-version`) is 3.14.
+- The release workflow runs `scripts/release_version.py` through
+  `uv run --no-project`, so it uses Python 3.14 rather than the runner's
+  system `python3`.
+- The unused `[tool.mypy]` configuration is removed. `ty` does the type
+  checking.
+- Dependency floors match the versions tested: `pyfiglet>=1.0.4`,
+  `tomli-w>=1.2.0`, and in the extras `pytest>=9.1.1`, `pytest-cov>=7.1.0`,
+  `ruff>=0.16.9`. `freezegun` and `pytest-mock` are removed from the extras
+  because no test used them.
+- `uv.lock` is regenerated. It still pinned igntui 0.1.1 and about 60 packages
+  from the old hatch, black, and mypy toolchain, so every plain `uv run`
+  rewrote it.
+- Changelog version headers use the Keep a Changelog form `## [x.y.z] - date`.
+- Prose in the docs, README, and code comments no longer uses em dashes. A few
+  status messages changed punctuation to match, for example
+  `Loaded N templates from .igntui.cfg.toml; press 'c' to clear`.
+
+## [0.5.0] - 2026-08-03
 
 ### Fixed
 
 - **The custom-patterns markers told you not to edit the block that is yours.**
   Through 0.4.0 they read `(do not edit between these markers; managed by
-  igntui)` — copied from the generated region, where it is true. On the custom
+  igntui)`, copied from the generated region, where it is true. On the custom
   region it is the opposite of the truth, and it discouraged people from using
   the one place in the file that survives regeneration. They now read:
 
@@ -25,15 +88,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   0.2.0 through 0.4.0 is rewritten with the new markers on its next save and
   your rules come across untouched. Nothing is duplicated and nothing is lost.
 
-  The generated region's markers are unchanged — "do not edit" is accurate
+  The generated region's markers are unchanged. "Do not edit" is accurate
   there, since that block is replaced on every save.
 
-## [0.4.0] — 2026-08-02
+## [0.4.0] - 2026-08-02
 
 ### Added
 
 - **Python 3.14 is supported, tested and declared.** The test suite already
-  passed on it — 214/214 — but nothing claimed it and CI never checked. It is in
+  passed on it, 214/214, but nothing claimed it and CI never checked. It is in
   the CI matrix and the classifiers now, so the claim is backed by a run.
 
 ### Changed
@@ -44,15 +107,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   at install time rather than degrading.
 
   No upper bound was added. `windows-curses` 2.4.2 ships wheels for cp39 through
-  cp314, so there is no gap for any Python igntui supports — capping the marker
+  cp314, so there is no gap for any Python igntui supports, and capping the marker
   would create exactly the failure it was meant to prevent.
 
-## [0.3.1] — 2026-07-30
+## [0.3.1] - 2026-07-30
 
 ### Fixed
 
 - **A failed cache write no longer destroys the entry it was replacing.**
-  `_save_disk_cache` opened the target file with `"w"` — truncating it — and only
+  `_save_disk_cache` opened the target file with `"w"`, which truncated it, and only
   then serialised the value. A crash, a full disk, or an unserialisable value
   left truncated JSON where a good entry had been; the next read logged a
   warning, deleted the file, and reported a miss. Writes now go to a temporary
@@ -60,21 +123,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   a second igntui process running at the same time) sees either the previous
   entry or the new one, never half of either.
 
-## [0.3.0] — 2026-07-28
+## [0.3.0] - 2026-07-28
 
 ### Changed
 
 - **The cache no longer reads itself into memory at startup.** `CacheManager`
   opened and parsed every `.cache` file in its constructor, and every command
   paid for it because `GitIgnoreAPI` builds a manager before doing anything.
-  Measured over a realistic cache — 300 content blobs, 3.5 MiB — that was
+  Measured over a realistic cache of 300 content blobs (3.5 MiB), that was
   **~19 ms down to ~0.9 ms**. Nothing is lost: a read already fell back to disk
   and promoted what it found, so the eager pass bought latency and nothing else.
 
   One behaviour does change. That pass also deleted expired files, and nothing
-  sweeps them automatically now. In practice a stale entry is short-lived — a
+  sweeps them automatically now. In practice a stale entry is short-lived, because a
   content key is a hash of its template set, so requesting the same set again
-  overwrites it in place — and only sets cached once and never asked for again
+  overwrites it in place. Only sets cached once and never asked for again
   linger.
 
 ### Added
@@ -82,9 +145,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **`igntui cache clear --expired`** removes only entries past their TTL and
   keeps everything still valid, so the next run is not forced back to the
   network. This is the on-demand replacement for the startup sweep, and it gives
-  `CacheManager.cleanup_expired()` — which had no callers at all — a home.
+  `CacheManager.cleanup_expired()`, which had no callers at all, a home.
 
-## [0.2.0] — 2026-07-27
+## [0.2.0] - 2026-07-27
 
 ### Added
 
@@ -97,7 +160,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   # >>> End of custom patterns (do not edit between these markers; managed by igntui) <<<
   ```
 
-  (That wording was wrong and is corrected in 0.5.0 — the block is yours to
+  (That wording was wrong and is corrected in 0.5.0. The block is yours to
   edit. Files carrying it are upgraded in place.)
 
   Its contents are read out of the existing file and written back verbatim on
@@ -112,7 +175,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **`--log-level` was parsed and then ignored**, and the `[logging]` config
   section had no reader at all. Both did nothing: file logging, rotation,
   `IGNTUI_LOG_LEVEL`, and the level itself. The implementation already existed in
-  `cli/setup.py` and nothing called it — `main()` and `tui_main()` call it now.
+  `cli/setup.py` and nothing called it. `main()` and `tui_main()` call it now.
 - **`Config.set()` wrote into the class-level defaults.** The nested section
   dicts were shared with `Config.DEFAULT_CONFIG`, so one instance's write became
   the starting value for every instance built afterwards in the same process, and
@@ -129,14 +192,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Three type errors outside `core/`: an implicit shadow of `run_tui` in
   `__init__.py`, a bare `Optional` annotation in `tui/curses_setup.py` (which
   annotates nothing), and a possibly-`None` `stdscr` in the mouse handler.
-- README: the development commands referenced `black`, `isort` and `mypy` — none
-  of which CI runs — and a test path that does not exist; troubleshooting
+- README: the development commands referenced `black`, `isort` and `mypy`, none
+  of which CI runs, and a test path that does not exist; troubleshooting
   suggested `igntui cache --clear` instead of `igntui cache clear`.
 - **`--config` and `--no-cache` never reached `igntui test`.** The command built
   its own `GitIgnoreAPI` instead of using the session's, so it tested a different
   configuration than the one in effect.
 - **`igntui cache info` reported the wrong TTL.** It built its own
-  `CacheManager`, which defaults to 3600 regardless of `api.cache_ttl` — and
+  `CacheManager`, which defaults to 3600 regardless of `api.cache_ttl`, and
   re-read every cache file from disk to do it.
 - **The fish completion was missing `--log-level`**, which bash and zsh both
   offered. Found by a new test that compares each emitted script against the real
@@ -144,12 +207,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Removed
 
-- `src/igntui/utils/` — 287 lines of logging and performance-metric machinery that
+- `src/igntui/utils/`: 287 lines of logging and performance-metric machinery that
   nothing imported, and the only module in the package at 0% coverage.
 - `TemplateCache.invalidate_template_content()` and
   `GitIgnoreAPI.invalidate_template()`. Content cache keys have been sha256
   prefixes since 0.0.2, so matching a template name against a key could only ever
-  hit by accident — and a short hex-ish name like `cafe` would delete unrelated
+  hit by accident, and a short hex-ish name like `cafe` would delete unrelated
   entries. Neither had any caller. `igntui cache clear` is the honest operation.
 - A second, unused `main()` in `tui/app.py` that duplicated `app.py:run_tui()`
   with different exit handling, plus `check_curses_availability()`, which was
@@ -161,7 +224,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `AGENTS.md` and `CLAUDE.md` cover the module layout, the queue-based threading
   model in the TUI, the config cascade, the managed-block format, and how to
   verify a change you cannot see in a diff.
-- `ROADMAP.md` — what is queued, with the evidence for each item, plus what has
+- `ROADMAP.md` lists what is queued, with the evidence for each item, plus what has
   been rejected on purpose.
 - `scripts/release_version.py` owns the two files that carry the version, and CI
   now fails if they disagree. `.github/workflows/release.yml` publishes to PyPI
@@ -170,9 +233,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - CI type-checks all of `src/igntui` instead of only `core/`, which is what
   surfaced the three errors above, and gates `ruff format --check` now that the
   tree is formatted consistently (43 of 76 files disagreed with it before).
-- Coverage 46% → 66%, aimed at the half that had none: `cli/parser.py` 14% → 100%,
-  `completion_cmd.py` 0% → 93%, `tui/event_handler.py` 7% → 63%, `tui/state.py`
-  54% → 84%, plus the `list` / `cache` / `test` command output paths and their exit
+- Coverage went from 46% to 66%, aimed at the half that had none: `cli/parser.py` 14% to
+  100%, `completion_cmd.py` 0% to 93%, `tui/event_handler.py` 7% to 63%, `tui/state.py`
+  54% to 84%, plus the `list` / `cache` / `test` command output paths and their exit
   codes. 201 tests, up from 96.
 - Community health files: `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
   a pull request template, issue forms, `CODEOWNERS`, and `dependabot.yml`. Bug
@@ -186,7 +249,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   dev dependencies that nothing invoked. The `uv_build` upper bound was widened so
   a current uv no longer warns on every build.
 
-## [0.1.1] — 2026-04-27
+## [0.1.1] - 2026-04-27
 
 ### Changed
 
@@ -212,15 +275,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `team.igntui.json` to `team.igntui.cfg.toml` to match the v0.1.0 file
   format.
 
-## [0.1.0] — 2026-04-27
+## [0.1.0] - 2026-04-27
 
 ### Renamed
 
-| Old (v0.0.x)           | New (v0.1.0)           | Format change |
-| ---------------------- | ---------------------- | ------------- |
-| `igntui.cfg.toml`      | `.igntui.cfg.toml`     | (none — TOML) |
-| `~/.igntui.json`       | `~/.igntui.cfg.toml`   | JSON → TOML   |
-| `~/.igntui_usage.json` | `~/.igntui.usage.toml` | JSON → TOML   |
+| Old (v0.0.x)           | New (v0.1.0)           | Format change      |
+| ---------------------- | ---------------------- | ------------------ |
+| `igntui.cfg.toml`      | `.igntui.cfg.toml`     | None, already TOML |
+| `~/.igntui.json`       | `~/.igntui.cfg.toml`   | JSON to TOML       |
+| `~/.igntui_usage.json` | `~/.igntui.usage.toml` | JSON to TOML       |
 
 All four files now follow one convention: `[.]igntui.[<scope>.]<role>.toml`.
 Leading dot when the file lives inside a project tree, role tag (`cfg` /
@@ -228,7 +291,7 @@ Leading dot when the file lives inside a project tree, role tag (`cfg` /
 
 ### Added
 
-- **`.igntui.repo.cfg.toml`** — new team-shared repo configuration. Lives
+- **`.igntui.repo.cfg.toml`** is a new team-shared repo configuration. Lives
   at any layer of the repo (discovered by walking up from CWD, bounded by
   `.git/` / `.hg/` / filesystem root). Sits between user config and the
   per-output sidecar in the cascade. Schema mirrors user config sections
@@ -245,7 +308,7 @@ Leading dot when the file lives inside a project tree, role tag (`cfg` /
 
 - **User configuration on-disk format is now TOML.** Schema is unchanged
   (`[api]`, `[ui]`, `[behavior]`, `[logging]`); only the wire format
-  changes. TOML supports comments — your `~/.igntui.cfg.toml` can be
+  changes. TOML supports comments, so your `~/.igntui.cfg.toml` can be
   documented inline.
 - **Usage data on-disk format is now TOML.** Same `count` / `last_used`
   schema per template name.
@@ -256,7 +319,7 @@ Leading dot when the file lives inside a project tree, role tag (`cfg` /
   ```
 
   The per-output sidecar overlays selection state (templates, search mode)
-  on top of this cascade — it does not override config knobs.
+  on top of this cascade. It does not override config knobs.
 
 ### Migrations
 
@@ -265,7 +328,7 @@ On first launch, igntui v0.1.0 transparently migrates v0.0.x users:
 - If `~/.igntui.json` exists and `~/.igntui.cfg.toml` does not, the JSON
   is read and a TOML file is written. The legacy JSON is **left in
   place** for the user to delete; an `info` log records the migration.
-- Same one-shot conversion for `~/.igntui_usage.json` →
+- Same one-shot conversion from `~/.igntui_usage.json` to
   `~/.igntui.usage.toml`.
 - The legacy non-dotted sidecar `igntui.cfg.toml` is still **discovered**
   by the TUI (with a one-shot info log prompting rename), but new saves
@@ -281,7 +344,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
 - New "File Naming Convention" section published, documenting the
   `[.]igntui.[<scope>.]<role>.toml` contract going forward.
 
-## [0.0.2] — 2026-04-27
+## [0.0.2] - 2026-04-27
 
 ### Added
 
@@ -307,7 +370,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
   shell's completions directory).
 - **`gitignore-tui` script honors flags.** `--version`, `--no-splash`, and
   `--verbose` now work on the dedicated TUI entry point.
-- **`igntui cache info`** reports real cache contents — entry count, total
+- **`igntui cache info`** reports real cache contents: entry count, total
   bytes, oldest/newest timestamps. Previously looked for a non-existent
   `templates.json`.
 - **Pytest suite** with 72 tests covering core (cache, search, managed-block,
@@ -321,7 +384,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
   `hash() % 1_000_000` with a 16-hex sha256 prefix, so cache filenames are
   stable between runs and collision-resistant. Legacy 6-digit-keyed entries
   are auto-purged on first launch.
-- **CLI `--no-cache` and `--config` flags now actually work.** `--no-cache`
+- **CLI `--no-cache` and `--config` flags now work.** `--no-cache`
   forces fresh API fetches for the session; `--config PATH` loads an alternate
   config file.
 - **TUI state is thread-safe.** Background workers post discriminated-union
@@ -346,12 +409,12 @@ All three legacy paths are scheduled for removal in v0.2.0.
 
 ### Fixed
 
-- **TUI search now actually returns fuzzy/regex results.** Positional args to
+- **TUI search now returns fuzzy/regex results.** Positional args to
   `SearchManager.search` were swapped in `tui/lifecycle.filter_templates`,
   causing every search to throw and silently fall back to substring matching.
 - **`igntui cache clear` no longer crashes.** Added `clear_all` alias on
   `CacheManager`. The missing `--force` flag on the parser is also restored.
-- **Mouse scroll wheel actually scrolls** the panel under the cursor — the
+- **Mouse scroll wheel now scrolls** the panel under the cursor. The
   viewport moves and the row counter updates. Earlier behavior fought the
   panel's auto-snap.
 
@@ -362,7 +425,7 @@ All three legacy paths are scheduled for removal in v0.2.0.
 - **Duplicate `create_base_parser`** in `cli/base.py` (dead code; the
   canonical version lives in `cli/parser.py`).
 
-## [0.0.1] — 2026-04-22
+## [0.0.1] - 2026-04-22
 
 - Initial release.
 

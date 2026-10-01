@@ -28,7 +28,7 @@ class CursesSetup:
             try:
                 curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
             except curses.error:
-                pass  # terminal doesn't support mouse — graceful degrade
+                pass  # terminal has no mouse support; run without it
 
     @staticmethod
     def setup_colors() -> None:

@@ -7,7 +7,7 @@ root.
 The schema mirrors the user config's sections (`[api]`, `[ui]`, `[behavior]`,
 `[logging]`) plus an optional `[selection]` table that seeds new sidecars
 when none exist in CWD. The repo config sits between the user config and
-the per-output sidecar in the cascade — see
+the per-output sidecar in the cascade; see
 `enhancement/INFORMATION_ARCHITECTURE.md`.
 """
 
@@ -27,8 +27,8 @@ def find_repo_config(start: Path | None = None) -> Path | None:
 
     Stops at:
     - the first `.igntui.repo.cfg.toml` found (returned),
-    - a directory containing `.git/` or `.hg/` (no further walk-up — repo
-      boundary),
+    - a directory containing `.git/` or `.hg/` (the repo boundary;
+      no further walk-up),
     - the filesystem root.
 
     Returns `None` when no file is found within the bounded search.
@@ -62,7 +62,7 @@ class RepoConfig:
     path: Path | None = None
 
     @classmethod
-    def load(cls, path: Path) -> "RepoConfig | None":
+    def load(cls, path: Path) -> RepoConfig | None:
         try:
             with open(path, "rb") as f:
                 data = tomllib.load(f)

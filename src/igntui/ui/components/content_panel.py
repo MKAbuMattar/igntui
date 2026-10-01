@@ -67,7 +67,9 @@ class ContentPanel(BasePanel):
 
             scroll_info = f" ({self.content_scroll + 1}-{min(self.content_scroll + inner_height, len(lines))}/{len(lines)})"
             try:
-                info_x = self.x + len(title) + 2
+                # draw_border centres " {title} ", so start right after it.
+                title_width = len(title) + 2
+                info_x = self.x + (self.width - title_width) // 2 + title_width - 1
                 if info_x + len(scroll_info) < self.x + self.width - 1:
                     self.stdscr.addstr(self.y, info_x, scroll_info, curses.color_pair(1))
             except curses.error:

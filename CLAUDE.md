@@ -1,6 +1,6 @@
 # igntui
 
-Agent instructions for this repo live in **@AGENTS.md** — read it first. It covers the module
+Agent instructions for this repo live in **@AGENTS.md**. Read it first. It covers the module
 layout, the config cascade, the queue-based threading model in the TUI, the managed-block file
 format, the working commands, and the hard rules (three checks pass, version bumped in one
 place, changelog entry, docs updated, clean conventional commits).
@@ -11,8 +11,8 @@ place, changelog entry, docs updated, clean conventional commits).
    a queue; `_drain_updates()` on the main loop is the only writer.
 2. **`core/config.py` runs `Config()` at import.** It reads the user's home directory and can
    write a migrated config file. Tests construct their own `Config(config_path=...)`.
-3. **The managed-block markers are a file format already living in users' repos.** Both
-   regions — generated content and custom patterns — are pinned by tests. Read
+3. **The managed-block markers are a file format already living in users' repos.** Tests pin
+   both regions, the generated content and the custom patterns. Read
    `core/managed_block.py` before touching either.
 
 ## Before changing the TUI

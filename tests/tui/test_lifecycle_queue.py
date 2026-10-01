@@ -23,7 +23,7 @@ from igntui.tui.updates import (
 )
 
 
-def _drain(q: "queue.Queue[StateUpdate]", timeout: float = 1.0) -> list:
+def _drain(q: queue.Queue[StateUpdate], timeout: float = 1.0) -> list:
     """Wait until LoadCompleted/GenerationCompleted arrives, return all messages."""
     out = []
     while True:

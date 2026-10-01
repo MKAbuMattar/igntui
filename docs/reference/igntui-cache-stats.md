@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui cache stats` — print cache hit/miss counters
+`igntui cache stats` prints cache hit/miss counters.
 
 ## SYNOPSIS
 
@@ -12,7 +12,7 @@ igntui [global-options] cache stats
 
 ## DESCRIPTION
 
-Prints process-local cache counters. Note: counters are **not** persisted —
+Prints process-local cache counters. Note: counters are **not** persisted, so
 they reset every invocation. Each metric reflects activity in the current
 `igntui cache stats` process only.
 
@@ -23,9 +23,9 @@ on disk, use [`igntui cache info`](igntui-cache-info.md).
 
 | Field            | Meaning                                    |
 | ---------------- | ------------------------------------------ |
-| `hit_rate`       | hits / (hits + misses) — float in `[0, 1]` |
+| `hit_rate`       | hits / (hits + misses), float in `[0, 1]`  |
 | `total_requests` | hits + misses                              |
-| `memory_entries` | entries promoted into memory so far this process (starts at 0 — nothing is preloaded) |
+| `memory_entries` | entries promoted into memory so far this process (starts at 0 because nothing is preloaded) |
 | `disk_entries`   | `.cache` files in the cache directory      |
 | `cache_dir`      | absolute path to the cache directory       |
 | `default_ttl`    | TTL applied to fresh writes (seconds)      |

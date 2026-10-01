@@ -106,11 +106,13 @@ class GitIgnoreAPI:
 
             return APIResponse(success=False, data=fallback_content, error_message=str(e))
 
-    def test_connection(self) -> APIResponse:
+    def test_connection(self, timeout: float | None = None) -> APIResponse:
         try:
             logger.info("Testing API connectivity...")
 
-            response = self.request_handler.make_request(f"{self.base_url}/list?limit=1")
+            response = self.request_handler.make_request(
+                f"{self.base_url}/list?limit=1", timeout=timeout
+            )
 
             if response.success:
                 test_results = {

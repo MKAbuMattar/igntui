@@ -11,7 +11,7 @@ name: release
 #
 # The split matters: nothing irreversible happens while the PR is open. Merging
 # is the act that publishes, so the PR diff is a preview of exactly what ships.
-# PyPI does not allow re-uploading a version — a mistaken merge burns that
+# PyPI does not allow re-uploading a version, so a mistaken merge burns that
 # number permanently, so the point of no return is one deliberate click.
 
 on:
@@ -47,7 +47,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
@@ -60,10 +60,10 @@ jobs:
 
       # Rejects a malformed or backwards version before anything is written.
       - name: Check it is a legal next version
-        run: python3 scripts/release_version.py check "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py check "${{ steps.version.outputs.version }}"
 
       - name: Bump both version files and roll the changelog
-        run: python3 scripts/release_version.py apply "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py apply "${{ steps.version.outputs.version }}"
 
       - name: Push the bump back to the pull request
         run: |
@@ -99,7 +99,7 @@ jobs:
       - name: Smoke-test the built wheel
         run: |
           set -euo pipefail
-          # Glob, not `ls` — its output is not safe to parse.
+          # Glob, not `ls`, because its output is not safe to parse.
           wheels=(dist/*.whl)
           [ -e "${wheels[0]}" ] || { echo "::error::no wheel was built"; exit 1; }
           uvx --from "${wheels[0]}" igntui --version
@@ -124,7 +124,7 @@ jobs:
               'Prepared and verified. Both version files are bumped on this branch,',
               'lint, types and tests pass, and the built wheel installs and runs.',
               '',
-              '**Merging this pull request will publish to PyPI.** That cannot be undone —',
+              '**Merging this pull request will publish to PyPI.** That cannot be undone.',
               `PyPI does not allow re-uploading a version, so a mistake means burning \`${version}\`.`,
               '',
               'On merge: upload to PyPI &rarr; confirm PyPI serves it &rarr; tag `v' + version + '` &rarr; Release page.',
@@ -159,7 +159,7 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
@@ -167,10 +167,10 @@ jobs:
         id: version
         run: echo "version=${GITHUB_HEAD_REF#release/}" >> "$GITHUB_OUTPUT"
 
-      # Refuses to publish if the merged tree does not actually carry the
+      # Refuses to publish if the merged tree does not carry the
       # version the branch name promises.
       - name: Confirm the merged tree is at that version
-        run: python3 scripts/release_version.py assert "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py assert "${{ steps.version.outputs.version }}"
 
       - name: Build
         run: uv build
@@ -192,7 +192,7 @@ jobs:
 
       # An upload can succeed and still serve nothing. Poll until it is real.
       - name: Confirm PyPI is serving it
-        run: python3 scripts/release_version.py verify "${{ steps.version.outputs.version }}"
+        run: uv run --no-project python scripts/release_version.py verify "${{ steps.version.outputs.version }}"
 
       - name: Tag the release commit
         run: |
@@ -207,7 +207,7 @@ jobs:
         run: |
           {
             echo 'body<<RELEASE_NOTES_EOF'
-            python3 scripts/release_version.py notes "${{ steps.version.outputs.version }}"
+            uv run --no-project python scripts/release_version.py notes "${{ steps.version.outputs.version }}"
             echo 'RELEASE_NOTES_EOF'
           } >> "$GITHUB_OUTPUT"
 

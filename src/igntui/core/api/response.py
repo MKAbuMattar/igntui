@@ -14,6 +14,6 @@ class APIResponse:
     response_time: float | None = None
     from_cache: bool = False
 
-    def with_data(self, data: Any) -> "APIResponse":
-        """Return a copy with `data` replaced — use instead of mutating in place."""
+    def with_data(self, data: Any) -> APIResponse:
+        """Return a copy with `data` replaced. Use this instead of mutating in place."""
         return replace(self, data=data)

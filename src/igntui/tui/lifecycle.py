@@ -28,7 +28,7 @@ class TemplateLifecycle:
         self.search_manager = search_manager
         self.usage = UsageTracker()
 
-    def load_templates_async(self, updates: "queue.Queue[StateUpdate]") -> None:
+    def load_templates_async(self, updates: queue.Queue[StateUpdate]) -> None:
         def load_templates():
             try:
                 logger.info("Loading templates from API")
@@ -52,12 +52,14 @@ class TemplateLifecycle:
     def generate_content_async(
         self,
         templates: list[str],
-        updates: "queue.Queue[StateUpdate]",
+        updates: queue.Queue[StateUpdate],
     ) -> None:
         if not templates:
             updates.put(ContentGenerationFailed("No templates selected", []))
             updates.put(GenerationCompleted())
             return
+
+        key = tuple(templates)
 
         def generate_content():
             try:
@@ -65,9 +67,7 @@ class TemplateLifecycle:
                 response = self.api.get_templates(templates)
                 if response.success:
                     logger.info("Generated %d chars", len(response.data))
-                    updates.put(
-                        ContentGenerated(response.data, response.from_cache, len(templates))
-                    )
+                    updates.put(ContentGenerated(response.data, response.from_cache, key))
                 else:
                     msg = response.error_message or "Unknown error"
                     logger.error("Failed to generate content: %s", msg)
@@ -78,7 +78,7 @@ class TemplateLifecycle:
                 logger.error("Exception generating content: %s", e)
                 updates.put(ContentGenerationFailed(f"Error: {e}", list(templates)))
             finally:
-                updates.put(GenerationCompleted())
+                updates.put(GenerationCompleted(key))
 
         threading.Thread(target=generate_content, daemon=True).start()
 

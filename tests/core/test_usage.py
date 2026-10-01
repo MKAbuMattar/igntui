@@ -26,7 +26,7 @@ def test_top_orders_by_count_then_recency(tmp_path):
     # b has count 2, then a/c have count 1; among ties, more recent wins
     top = t.top(3)
     assert top[0] == "b"
-    # c was recorded after a → c before a
+    # c was recorded after a, so c sorts before a
     assert top.index("c") < top.index("a")
 
 
@@ -94,7 +94,7 @@ def test_legacy_json_is_migrated_to_toml(tmp_path):
 
 
 def test_no_migration_when_target_already_exists(tmp_path):
-    """If TOML already exists, the legacy file is ignored — no double-migration."""
+    """If TOML already exists, the legacy file is ignored, so nothing migrates twice."""
     target = tmp_path / USAGE_FILENAME
     legacy = tmp_path / LEGACY_USAGE_FILENAME
 
@@ -108,3 +108,21 @@ def test_no_migration_when_target_already_exists(tmp_path):
     # node should not appear; the existing TOML is the source of truth.
     assert "node" not in t.top(10)
     assert "python" in t.top(10)
+
+
+def test_record_writes_nothing_when_usage_stats_are_off(tmp_path, monkeypatch):
+    from igntui.core import usage as usage_mod
+
+    real_get = usage_mod.config.get
+    monkeypatch.setattr(
+        usage_mod.config,
+        "get",
+        lambda section, key, default=None: (
+            False
+            if (section, key) == ("behavior", "save_usage_stats")
+            else real_get(section, key, default=default)
+        ),
+    )
+    path = tmp_path / "usage.toml"
+    UsageTracker(path=path).record("python")
+    assert not path.exists()

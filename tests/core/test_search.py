@@ -20,7 +20,7 @@ def test_fuzzy_finds_subsequence(mgr, template_list):
 def test_fuzzy_orders_exact_match_first(mgr, template_list):
     out = mgr.search(template_list, "java", mode=SearchMode.FUZZY)
     items = out.get_items()
-    # `java` is a substring/exact match — must outrank `javascript`
+    # `java` is a substring/exact match and must outrank `javascript`
     assert items[0] == "java"
 
 

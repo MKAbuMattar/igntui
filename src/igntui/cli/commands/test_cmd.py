@@ -25,7 +25,7 @@ class TestCommand(CLICommand):
             # GitIgnoreAPI here ignored `--config` and `--no-cache`, so the
             # command tested a different configuration than the one in use.
             print("Attempting to connect...", end="", flush=True)
-            response = self.cli.api.test_connection()
+            response = self.cli.api.test_connection(timeout=args.timeout)
 
             if not response.success:
                 print(" FAILED")
@@ -36,9 +36,7 @@ class TestCommand(CLICommand):
             print()
 
             # test_connection() reports the probe's timing inside `data`, not on
-            # the wrapper it returns — reading the wrapper printed 0.000s / N/A
-            # every time, which made the one command whose job is diagnosing
-            # latency useless.
+            # the wrapper it returns. The wrapper always reads 0.000s / N/A.
             details = response.data if isinstance(response.data, dict) else {}
             response_time = details.get("response_time") or 0.0
             cache_stats = details.get("cache_stats") or {}

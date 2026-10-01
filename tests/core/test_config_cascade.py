@@ -19,7 +19,7 @@ def test_set_does_not_leak_into_the_class_defaults(tmp_path):
     """`set()` used to write straight into `Config.DEFAULT_CONFIG`.
 
     The nested section dicts were shared with the class attribute, so one
-    instance's write became every later instance's starting value — and
+    instance's write became every later instance's starting value, and
     `reset_to_defaults()` could never undo it.
     """
     original = Config.DEFAULT_CONFIG["api"]["timeout"]
@@ -67,8 +67,8 @@ def test_env_overrides_repo_config(tmp_path):
 
 
 def test_repo_config_does_not_leak_selection_into_config(tmp_path):
-    """`[selection]` from repo config is not merged into the runtime config —
-    it's read separately by the TUI/CLI sidecar-seeding path."""
+    """`[selection]` from repo config is not merged into the runtime config.
+    It's read separately by the TUI/CLI sidecar-seeding path."""
     repo_path = tmp_path / "repo.cfg.toml"
     _write_toml(
         repo_path,
@@ -108,3 +108,32 @@ def test_user_config_legacy_json_is_migrated(tmp_path):
     assert target.exists()
     assert legacy.exists()  # left in place
     assert cfg.get("api", "timeout") == 42
+
+
+def test_cli_config_flag_reaches_the_api(tmp_path, monkeypatch):
+    """BaseCLI used to build a second Config that nothing read.
+
+    The API, logging, and usage tracker all read the `config` singleton, so
+    `--config` and `.igntui.repo.cfg.toml` had no effect on any request.
+    """
+    import copy
+
+    from igntui.cli.base import BaseCLI
+    from igntui.core.config import config
+
+    saved = copy.deepcopy(config.__dict__)
+    try:
+        user_path = tmp_path / "user.cfg.toml"
+        _write_toml(user_path, {"api": {"base_url": "https://example.invalid/api", "timeout": 99}})
+        _write_toml(tmp_path / ".igntui.repo.cfg.toml", {"api": {"timeout": 7}})
+        (tmp_path / ".git").mkdir()
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(Config, "get_cache_dir", lambda self: tmp_path / "cache")
+
+        cli = BaseCLI(config_path=user_path)
+
+        assert cli.api.base_url == "https://example.invalid/api"
+        assert cli.api.timeout == 7
+    finally:
+        config.__dict__.clear()
+        config.__dict__.update(saved)

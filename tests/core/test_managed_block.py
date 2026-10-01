@@ -86,7 +86,7 @@ def test_markers_are_the_documented_text():
 def test_custom_markers_invite_editing():
     """The custom block is the one region the user owns.
 
-    Through 0.4.0 it said "do not edit between these markers" — the opposite of
+    Through 0.4.0 it said "do not edit between these markers", the opposite of
     its purpose, telling people not to use the block that exists for them.
     """
     for marker in (CUSTOM_BEGIN_MARKER, CUSTOM_END_MARKER):
@@ -196,3 +196,60 @@ def test_upgrading_twice_does_not_duplicate_anything():
     assert text.count(CUSTOM_END_MARKER) == 1
     assert text.count("keep-me") == 1
     assert old_begin not in text
+
+
+def test_write_file_keeps_old_file_when_the_write_fails(tmp_path, monkeypatch):
+    import builtins
+
+    import pytest
+
+    from igntui.core.managed_block import write_file
+
+    target = tmp_path / ".gitignore"
+    target.write_text("OLD\n", encoding="utf-8")
+    real_open = builtins.open
+
+    class Boom:
+        def __init__(self, f):
+            self.f = f
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            self.f.close()
+
+        def write(self, text):
+            self.f.write(text[:10])
+            raise OSError("disk full")
+
+    monkeypatch.setattr(builtins, "open", lambda *a, **k: Boom(real_open(*a, **k)))
+    with pytest.raises(OSError):
+        write_file(target, "NEW " * 1000)
+    monkeypatch.undo()
+
+    assert target.read_text(encoding="utf-8") == "OLD\n"
+    assert [p.name for p in tmp_path.iterdir()] == [".gitignore"]
+
+
+def test_write_file_keeps_mode_and_symlink(tmp_path):
+    import os
+    import stat
+
+    import pytest
+
+    from igntui.core.managed_block import write_file
+
+    if os.name != "posix":
+        pytest.skip("POSIX permissions")
+    real = tmp_path / "real.gitignore"
+    real.write_text("OLD\n", encoding="utf-8")
+    real.chmod(0o644)
+    link = tmp_path / ".gitignore"
+    link.symlink_to(real)
+
+    write_file(link, "NEW\n")
+
+    assert link.is_symlink()
+    assert real.read_text(encoding="utf-8") == "NEW\n"
+    assert stat.S_IMODE(real.stat().st_mode) == 0o644

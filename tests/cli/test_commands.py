@@ -1,7 +1,7 @@
 """The command classes: what they print and what they return.
 
 Each one is `execute(args) -> int` over an injected `cli` object, so a fake CLI
-and a fake API cover them with no network. Exit codes matter — they are
+and a fake API cover them with no network. Exit codes matter: they are
 documented in `docs/concepts/return-codes.md` and scripts depend on them.
 """
 
@@ -27,7 +27,8 @@ class FakeAPI:
             raise self._list
         return self._list
 
-    def test_connection(self):
+    def test_connection(self, timeout=None):
+        self.timeout = timeout
         if isinstance(self._test, Exception):
             raise self._test
         return self._test
@@ -84,6 +85,16 @@ def test_list_filter_matching_nothing_is_a_failure(capsys):
     """Non-zero, so `igntui list --filter x` is usable in a shell conditional."""
     assert list_command().execute(args(filter="zzz", count=False)) == 1
     assert "zzz" in capsys.readouterr().out
+
+
+def test_list_count_matching_nothing_is_a_failure(capsys):
+    assert list_command().execute(args(filter="zzz", count=True)) == 1
+
+
+def test_connection_command_passes_the_timeout_through():
+    api = FakeAPI(test_response=APIResponse(True, {}))
+    ConnectionCommand(FakeCLI(api)).execute(args(timeout=3))
+    assert api.timeout == 3
 
 
 def test_list_reports_api_failure(capsys):

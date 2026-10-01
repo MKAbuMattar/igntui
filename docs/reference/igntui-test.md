@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui test` — test connectivity to the gitignore.io API
+`igntui test` tests connectivity to the gitignore.io API
 
 ## SYNOPSIS
 

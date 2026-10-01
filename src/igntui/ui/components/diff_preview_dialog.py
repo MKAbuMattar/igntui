@@ -33,7 +33,7 @@ class DiffPreviewDialog(BaseDialog):
 
     def show(self) -> bool:
         if self.is_empty():
-            return True  # nothing to confirm — let caller short-circuit
+            return True  # nothing to confirm; caller short-circuits
 
         max_y, max_x = self.stdscr.getmaxyx()
         width = min(max_x - 4, max(60, max(len(line) for line in self.diff_lines) + 4))

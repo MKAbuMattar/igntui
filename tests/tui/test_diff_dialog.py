@@ -1,6 +1,6 @@
 """Tests for DiffPreviewDialog logic (Phase 5.4).
 
-We test the diff-computation parts only — the curses interaction layer
+We test the diff-computation parts only. The curses interaction layer
 (`show()`'s key loop) requires a real terminal and isn't unit-tested.
 """
 

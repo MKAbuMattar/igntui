@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         For anything about how the **TUI looks or responds**, use the
-        "TUI / rendering problem" form instead — it asks for the terminal details
+        "TUI / rendering problem" form instead. It asks for the terminal details
         that make those reports actionable.
 
   - type: input
@@ -14,7 +14,7 @@ body:
     attributes:
       label: igntui version
       description: Output of `igntui --version` (it includes Python and OS).
-      placeholder: igntui/0.1.1 Python/3.13.1 Linux/6.8.0
+      placeholder: igntui/0.5.0 Python/3.14.7 Linux/6.8.0
     validations:
       required: true
 
