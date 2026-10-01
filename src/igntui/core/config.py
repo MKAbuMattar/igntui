@@ -122,6 +122,19 @@ class Config:
         self._load_repo_config()
         self._load_env_overrides()
 
+    def reload(
+        self,
+        config_path: Path | None = None,
+        repo_config_path: Path | None = None,
+    ) -> None:
+        """Rebuild this instance from the full cascade, in place.
+
+        Every module imports the `config` singleton by name, so the CLI has to
+        load `--config` and the repo file into that object. A second `Config`
+        would hold the right values and be read by nothing.
+        """
+        self.__init__(config_path=config_path, repo_config_path=repo_config_path)
+
     def _migrate_legacy_user_config_if_present(self) -> None:
         """Convert ~/.igntui.json to ~/.igntui.cfg.toml (one-shot, on first launch)."""
         if self.config_path.exists():

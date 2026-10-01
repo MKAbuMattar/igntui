@@ -38,10 +38,11 @@ logger = logging.getLogger(__name__)
 
 
 class GitIgnoreTUI:
-    def __init__(self, stdscr, show_splash: bool = True):
+    def __init__(self, stdscr, show_splash: bool = True, api: GitIgnoreAPI | None = None):
         self.stdscr = stdscr
         self.show_splash = show_splash
-        self.api = GitIgnoreAPI()
+        # The CLI passes its own handle so `--no-cache` reaches the TUI.
+        self.api = api or GitIgnoreAPI()
         self.search_manager = SearchManager()
         self.state = TUIState()
         self.updates: queue.Queue[StateUpdate] = queue.Queue()

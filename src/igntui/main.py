@@ -73,6 +73,10 @@ def tui_main() -> None:
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose/debug output")
     args = parser.parse_args()
 
+    from .core.config import config
+    from .core.repo_config import find_repo_config
+
+    config.reload(repo_config_path=find_repo_config())
     setup_logging(verbose=args.verbose)
 
     try:

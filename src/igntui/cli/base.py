@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from ..core.api import GitIgnoreAPI
-from ..core.config import Config
+from ..core.config import config
 from ..core.repo_config import find_repo_config
 
 logger = logging.getLogger(__name__)
@@ -20,10 +20,8 @@ class BaseCLI:
         no_cache: bool = False,
     ):
         repo_path = find_repo_config()
-        self.config = Config(
-            config_path=config_path,
-            repo_config_path=repo_path,
-        )
+        config.reload(config_path=config_path, repo_config_path=repo_path)
+        self.config = config
         self.repo_config_path = repo_path
         self.no_cache = no_cache
         self.api = GitIgnoreAPI()
