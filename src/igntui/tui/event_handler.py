@@ -58,10 +58,10 @@ class EventHandler:
             return True
 
         # Quit / leave-search semantics:
-        # - In any panel except Search: q / Q / Esc → quit the app
+        # - In any panel except Search: q / Q / Esc quits the app
         # - In Search panel:
-        #     • Esc → exit search mode (focus Templates instead)
-        #     • q / Q → typed as letters into the search box
+        #     - Esc exits search mode (focus moves to Templates)
+        #     - q / Q are typed as letters into the search box
         if key in (ord("q"), ord("Q"), 27):
             if self.state.current_panel != 0:
                 if self.on_quit:
@@ -71,7 +71,7 @@ class EventHandler:
                 self.state.current_panel = 1
                 self.state.set_status_message("Exited search mode")
                 return True
-            # q / Q while focused on Search — fall through to typing
+            # q / Q while focused on Search: fall through to typing
             self._handle_search_input(key)
             return True
 
@@ -114,6 +114,8 @@ class EventHandler:
         elif key == ord("c"):
             self.state.clear_all_selections()
             self.state.generated_content = ""
+            self.state.content_ok = False
+            self.state.generation_in_progress = False
             self.state.set_status_message("Cleared all selections")
             return True
 
@@ -355,7 +357,7 @@ class EventHandler:
         # In the Templates panel, also pick the row under the cursor and toggle
         # selection on a click.
         if panel == 1 and panel_top is not None:
-            row = my - panel_top - 1  # account for 1-line border
+            row = my - panel_top - 2  # border row, then the count header
             display = self.state.get_display_templates()
             if 0 <= row:
                 target = self.state.template_scroll + row

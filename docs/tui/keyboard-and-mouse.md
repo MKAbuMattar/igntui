@@ -9,7 +9,7 @@ Complete input map for the [igntui TUI](overview.md).
 | `Tab`                              | Focus next panel                                     |
 | `Shift+Tab`                        | Focus previous panel                                 |
 | `/`                                | Focus Search panel                                   |
-| `Esc` (in Search)                  | Exit Search → focus Templates                        |
+| `Esc` (in Search)                  | Exit Search and focus Templates                      |
 | `q` / `Q` / `Esc` (outside Search) | Quit                                                 |
 | `Space` / `Enter` (in Templates)   | Toggle selection of highlighted template             |
 | `Enter` (in Selected)              | Remove highlighted template from selection           |
@@ -39,7 +39,7 @@ content rather than moving a cursor.
 
 ## Search panel
 
-When focused (panel index 0) — typed characters become the filter query.
+When focused (panel index 0), typed characters become the filter query.
 Live filtering re-runs on every keystroke.
 
 | Key                | Effect                               |
@@ -54,7 +54,7 @@ Live filtering re-runs on every keystroke.
 | `Ctrl+E`           | Move cursor to end                   |
 | `Ctrl+U`           | Clear the entire query               |
 | `F1` / `F2` / `F3` | Switch search mode (preserves query) |
-| `Esc`              | Exit Search → focus Templates        |
+| `Esc`              | Exit Search and focus Templates      |
 
 ## Search modes
 
@@ -62,7 +62,7 @@ Live filtering re-runs on every keystroke.
 | ----- | ------- | ----------------------------------------------------------------- |
 | Fuzzy | `F1`    | Subsequence match, scored by ratio + start-bonus + length-penalty |
 | Exact | `F2`    | Case-insensitive substring                                        |
-| Regex | `F3`    | Python `re` against each template name; invalid regex → empty     |
+| Regex | `F3`    | Python `re` against each template name; invalid regex returns empty |
 
 The current mode is shown in the Search panel title and in the status bar.
 
@@ -79,7 +79,7 @@ The current mode is shown in the Search panel title and in the status bar.
 
 Each addition is recorded in `~/.igntui.usage.toml` (see
 [Usage data](../files/usage-data.md)) and bumps the template's "recently
-used" rank — recents are pinned to the top of the Templates panel within
+used" rank. Recents are pinned to the top of the Templates panel within
 the current filter.
 
 ## Mouse
@@ -90,7 +90,7 @@ When `ui.mouse_support` is `true` (default):
 | -------------------- | ------------------------------------------------------------- |
 | Left-click on panel  | Focus that panel                                              |
 | Left-click on row    | Focus Templates panel + select that row + toggle on click     |
-| Scroll wheel up/down | Scroll the panel under the cursor — does **not** change focus |
+| Scroll wheel up/down | Scroll the panel under the cursor; does **not** change focus |
 
 The scroll wheel scrolls the **viewport** (the "1-N/M" counter in the panel
 title updates) and drags the selection cursor along only when it would

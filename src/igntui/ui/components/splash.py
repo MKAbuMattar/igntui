@@ -166,6 +166,7 @@ class SplashScreen:
             self.stdscr.refresh()
             self.stdscr.timeout(5000)
             self.stdscr.getch()
+            self.stdscr.timeout(100)
             return False
         else:
             if self.template_count > 0:
@@ -216,6 +217,3 @@ class SplashScreen:
             " |_|  \\__, | |_| |_|  \\__| \\__,_| ",
             "      |___/                       ",
         ]
-        self.stdscr.timeout(100)
-        self.stdscr.clear()
-        self.stdscr.refresh()

@@ -1,6 +1,6 @@
 """Regression tests for tui.lifecycle.filter_templates.
 
-This locks in the Phase 1.1 fix — the call to SearchManager.search had its
+This locks in the Phase 1.1 fix: the call to SearchManager.search had its
 positional args swapped, so search silently fell back to substring matching.
 """
 
@@ -47,7 +47,7 @@ def test_empty_filter_returns_all(lc, template_list):
 
 
 def test_filter_returns_list_of_strings(lc, template_list):
-    """Ensures the SearchResults wrapper is unwrapped before returning."""
+    """The SearchResults wrapper is unwrapped before returning."""
     out = lc.filter_templates(template_list, "py", "fuzzy")
     assert isinstance(out, list)
     assert all(isinstance(x, str) for x in out)

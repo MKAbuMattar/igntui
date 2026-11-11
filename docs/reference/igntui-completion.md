@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui completion` — emit a shell completion script
+`igntui completion` emits a shell completion script.
 
 ## SYNOPSIS
 
@@ -23,7 +23,7 @@ The script completes:
 
 Both `igntui` and `gitignore-tui` are wired up.
 
-The script does **not** complete template names dynamically — that would
+The script does **not** complete template names dynamically, because that would
 require a live API call on every Tab. Use the TUI for template discovery.
 
 ## OPTIONS
@@ -35,7 +35,7 @@ completion for.
 
 ## EXAMPLES
 
-### Bash — eval at shell startup
+### Bash: eval at shell startup
 
 Add to `~/.bashrc`:
 
@@ -49,7 +49,7 @@ Or install system-wide:
 sudo igntui completion bash > /etc/bash_completion.d/igntui
 ```
 
-### Zsh — install to `$fpath`
+### Zsh: install to `$fpath`
 
 ```bash
 mkdir -p ~/.zsh/completions
@@ -63,7 +63,7 @@ fpath=(~/.zsh/completions $fpath)
 autoload -U compinit && compinit
 ```
 
-### Fish — drop into completions
+### Fish: drop into completions
 
 ```fish
 igntui completion fish > ~/.config/fish/completions/igntui.fish
@@ -89,4 +89,4 @@ saved. No additional output.
 
 ## SEE ALSO
 
-- [`igntui`](igntui.md) — global flags that the completions cover
+- [`igntui`](igntui.md): global flags that the completions cover

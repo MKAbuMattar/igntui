@@ -1,6 +1,6 @@
 """Keyboard handling: the biggest module in the tree, and the least covered.
 
-`handle_input` is a pure function of (key, state) plus optional callbacks — no
+`handle_input` is a pure function of (key, state) plus optional callbacks, with no
 curses calls on any path except the mouse one. So the keymap is testable without
 a terminal, which matters because a broken binding is invisible: the TUI keeps
 running and simply stops responding to that key.
@@ -280,3 +280,19 @@ def test_unhandled_key_keeps_the_loop_running(handler):
 def test_mouse_event_without_a_screen_is_ignored(handler):
     """stdscr is Optional; the mouse path must not raise when it is None."""
     assert handler.handle_input(curses.KEY_MOUSE) is True
+
+
+def test_click_toggles_the_row_under_the_cursor(handler, monkeypatch):
+    """Templates panel: border at row 3, count header at 4, first item at 5."""
+
+    class Screen:
+        def getmaxyx(self):
+            return (24, 80)
+
+    handler.stdscr = Screen()
+    handler.state.template_scroll = 2
+    monkeypatch.setattr(curses, "getmouse", lambda: (0, 1, 5, 0, curses.BUTTON1_CLICKED))
+
+    assert handler.handle_input(curses.KEY_MOUSE) is True
+    assert handler.state.template_selected == 2
+    assert handler.state.selected_templates == {TEMPLATES[2]}

@@ -30,7 +30,7 @@ def test_find_returns_none_when_no_config(tmp_path):
 
 
 def test_find_stops_at_git_boundary(tmp_path):
-    """A `.git/` marker bounds the walk-up — outer config is not found."""
+    """A `.git/` marker bounds the walk-up, so the outer config is not found."""
     outer = tmp_path
     repo_root = outer / "myrepo"
     repo_root.mkdir()
@@ -38,7 +38,7 @@ def test_find_stops_at_git_boundary(tmp_path):
     sub = repo_root / "src"
     sub.mkdir()
 
-    # Config OUTSIDE the repo — should NOT be picked up.
+    # Config OUTSIDE the repo should NOT be picked up.
     (outer / REPO_CONFIG_FILENAME).write_text("[api]\ntimeout = 99\n")
 
     assert find_repo_config(sub) is None

@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui cache info` — print cache directory, TTL, and entry count
+`igntui cache info` prints the cache directory, TTL, and entry count.
 
 ## SYNOPSIS
 

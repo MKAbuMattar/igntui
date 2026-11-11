@@ -23,8 +23,7 @@ def main() -> int:
         no_cache=args.no_cache,
     )
 
-    # `--log-level` used to be parsed and then ignored, and the `[logging]`
-    # section of the config had no reader at all. Both are honored here.
+    # Honors both `--log-level` and the config's `[logging]` section.
     setup_logging(verbose=args.verbose, log_level=args.log_level)
 
     command = args.command
@@ -74,6 +73,10 @@ def tui_main() -> None:
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose/debug output")
     args = parser.parse_args()
 
+    from .core.config import config
+    from .core.repo_config import find_repo_config
+
+    config.reload(repo_config_path=find_repo_config())
     setup_logging(verbose=args.verbose)
 
     try:

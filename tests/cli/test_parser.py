@@ -16,7 +16,7 @@ from igntui.cli.parser import (
 )
 
 # Every subcommand the CLI advertises, and the flags each one owns. The
-# completion scripts hardcode the same lists — see test_completion_cmd.py.
+# completion scripts hardcode the same lists; see test_completion_cmd.py.
 SUBCOMMANDS = ["tui", "list", "generate", "cache", "test", "completion"]
 GLOBAL_FLAGS = ["--version", "--verbose", "--log-level", "--config", "--no-cache"]
 COMMAND_FLAGS = {

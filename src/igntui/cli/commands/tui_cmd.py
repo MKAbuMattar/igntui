@@ -19,7 +19,7 @@ class TUICommand(CLICommand):
         try:
             from ...app import run_tui
 
-            return run_tui(show_splash=not args.no_splash)
+            return run_tui(show_splash=not args.no_splash, api=self.cli.api)
 
         except KeyboardInterrupt:
             print("\nOperation cancelled by user")

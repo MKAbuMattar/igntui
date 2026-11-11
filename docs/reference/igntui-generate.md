@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui generate` — generate `.gitignore` content for one or more templates
+`igntui generate` generates `.gitignore` content for one or more templates.
 
 ## SYNOPSIS
 
@@ -56,7 +56,7 @@ printed to stdout (pipeable, clean output with no header line).
 ### `--append`, `-a`
 
 (boolean) Append to `<file>` instead of replacing it. Bypasses managed-block
-markers — content is written raw with a separator comment. Mutually
+markers, so content is written raw with a separator comment. Mutually
 exclusive with `--force` semantically (force has no effect when appending).
 Default: false.
 
@@ -68,7 +68,7 @@ Default: prompt for confirmation when file exists.
 ### `--dry-run`
 
 (boolean) Resolve content but do **not** write any file. Content is printed
-to stdout with a `# (dry-run — no file written)` comment on stderr. With
+to stdout with a `# (dry-run: no file written)` comment on stderr. With
 `--output FILE`, the byte count of what would be written is reported on
 stderr. Default: false.
 
@@ -100,7 +100,7 @@ $ igntui generate python node macos --output .gitignore
 
 ```
 $ igntui generate python --output .gitignore --dry-run
-# (dry-run — would write 3583 bytes to .gitignore)
+# (dry-run: would write 3583 bytes to .gitignore)
 # Created by https://www.toptal.com/developers/gitignore/api/python
 ...
 ```

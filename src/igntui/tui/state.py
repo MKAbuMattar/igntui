@@ -13,6 +13,8 @@ class TUIState:
     templates: list[str] = field(default_factory=list)
     selected_templates: set[str] = field(default_factory=set)
     generated_content: str = ""
+    # True only while generated_content holds real API output that is safe to save.
+    content_ok: bool = False
     filter_text: str = ""
     cursor_position: int = 0  # Cursor position in search input
     filtered_templates: list[str] = field(default_factory=list)

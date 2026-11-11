@@ -39,6 +39,8 @@ class UsageTracker:
         self._load()
 
     def record(self, template: str) -> None:
+        if not config.get("behavior", "save_usage_stats", default=True):
+            return
         entry = self._entries.setdefault(template, _Entry())
         entry.count += 1
         entry.last_used = time.time()
@@ -53,7 +55,7 @@ class UsageTracker:
         return [name for name, _ in items[:n]]
 
     def _migrate_legacy_if_present(self) -> None:
-        """Convert ~/.igntui_usage.json → ~/.igntui.usage.toml (one-shot)."""
+        """Convert ~/.igntui_usage.json to ~/.igntui.usage.toml (one-shot)."""
         if self.path.exists():
             return
         legacy = self.path.parent / LEGACY_USAGE_FILENAME

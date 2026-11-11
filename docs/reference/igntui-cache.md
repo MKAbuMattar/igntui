@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui cache` — manage the local template / content cache
+`igntui cache` manages the local template and content cache.
 
 ## SYNOPSIS
 

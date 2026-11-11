@@ -11,13 +11,15 @@ A file written by igntui carries two marked regions:
     ...your own rules...
     # >>> End of custom patterns (edit freely; igntui preserves this block) <<<
 
-The first region is rewritten on every save — do not put your own rules there.
+The first region is rewritten on every save, so do not put your own rules there.
 The second is yours: its body is read out of the existing file and put back
 verbatim, so anything you add survives regeneration. Text outside both regions
 is preserved too.
 """
 
 import logging
+import os
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ CUSTOM_END_MARKER = "# >>> End of custom patterns (edit freely; igntui preserves
 # Custom-block markers written by earlier versions, still recognised on read.
 # 0.2.0 through 0.4.0 shipped a pair that said "do not edit between these
 # markers" on the one region the user is meant to edit. Files carrying it are
-# rewritten with the current wording, body intact — dropping this tuple would
+# rewritten with the current wording, body intact. Dropping this tuple would
 # make the next save append a second block instead of replacing the first.
 LEGACY_CUSTOM_MARKER_PAIRS: tuple[tuple[str, str], ...] = (
     (
@@ -115,11 +117,11 @@ def _strip_custom_block(text: str) -> str:
 def merge(existing: str | None, new_content: str) -> str:
     """Merge new generated content into an existing `.gitignore`.
 
-    - No existing file or empty file → both regions, custom block empty.
-    - Existing regions → generated content is replaced, the custom block's body
+    - No existing file or empty file: both regions, custom block empty.
+    - Existing regions: generated content is replaced, the custom block's body
       is carried over unchanged, and text outside both is preserved.
-    - Existing file without markers (legacy) → the regions are appended after it.
-    - Malformed (END before BEGIN, or BEGIN without END) → a fresh pair of
+    - Existing file without markers (legacy): the regions are appended after it.
+    - Malformed (END before BEGIN, or BEGIN without END): a fresh pair of
       regions is appended and a warning logged; nothing is thrown away.
     """
     custom = extract_custom(existing)
@@ -131,7 +133,7 @@ def merge(existing: str | None, new_content: str) -> str:
     begin_idx = existing.find(BEGIN_MARKER)
     end_idx = existing.find(END_MARKER, begin_idx + len(BEGIN_MARKER) if begin_idx != -1 else 0)
 
-    # Both markers present and in the right order → splice both regions in place.
+    # Both markers present and in the right order: splice both regions in place.
     if begin_idx != -1 and end_idx != -1 and end_idx > begin_idx:
         after_start = end_idx + len(END_MARKER)
         before = existing[:begin_idx].rstrip("\n")
@@ -147,7 +149,7 @@ def merge(existing: str | None, new_content: str) -> str:
             parts.append("\n" + after + "\n")
         return "".join(parts)
 
-    # Markers missing or malformed → append fresh regions.
+    # Markers missing or malformed: append fresh regions.
     if begin_idx != -1 or existing.find(END_MARKER) != -1:
         logger.warning(
             "managed-block markers in existing file are malformed; appending a fresh block"
@@ -155,3 +157,25 @@ def merge(existing: str | None, new_content: str) -> str:
 
     trimmed = _strip_custom_block(existing).rstrip("\n")
     return f"{trimmed}\n\n{wrapped}" if trimmed else wrapped
+
+
+def write_file(path: Path, text: str) -> None:
+    """Write `text` to `path` so a failed write leaves the old file intact.
+
+    A truncated `.gitignore` loses its END marker, and the next `merge()` then
+    treats the custom-patterns block as gone. The temp file sits next to the
+    target so `os.replace` is a rename. It is opened with "x" so it gets the
+    umask's permissions rather than mkstemp's 0600, and an existing file's
+    mode is copied over. A symlinked target is resolved so the link survives.
+    """
+    target = Path(os.path.realpath(path))
+    tmp = target.with_name(f".{target.name}.{os.getpid()}.tmp")
+    try:
+        with open(tmp, "x", encoding="utf-8") as f:
+            f.write(text)
+        if target.exists():
+            os.chmod(tmp, target.stat().st_mode & 0o7777)
+        os.replace(tmp, target)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise

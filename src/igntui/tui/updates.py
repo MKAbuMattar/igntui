@@ -22,7 +22,7 @@ class TemplatesLoadFailed:
 class ContentGenerated:
     content: str
     from_cache: bool
-    selected_count: int
+    templates: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -38,7 +38,9 @@ class LoadCompleted:
 
 @dataclass(frozen=True)
 class GenerationCompleted:
-    """Same, for generation flows."""
+    """Same, for generation flows. `templates` is the selection the worker ran for."""
+
+    templates: tuple[str, ...] = ()
 
 
 StateUpdate = (

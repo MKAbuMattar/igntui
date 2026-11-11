@@ -6,11 +6,11 @@ How igntui's two-layer cache decides when to hit the API.
 
 igntui caches every API response on disk and in memory. Two cache categories:
 
-- **Template list** — one entry under key `gitignore_templates_list`,
+- **Template list**: one entry under key `gitignore_templates_list`,
   populated by [`igntui list`](../reference/igntui-list.md) and the TUI
   startup load. Nothing is read into memory when a process starts; the first
   lookup pulls what it needs off disk and keeps it for the rest of the run.
-- **Template content blobs** — one entry per unique template combination,
+- **Template content blobs**: one entry per unique template combination,
   populated by [`igntui generate`](../reference/igntui-generate.md) and the
   TUI's content panel.
 
@@ -48,8 +48,8 @@ key:  gitignore_content_ab23cd45ef678901
 
 This guarantees:
 
-- The same combination produces the same filename **across processes** —
-  Python's randomized `hash()` is not used (legacy entries from pre-0.0.2
+- The same combination produces the same filename **across processes**,
+  because Python's randomized `hash()` is not used (legacy entries from pre-0.0.2
   are auto-purged on first launch).
 - Different combinations are collision-resistant.
 - Order, casing, and whitespace in the input do not change the key.
@@ -68,7 +68,7 @@ Default TTL: `api.cache_ttl = 3600` seconds (1 hour). Override in
 
 **Nothing sweeps expired files on its own.** Construction used to read every
 entry and delete the expired ones, but that cost every command the time to
-open and parse the whole cache — around 19 ms over 300 content blobs — for no
+open and parse the whole cache, around 19 ms over 300 content blobs, for no
 benefit, since a read already falls back to disk on its own. Startup is lazy
 now, and expired files are removed when something touches them, or on demand
 with `igntui cache clear --expired`.
@@ -77,7 +77,7 @@ In practice a stale entry is short-lived anyway: a content key is a hash of its
 template set, so asking for the same set again overwrites the expired entry in
 place. Only sets that were cached once and never requested again linger.
 
-There is no LRU / size-based eviction — the cache grows linearly with the
+There is no LRU / size-based eviction, so the cache grows linearly with the
 number of unique combinations the user has generated, plus the one
 template-list entry. Run `igntui cache clear` periodically if disk usage
 is a concern.
@@ -103,8 +103,8 @@ A miss in memory promotes the disk hit into memory.
 ## WRITES ARE ATOMIC
 
 An entry is written to a temporary file in the cache directory and then renamed
-over its target. A reader — including a second igntui process running at the
-same time — sees either the previous entry or the new one, never a half-written
+over its target. A reader, including a second igntui process running at the
+same time, sees either the previous entry or the new one, never a half-written
 file, and an interrupted or failed write leaves the previous entry intact.
 
 A corrupt `.cache` file is still handled if one appears by other means: the read
@@ -114,7 +114,7 @@ logs a warning, deletes the file, and reports a miss.
 
 | How                                                           | Scope                                        |
 | ------------------------------------------------------------- | -------------------------------------------- |
-| [`--no-cache`](../reference/igntui.md#--no-cache) global flag | Per session — `force_refresh_default = True` |
+| [`--no-cache`](../reference/igntui.md#--no-cache) global flag | Per session, `force_refresh_default = True` |
 | `force_refresh=True` in code                                  | Per call                                     |
 | `igntui cache clear`                                          | Wipe everything; subsequent calls re-fetch   |
 

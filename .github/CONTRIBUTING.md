@@ -3,7 +3,7 @@
 Thanks for wanting to improve igntui.
 
 Two surfaces share one core: a CLI and a curses TUI over the same `core/` package. Most bugs
-worth reporting live in the seam between them — a flag that the parser accepts and nothing
+worth reporting live in the seam between them: a flag that the parser accepts and nothing
 reads, a config key with no reader, a marker format that drifts from what is already sitting
 in people's repositories.
 
@@ -37,14 +37,14 @@ The tests are pure: no network, no terminal, no home directory. That is delibera
 means they cannot tell you whether the TUI *works*. For anything in `tui/` or `ui/`:
 
 1. **Run it at 80×24, then at something small like 45×13.** The panels clip rather than
-   raising, so a broken layout is silent — nothing will crash to tell you.
+   raising, so a broken layout is silent. Nothing will crash to tell you.
 2. **Try it with the mouse off** (`mouse_support = false` in `~/.igntui.cfg.toml`). Mouse
    handling is the least covered path in the codebase.
 3. **Check both entry points**: `igntui tui` and the standalone `gitignore-tui`.
 4. **Exercise the save flow on a `.gitignore` that already has content**, including one with a
    managed block already in it. That is the path with real user data in it.
 
-Write down what you actually did in the pull request template. "Lint passes" is not
+Write down what you did in the pull request template. "Lint passes" is not
 verification of a terminal UI.
 
 ## Threading
@@ -71,7 +71,7 @@ Do not mutate `TUIState` from a worker thread. That bug has been fixed once alre
 
 Those exact strings are already in files people have committed. If you change one, the next
 save will not recognise the old text and will append a second block instead of replacing the
-first — so any change has to keep reading the previous form. Tests pin both pairs.
+first. Any change has to keep reading the previous form. Tests pin both pairs.
 
 ## Configuration
 
@@ -81,7 +81,7 @@ DEFAULT_CONFIG → ~/.igntui.cfg.toml → .igntui.repo.cfg.toml → IGNTUI_* env
 
 If you add a config key, add a reader for it in the same change. A documented key that nothing
 reads is worse than no key: it looks like a feature. Two of those were found and fixed
-recently — see `ROADMAP.md` items 2 and 9.
+recently. See `ROADMAP.md` items 2 and 9.
 
 `Config` deep-copies `DEFAULT_CONFIG`. Keep it that way: a shallow copy shares the nested
 section dicts and `set()` then writes into the class attribute.

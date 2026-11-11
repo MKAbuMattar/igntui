@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""`igntui completion <shell>` — emit a shell completion script."""
+"""`igntui completion <shell>`: emit a shell completion script."""
 
 import argparse
 
@@ -10,7 +10,7 @@ _GLOBAL_FLAGS = "--version --verbose --log-level --config --no-cache --help"
 
 
 _BASH = """\
-# bash completion for igntui — install with:
+# bash completion for igntui. Install with:
 #   eval "$(igntui completion bash)"
 # or save to /etc/bash_completion.d/igntui
 _igntui_complete() {
@@ -47,7 +47,7 @@ complete -F _igntui_complete gitignore-tui
 
 _ZSH = """\
 #compdef igntui gitignore-tui
-# zsh completion for igntui — install with:
+# zsh completion for igntui. Install with:
 #   eval "$(igntui completion zsh)"
 # or save to a directory on $fpath as _igntui
 
@@ -89,7 +89,7 @@ _igntui "$@"
 
 
 _FISH = """\
-# fish completion for igntui — install with:
+# fish completion for igntui. Install with:
 #   igntui completion fish | source
 # or save to ~/.config/fish/completions/igntui.fish
 

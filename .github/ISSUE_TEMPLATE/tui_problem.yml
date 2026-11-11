@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         "It looks wrong" is unactionable without knowing the terminal. The panels
-        clip rather than raising an error, so layout problems are silent — these
+        clip rather than raising an error, so layout problems are silent, so these
         four fields are what make the report reproducible.
 
   - type: input

@@ -2,8 +2,8 @@
 
 ## NAME
 
-`igntui` TUI — interactive curses interface for selecting templates and
-generating a `.gitignore`
+The `igntui` TUI is an interactive curses interface for selecting templates and
+generating a `.gitignore`.
 
 ## LAUNCHING
 
@@ -56,7 +56,7 @@ panel. Mouse click focuses the panel under the cursor.
 
 The bottom-most line displays:
 
-- **Status messages** (success: green; error: red) — auto-clear after 5 s.
+- **Status messages** (success: green; error: red), which auto-clear after 5 s.
 - **Current panel index** and search mode.
 - **Cache hit / load-progress notes** during async fetches.
 
@@ -64,9 +64,9 @@ The bottom-most line displays:
 
 Two operations run in background threads and post results to the main loop:
 
-- **Template list load** — at startup (via splash or first launch) and on
+- **Template list load**: at startup (via splash or first launch) and on
   `r` / `F5` refresh.
-- **Content generation** — every time the selection set changes.
+- **Content generation**: every time the selection set changes.
 
 The TUI remains responsive while these run; the status bar reports
 progress.
@@ -78,7 +78,7 @@ sidecar, its `[selection]` is loaded into the Selected panel before the
 first render and a generation is triggered. Status bar shows:
 
 ```
-✓ Loaded N templates from .igntui.cfg.toml — Press 'c' to clear
+✓ Loaded N templates from .igntui.cfg.toml; press 'c' to clear
 ```
 
 ## ON SAVE
@@ -90,7 +90,7 @@ Pressing `s` opens a Save dialog. If the target file already exists:
 - If the diff is empty (no-op), the save is short-circuited with a status
   message.
 - Confirmation writes the file (preserving user-edited regions outside the
-  managed-block markers — see [Managed blocks](../concepts/managed-blocks.md))
+  managed-block markers; see [Managed blocks](../concepts/managed-blocks.md))
   and refreshes `.igntui.cfg.toml`.
 
 ## SEE ALSO

@@ -5,12 +5,12 @@ import curses
 import sys
 
 
-def run_tui(show_splash: bool = True) -> int:
+def run_tui(show_splash: bool = True, api=None) -> int:
     try:
         from .tui import GitIgnoreTUI
 
         def main(stdscr):
-            tui = GitIgnoreTUI(stdscr, show_splash=show_splash)
+            tui = GitIgnoreTUI(stdscr, show_splash=show_splash, api=api)
             return tui.run()
 
         exit_code = curses.wrapper(main)

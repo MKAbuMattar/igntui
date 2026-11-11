@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Version bookkeeping for a release.
 
-The version lives in exactly two files — `pyproject.toml` and
-`src/igntui/__init__.py` — and everything else reads `__version__` at runtime.
+The version lives in exactly two files, `pyproject.toml` and
+`src/igntui/__init__.py`, and everything else reads `__version__` at runtime.
 They drift silently: nothing at build time compares them, so a mismatch first
 shows up as a release on PyPI labelled with the wrong number.
 
@@ -114,7 +114,7 @@ def apply(version: str) -> None:
         raise SystemExit("error: CHANGELOG.md has no '## [Unreleased]' heading")
     text = text.replace(
         "## [Unreleased]",
-        f"## [Unreleased]\n\n## [{version}] — {today}",
+        f"## [Unreleased]\n\n## [{version}] - {today}",
         1,
     )
     text = text.rstrip("\n") + f"\n[{version}]: {REPO}/releases/tag/v{version}\n"
@@ -152,7 +152,7 @@ def status() -> None:
     print(f"  on PyPI       : {live or 'unreachable'}")
 
     if live is None:
-        print("\n  Could not reach PyPI — offline, or the request timed out.")
+        print("\n  Could not reach PyPI. It is offline, or the request timed out.")
     elif live == local:
         print(f"\n  In step. v{local} is the published release.")
     elif parse(local) > parse(live):
@@ -188,7 +188,7 @@ def verify(version: str, attempts: int = 10, delay: float = 6.0) -> None:
 
     raise SystemExit(
         f"error: PyPI never served {version} after {attempts} attempts.\n"
-        f"       The upload may have failed silently — check the publish step."
+        f"       The upload may have failed silently. Check the publish step."
     )
 
 

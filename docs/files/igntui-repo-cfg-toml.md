@@ -2,7 +2,7 @@
 
 ## NAME
 
-`.igntui.repo.cfg.toml` — team-shared repo configuration
+`.igntui.repo.cfg.toml` is the team-shared repo configuration file.
 
 ## LOCATION
 
@@ -18,11 +18,11 @@ my-repo/
 ├── frontend/
 │   └── (igntui run from here also discovers the file above)
 └── backend/
-    └── (same — walk-up finds it)
+    └── (same, walk-up finds it)
 ```
 
 If a `.git/` boundary is encountered before any `.igntui.repo.cfg.toml`,
-discovery returns no result — keeping per-repo config strictly inside the
+discovery returns no result, which keeps per-repo config strictly inside the
 repo.
 
 ## SYNOPSIS
@@ -54,14 +54,14 @@ DEFAULT_CONFIG → ~/.igntui.cfg.toml → .igntui.repo.cfg.toml → IGNTUI_* env
 
 The per-output sidecar [`.igntui.cfg.toml`](igntui-cfg-toml.md) overlays
 **only selection state** (`templates`, `search_mode`, `output.path`) on top
-of the cascade — it never overrides config knobs from the repo file.
+of the cascade. It never overrides config knobs from the repo file.
 
 When no per-output sidecar exists in CWD but the repo config defines
 `[selection]`, the TUI uses those templates as the initial selection on
 launch. The status bar reads:
 
 ```
-✓ Seeded N templates from .igntui.repo.cfg.toml — Press 'c' to clear
+✓ Seeded N templates from .igntui.repo.cfg.toml; press 'c' to clear
 ```
 
 ## SCHEMA
@@ -94,7 +94,7 @@ def find_repo_config(cwd):
         if (current / ".igntui.repo.cfg.toml").is_file():
             return current / ".igntui.repo.cfg.toml"
         if (current / ".git").exists() or (current / ".hg").exists():
-            return None  # repo boundary — stop walking up
+            return None  # repo boundary, stop walking up
         if current.parent == current:
             return None  # filesystem root
         current = current.parent
@@ -103,8 +103,8 @@ def find_repo_config(cwd):
 This means:
 
 - An `.igntui.repo.cfg.toml` sitting **outside** a repo (e.g., in `$HOME`)
-  is **not** picked up — that's what `~/.igntui.cfg.toml` is for.
-- Nested repos shadow their parent — the inner-most repo's config wins.
+  is **not** picked up, because that's what `~/.igntui.cfg.toml` is for.
+- Nested repos shadow their parent, so the inner-most repo's config wins.
 - A repo with no `.git/` and no `.hg/` walks all the way to `/`, but is
   unusual.
 

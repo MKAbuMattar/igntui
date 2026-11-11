@@ -121,3 +121,18 @@ def test_failure_response_returns_nonzero(capsys):
     out = capsys.readouterr()
     assert rc == 1
     assert "boom" in out.out
+
+
+def test_dry_run_reports_the_size_of_the_merged_file(tmp_path, capsys):
+    from igntui.core.managed_block import merge
+
+    out_file = tmp_path / ".gitignore"
+    out_file.write_text("my-rule\n", encoding="utf-8")
+    cmd = _command_with_response("GENERATED")
+
+    rc = cmd.execute(_make_args(output=out_file, dry_run=True, force=True))
+
+    expected = len(merge("my-rule\n", "GENERATED").encode("utf-8"))
+    assert rc == 0
+    assert f"would write {expected} bytes" in capsys.readouterr().err
+    assert out_file.read_text(encoding="utf-8") == "my-rule\n"

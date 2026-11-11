@@ -15,5 +15,5 @@ class APIResponse:
     from_cache: bool = False
 
     def with_data(self, data: Any) -> "APIResponse":
-        """Return a copy with `data` replaced — use instead of mutating in place."""
+        """Return a copy with `data` replaced. Use this instead of mutating in place."""
         return replace(self, data=data)

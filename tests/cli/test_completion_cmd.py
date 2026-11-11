@@ -3,7 +3,7 @@
 `_SUBCOMMANDS`, `_GLOBAL_FLAGS` and the per-command flag lists inside the three
 templates are not derived from the argparse tree. Nothing stops a new subcommand
 or flag from being invisible to every shell, so these tests compare the emitted
-scripts against what argparse actually knows.
+scripts against what argparse knows.
 """
 
 import argparse

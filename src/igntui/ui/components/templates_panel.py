@@ -63,7 +63,7 @@ class TemplatesPanel(BasePanel):
             search_info = ""
 
         try:
-            self.stdscr.addstr(y, x + 1, count_text, curses.color_pair(1))
+            self.stdscr.addstr(y, x + 1, count_text[: max(0, width - 2)], curses.color_pair(1))
             if search_info and len(count_text + search_info) < width - 4:
                 self.stdscr.addstr(y, x + 1 + len(count_text), search_info, curses.color_pair(2))
             y += 1

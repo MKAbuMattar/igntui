@@ -1,7 +1,7 @@
 version: 2
 updates:
   # Actions only. Three runtime dependencies, one of them platform gated, and
-  # `uv.lock` is committed — a pip ecosystem entry would mostly generate noise.
+  # `uv.lock` is committed, so a pip ecosystem entry would mostly generate noise.
   - package-ecosystem: github-actions
     directory: /
     schedule:

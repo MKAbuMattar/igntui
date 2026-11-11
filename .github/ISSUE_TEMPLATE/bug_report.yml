@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         For anything about how the **TUI looks or responds**, use the
-        "TUI / rendering problem" form instead — it asks for the terminal details
+        "TUI / rendering problem" form instead. It asks for the terminal details
         that make those reports actionable.
 
   - type: input

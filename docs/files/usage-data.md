@@ -2,7 +2,7 @@
 
 ## NAME
 
-`~/.igntui.usage.toml` — persistent counter of recently-used templates
+`~/.igntui.usage.toml` is a persistent counter of recently-used templates.
 
 ## LOCATION
 
@@ -27,9 +27,9 @@ of the Available Templates panel within the current filter result.
 
 The file is written every time a template is added to the selection (either
 in the TUI or implicitly via [`.igntui.cfg.toml`](igntui-cfg-toml.md)
-auto-load — sidecar loads do not count as "uses").
+auto-load). Sidecar loads do not count as "uses".
 
-It is **not** written by `igntui generate` from the CLI — only TUI
+It is **not** written by `igntui generate` from the CLI. Only TUI
 selections increment counters.
 
 ## SCHEMA
@@ -46,8 +46,8 @@ value is an object with:
 
 `UsageTracker.top(n)` orders entries by:
 
-1. `count` descending — most-used first.
-2. Ties broken by `last_used` descending — most recent first.
+1. `count` descending, most-used first.
+2. Ties broken by `last_used` descending, most recent first.
 
 The top `behavior.max_recent_templates` entries (default `10`) that also
 appear in the current filter result are surfaced at the top of the

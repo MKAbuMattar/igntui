@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui list` — print available `.gitignore` templates
+`igntui list` prints the available `.gitignore` templates.
 
 ## SYNOPSIS
 

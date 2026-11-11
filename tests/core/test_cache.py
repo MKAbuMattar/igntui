@@ -113,7 +113,7 @@ def test_construction_does_not_read_the_cache_into_memory(tmp_cache_dir):
     """Startup is lazy: reading every entry cost every command real time.
 
     A CacheManager over a populated directory used to open and json.loads each
-    file in __init__, which measured ~19 ms over 300 content blobs — paid by
+    file in __init__, which measured ~19 ms over 300 content blobs, paid by
     every command, because GitIgnoreAPI builds a manager before doing anything.
     """
     seed = CacheManager(str(tmp_cache_dir))
@@ -144,7 +144,7 @@ def test_expired_entry_is_dropped_on_read_not_at_startup(tmp_cache_dir):
     CacheManager(str(tmp_cache_dir)).set("stale", "v", ttl=-1)
 
     fresh = CacheManager(str(tmp_cache_dir))
-    # Still on disk — construction no longer sweeps.
+    # Still on disk: construction does not sweep.
     assert fresh.get_stats()["disk_entries"] == 1
 
     assert fresh.get("stale") is None

@@ -2,7 +2,7 @@
 
 ## NAME
 
-`igntui tui` — launch the interactive Terminal User Interface
+`igntui tui` launches the interactive Terminal User Interface.
 
 ## SYNOPSIS
 
@@ -19,7 +19,7 @@ bar.
 
 If the working directory contains an [`.igntui.cfg.toml`](../files/igntui-cfg-toml.md)
 sidecar, its `[selection]` is auto-loaded on launch and the status bar
-reports `✓ Loaded N templates from .igntui.cfg.toml — Press 'c' to clear`.
+reports `✓ Loaded N templates from .igntui.cfg.toml; press 'c' to clear`.
 
 This command is the **default** when `igntui` is invoked with no subcommand.
 
@@ -61,7 +61,7 @@ $ gitignore-tui --version
 
 ## OUTPUT
 
-None to stdout under normal use — the TUI takes over the terminal until
+None to stdout under normal use. The TUI takes over the terminal until
 the user quits with `q` or `Esc`. Errors during initialization are printed
 to stderr.
 

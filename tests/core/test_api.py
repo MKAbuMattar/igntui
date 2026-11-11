@@ -80,7 +80,7 @@ def test_get_templates_filters_invalid_names(api):
     """Names with .., //, etc. should be skipped before contacting the API."""
     with patch("urllib.request.urlopen", return_value=_fake_response("ok")):
         result = api.get_templates(["python/../etc", "node"])
-    # node is valid → call still made
+    # node is valid, so the call is still made
     assert result.success
     # the filtered call would have used only "node"
 

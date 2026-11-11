@@ -54,7 +54,7 @@ class CacheManager:
 
         # Deliberately not reading the cache into memory here. `get()` already
         # falls back to disk and promotes what it finds, so an eager load bought
-        # nothing except latency — and every command pays it, because
+        # nothing except latency, and every command pays it because
         # GitIgnoreAPI constructs a manager on the way to doing anything. Over a
         # realistic cache (300 content blobs, ~3.5 MiB) it measured ~19 ms of
         # open + json.loads before the process could start its actual work.
@@ -69,7 +69,7 @@ class CacheManager:
     def _purge_legacy_content_keys(self) -> None:
         # Pre-Phase-2.1 keys used `hash() % 1000000` (6 decimal digits, non-stable
         # across processes). New keys are 16 hex chars from sha256. Anything that
-        # matches the old shape is dead weight — drop it.
+        # matches the old shape is dead weight, so drop it.
         legacy_re = re.compile(r"^gitignore_content_\d{6}$")
         purged = 0
         for cache_file in self.cache_dir.glob("gitignore_content_*.cache"):
@@ -233,8 +233,8 @@ class CacheManager:
         """Write an entry to disk atomically.
 
         Writing in place meant a crash, a full disk, or two processes saving the
-        same key could leave truncated JSON behind. That was survivable — a read
-        catches the JSONDecodeError and unlinks the file — but the entry was lost
+        same key could leave truncated JSON behind. A read survives that (it
+        catches the JSONDecodeError and unlinks the file), but the entry was lost
         and the failure was silent. Writing a temp file in the same directory and
         renaming makes the swap atomic on POSIX and Windows: a reader sees either
         the old entry or the new one, never half of either.
@@ -298,7 +298,7 @@ class TemplateCache:
 
     # No per-template invalidation helper: content keys are sha256 prefixes, so a
     # template name cannot be recovered from one. The version that tried matched
-    # `name in key`, which could only ever hit by accident — and would delete
+    # `name in key`, which could only ever hit by accident and would delete
     # unrelated entries for a short hex-ish name like `ade` or `cafe`. Clearing
     # the whole content cache (`igntui cache clear`) is the honest operation; a
     # real implementation needs a stored name -> digest index.
