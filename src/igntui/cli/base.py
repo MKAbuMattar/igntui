@@ -1,6 +1,5 @@
 import argparse
 import logging
-import sys
 from pathlib import Path
 
 from ..core.api import GitIgnoreAPI
@@ -58,9 +57,3 @@ class CLICommand:
 
     def execute(self, args: argparse.Namespace) -> int:
         raise NotImplementedError
-
-
-def safe_exit(code: int = 0) -> None:
-    # Note: Don't call curses.endwin() here as curses.wrapper handles cleanup
-    # Calling it multiple times causes "endwin() returned ERR" errors
-    sys.exit(code)
