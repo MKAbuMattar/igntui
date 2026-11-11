@@ -2,7 +2,6 @@
 
 
 import logging
-from typing import Any
 
 from ..cache import CacheManager, TemplateCache
 from ..config import config
@@ -28,7 +27,6 @@ class GitIgnoreAPI:
             cache_dir=config.get_cache_dir(), default_ttl=self.cache_ttl
         )
         self.template_cache = TemplateCache(self.cache_manager)
-        self.stats = {"cache_hits": 0, "cache_misses": 0}
         # Session-wide override; set by `--no-cache`. Per-call force_refresh still wins.
         self.force_refresh_default = False
 
@@ -38,10 +36,8 @@ class GitIgnoreAPI:
             cached_templates = self.template_cache.get_template_list()
             if cached_templates is not None:
                 logger.debug("Using cached template list")
-                self.stats["cache_hits"] += 1
                 return APIResponse(success=True, data=cached_templates, from_cache=True)
 
-        self.stats["cache_misses"] += 1
         url = f"{self.base_url}/list"
 
         try:
@@ -75,10 +71,8 @@ class GitIgnoreAPI:
             cached_content = self.template_cache.get_template_content(clean_techs)
             if cached_content is not None:
                 logger.debug("Using cached content for %d templates", len(clean_techs))
-                self.stats["cache_hits"] += 1
                 return APIResponse(success=True, data=cached_content, from_cache=True)
 
-        self.stats["cache_misses"] += 1
         tech_string = ",".join(clean_techs).lower()
         url = f"{self.base_url}/{tech_string}"
 
@@ -133,38 +127,6 @@ class GitIgnoreAPI:
         except Exception as e:
             logger.error("API connection test failed: %s", e)
             return APIResponse(success=False, data={"status": "error"}, error_message=str(e))
-
-    def get_stats(self) -> dict[str, Any]:
-        request_stats = self.request_handler.get_stats()
-        total_requests = request_stats["requests_made"]
-        avg_response_time = (
-            request_stats["total_response_time"] / total_requests if total_requests > 0 else 0.0
-        )
-
-        cache_stats = self.cache_manager.get_stats()
-
-        return {
-            "api_stats": {
-                "requests_made": total_requests,
-                "avg_response_time": avg_response_time,
-                "error_rate": request_stats["errors"] / max(1, total_requests),
-                "base_url": self.base_url,
-                "timeout": self.timeout,
-                "retry_attempts": self.retry_attempts,
-            },
-            "cache_stats": cache_stats,
-            "performance_stats": {
-                "cache_hit_rate": (
-                    self.stats["cache_hits"]
-                    / max(1, self.stats["cache_hits"] + self.stats["cache_misses"])
-                ),
-                "total_cache_operations": self.stats["cache_hits"] + self.stats["cache_misses"],
-            },
-        }
-
-    def clear_cache(self) -> None:
-        self.cache_manager.clear()
-        logger.info("Cleared all API cache data")
 
     def _parse_template_list(self, response_text: str) -> list[str]:
         all_templates = []
