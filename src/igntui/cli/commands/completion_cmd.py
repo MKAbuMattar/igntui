@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """`igntui completion <shell>`: emit a shell completion script."""
 
 import argparse

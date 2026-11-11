@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import argparse
 
 from .cli.base import BaseCLI, safe_exit

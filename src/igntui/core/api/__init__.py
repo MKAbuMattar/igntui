@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from .client import GitIgnoreAPI
 from .errors import APIError, NetworkError, RateLimitError, ServiceUnavailableError
 from .response import APIResponse

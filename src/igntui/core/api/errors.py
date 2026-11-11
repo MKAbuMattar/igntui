@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 class APIError(Exception):
     def __init__(
         self,

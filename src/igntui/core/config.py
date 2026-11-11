@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """User-level configuration loader.
 
 Loads `~/.igntui.cfg.toml` by default. Honors environment overrides and

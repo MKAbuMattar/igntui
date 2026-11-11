@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import platform
 import sys
 from collections.abc import Callable
