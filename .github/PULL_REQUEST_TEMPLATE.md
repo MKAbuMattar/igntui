@@ -24,7 +24,7 @@ TUI renders correctly.** If you touched `tui/` or `ui/`, tell us what you ran:
 - [ ] Touched the save path: tested against a `.gitignore` that already has content **and** one
       that already has a managed block, and custom patterns survived
 - [ ] Touched `TUIState` from a background thread: **no** (post a `StateUpdate` to the queue)
-- [ ] No new dependency (three runtime deps is the budget, one platform gated)
+- [ ] No new dependency (two runtime deps is the budget, one platform gated)
 - [ ] Nothing writes to stdout while the TUI is running
 - [ ] `CHANGELOG.md` updated under `## [Unreleased]` if a user would notice the change
 - [ ] Version **not** touched by hand. `scripts/release_version.py` owns both files

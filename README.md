@@ -56,7 +56,7 @@
 - **Multi-template selection.** Select and combine multiple templates.
 - **Live preview.** See the generated `.gitignore` content in real time.
 - **Navigation.** Tab between panels, arrow keys, vim-style shortcuts.
-- **Splash screen.** Animated, with pyfiglet ASCII art.
+- **Splash screen.** Animated, with ASCII art.
 
 ### Performance
 
@@ -480,7 +480,7 @@ the License, or (at your option) any later version.
 ## Acknowledgments
 
 - [gitignore.io](https://www.toptal.com/developers/gitignore) for the templates
-- [pyfiglet](https://github.com/pwaller/pyfiglet) for the ASCII art
+- [FIGlet](http://www.figlet.org/) for the slant font the banner was drawn in
 - [Python curses](https://docs.python.org/3/library/curses.html) for the terminal UI
 
 ## Statistics
