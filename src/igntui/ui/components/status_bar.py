@@ -65,11 +65,3 @@ class StatusBar:
                     self.stdscr.addstr(status_y, msg_x, message, msg_attr)
         except curses.error:
             pass
-
-    def set_message(self, message: str, is_error: bool = False):
-        if is_error:
-            self.error_message = message
-            self.status_message = ""
-        else:
-            self.status_message = message
-            self.error_message = ""

@@ -6,7 +6,6 @@ class BaseDialog:
         self.stdscr = stdscr
         self.title = title
         self.result = None
-        self.cancelled = False
 
     def calculate_position(self, width: int, height: int):
         max_y, max_x = self.stdscr.getmaxyx()

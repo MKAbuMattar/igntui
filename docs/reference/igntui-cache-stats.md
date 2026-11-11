@@ -32,7 +32,6 @@ on disk, use [`igntui cache info`](igntui-cache-info.md).
 | `hits`           | counter of cache hits                      |
 | `misses`         | counter of cache misses                    |
 | `sets`           | counter of cache writes                    |
-| `deletes`        | counter of explicit deletions              |
 | `evictions`      | counter of expired-on-read evictions       |
 | `disk_reads`     | counter of disk file loads                 |
 | `disk_writes`    | counter of disk file saves                 |
@@ -55,7 +54,6 @@ Cache Statistics:
   hits: 0
   misses: 0
   sets: 0
-  deletes: 0
   evictions: 0
   disk_reads: 4
   disk_writes: 0
