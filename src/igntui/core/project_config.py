@@ -11,6 +11,7 @@ import time
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Optional
 
 import tomli_w
 
@@ -34,7 +35,7 @@ class ProjectConfig:
     schema_version: int = SCHEMA_VERSION
 
     @classmethod
-    def load(cls, path: Path) -> ProjectConfig | None:
+    def load(cls, path: Path) -> Optional["ProjectConfig"]:
         try:
             with open(path, "rb") as f:
                 data = tomllib.load(f)
