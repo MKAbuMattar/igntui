@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import curses
 import logging
 import threading
@@ -9,13 +6,15 @@ from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
-try:
-    import pyfiglet
-
-    HAS_PYFIGLET = True
-except ImportError:
-    HAS_PYFIGLET = False
-    logger.warning("pyfiglet not installed - using basic ASCII art")
+# "igntui" in figlet's slant font, pre-rendered so pyfiglet is not a dependency.
+LOGO = [
+    "    _             __        _ ",
+    "   (_)___ _____  / /___  __(_)",
+    "  / / __ `/ __ \\/ __/ / / / / ",
+    " / / /_/ / / / / /_/ /_/ / /  ",
+    "/_/\\__, /_/ /_/\\__/\\__,_/_/   ",
+    "  /____/                      ",
+]
 
 
 class SplashScreen:
@@ -36,16 +35,8 @@ class SplashScreen:
         max_y, max_x = self.stdscr.getmaxyx()
         self.stdscr.clear()
 
-        if HAS_PYFIGLET:
-            try:
-                figlet = pyfiglet.Figlet(font="slant", width=max_x)
-                logo_text = figlet.renderText("igntui")
-                logo = logo_text.split("\n")
-            except Exception as e:
-                logger.warning(f"pyfiglet error: {e}, using fallback")
-                logo = self._get_fallback_logo()
-        else:
-            logo = self._get_fallback_logo()
+        # Too narrow for the banner: skip it rather than draw half of it.
+        logo = LOGO if max_x > len(LOGO[0]) else []
 
         if load_callback:
             loading_thread = threading.Thread(
@@ -207,13 +198,3 @@ class SplashScreen:
             self.loading_error = str(e)
         finally:
             self.loading_complete = True
-
-    def _get_fallback_logo(self) -> list:
-        return [
-            "  _                   _         _ ",
-            " (_)   __ _   _ __   | |_  _   (_)",
-            " | |  / _` | | '_ \\  | __|| | | | ",
-            " | | | (_| | | | | | | |_ | |_| | ",
-            " |_|  \\__, | |_| |_|  \\__| \\__,_| ",
-            "      |___/                       ",
-        ]

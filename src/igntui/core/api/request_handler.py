@@ -1,13 +1,9 @@
-#!/usr/bin/env python3
-
-
 import logging
 import time
 import urllib.error
 import urllib.request
 
 from .errors import APIError, NetworkError, RateLimitError, ServiceUnavailableError
-from .rate_limiter import RateLimiter
 from .response import APIResponse
 
 logger = logging.getLogger(__name__)
@@ -18,11 +14,11 @@ class RequestHandler:
         self.user_agent = user_agent
         self.timeout = timeout
         self.retry_attempts = retry_attempts
-        self.rate_limiter = RateLimiter(min_interval=0.1)
-        self.stats = {"requests_made": 0, "errors": 0, "total_response_time": 0.0}
+        self._last_request = 0.0
 
     def make_request(self, url: str, timeout: float | None = None) -> APIResponse:
-        self.rate_limiter.wait_if_needed()
+        # At most one request per 100 ms.
+        time.sleep(max(0.0, self._last_request + 0.1 - time.time()))
 
         start_time = time.time()
         timeout = timeout or self.timeout
@@ -41,9 +37,7 @@ class RequestHandler:
                 content = response.read().decode("utf-8")
                 response_time = time.time() - start_time
 
-                self.rate_limiter.mark_request()
-                self.stats["requests_made"] += 1
-                self.stats["total_response_time"] += response_time
+                self._last_request = time.time()
 
                 logger.debug("API request to %s took %.3fs", url, response_time)
 
@@ -57,7 +51,6 @@ class RequestHandler:
         except urllib.error.HTTPError as e:
             # The error is also the response and holds its socket open.
             e.close()
-            self.stats["errors"] += 1
 
             error_msg = f"HTTP {e.code}: {e.reason}"
 
@@ -70,15 +63,12 @@ class RequestHandler:
                 raise APIError(error_msg, e.code) from e
 
         except urllib.error.URLError as e:
-            self.stats["errors"] += 1
-
             if "timeout" in str(e.reason).lower():
                 raise NetworkError(f"Request timeout after {timeout}s") from e
             else:
                 raise NetworkError(f"Network error: {e.reason}") from e
 
         except Exception as e:
-            self.stats["errors"] += 1
             raise APIError(f"Unexpected error: {e}") from e
 
     def make_request_with_retry(self, url: str) -> APIResponse:
@@ -116,6 +106,3 @@ class RequestHandler:
         if last_exception:
             raise last_exception
         raise APIError("All retry attempts failed")
-
-    def get_stats(self) -> dict:
-        return self.stats.copy()

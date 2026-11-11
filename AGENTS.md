@@ -13,7 +13,7 @@ A curses TUI **and** a CLI for generating `.gitignore` files from
 pipx install igntui && igntui
 ```
 
-~6,300 lines under `src/igntui/`, three runtime dependencies (`pyfiglet`, `tomli-w`, and
+~5,300 lines under `src/igntui/`, two runtime dependencies (`tomli-w`, and
 `windows-curses` on Windows only). One network dependency: the gitignore.io API. Everything
 else is stdlib.
 
@@ -126,7 +126,7 @@ and disabled (`ui.mouse_support`).
   `Exception` from a new failure mode.
 - **Nothing writes to stdout while the TUI is running.** The terminal belongs to curses; use
   the status bar or the logger.
-- Keep the dependency list where it is. Three runtime dependencies, one of them platform
+- Keep the dependency list where it is. Two runtime dependencies, one of them platform
   gated, and everything else stdlib.
 
 ## Hard rules

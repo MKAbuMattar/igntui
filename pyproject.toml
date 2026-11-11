@@ -20,7 +20,6 @@ dependencies = [
     # Windows: an older pin can resolve to a version with no wheel for the
     # running interpreter, which fails at install time rather than degrading.
     "windows-curses>=2.4.2; sys_platform == 'win32'",
-    "pyfiglet>=1.0.4",
     "tomli-w>=1.2.0",
 ]
 keywords = ["gitignore", "tui", "terminal", "git", "templates", "cli"]

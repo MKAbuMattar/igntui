@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import curses
 from typing import Any
 
@@ -47,10 +44,6 @@ class CursesSetup:
         curses.init_pair(CursesSetup.COLOR_NORMAL, curses.COLOR_WHITE, -1)
 
     @staticmethod
-    def get_color_pair(color_id: int) -> int:
-        return curses.color_pair(color_id)
-
-    @staticmethod
     def cleanup(stdscr: Any = None) -> None:
         try:
             if stdscr:
@@ -58,35 +51,3 @@ class CursesSetup:
             curses.curs_set(1)
         except curses.error:
             pass
-
-
-def get_border_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_BORDER)
-
-
-def get_highlight_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_HIGHLIGHT)
-
-
-def get_selected_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_SELECTED)
-
-
-def get_success_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_SUCCESS)
-
-
-def get_status_bar_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_STATUS_BAR)
-
-
-def get_title_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_TITLE)
-
-
-def get_error_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_ERROR)
-
-
-def get_normal_color() -> int:
-    return CursesSetup.get_color_pair(CursesSetup.COLOR_NORMAL)

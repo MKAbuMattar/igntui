@@ -1,16 +1,9 @@
-#!/usr/bin/env python3
-
-
 import argparse
+import sys
 
-from .cli import (
-    BaseCLI,
-    create_base_parser,
-    create_command_parser,
-    get_command_instance,
-    safe_exit,
-    setup_logging,
-)
+from .cli.base import BaseCLI
+from .cli.parser import create_base_parser, create_command_parser, get_command_instance
+from .cli.setup import setup_logging
 
 
 def main() -> int:
@@ -55,10 +48,10 @@ def main() -> int:
 def cli_main() -> None:
     try:
         exit_code = main()
-        safe_exit(exit_code)
+        sys.exit(exit_code)
     except Exception as e:
         print(f"Fatal error: {e}")
-        safe_exit(1)
+        sys.exit(1)
 
 
 def tui_main() -> None:
@@ -83,10 +76,10 @@ def tui_main() -> None:
         from .app import run_tui
 
         exit_code = run_tui(show_splash=not args.no_splash)
-        safe_exit(exit_code)
+        sys.exit(exit_code)
     except Exception as e:
         print(f"Fatal error: {e}")
-        safe_exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

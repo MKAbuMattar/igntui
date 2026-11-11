@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from .main import cli_main
 
 if __name__ == "__main__":

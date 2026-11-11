@@ -1,13 +1,10 @@
-#!/usr/bin/env python3
-
-
 import logging
 import queue
 import threading
 
 from ..core.api import GitIgnoreAPI
 from ..core.config import config
-from ..core.search import SearchManager, SearchMode
+from ..core.search import SearchMode, search
 from ..core.usage import UsageTracker
 from .updates import (
     ContentGenerated,
@@ -23,9 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class TemplateLifecycle:
-    def __init__(self, api: GitIgnoreAPI, search_manager: SearchManager):
+    def __init__(self, api: GitIgnoreAPI):
         self.api = api
-        self.search_manager = search_manager
         self.usage = UsageTracker()
 
     def load_templates_async(self, updates: "queue.Queue[StateUpdate]") -> None:
@@ -90,13 +86,11 @@ class TemplateLifecycle:
 
         try:
             mode = SearchMode(search_mode) if search_mode else SearchMode.FUZZY
-            results = self.search_manager.search(templates, filter_text, mode=mode)
-            return self._pin_recents(results.get_items())
+            return self._pin_recents(search(templates, filter_text, mode))
 
         except ValueError:
             logger.warning("Unknown search mode %r; using fuzzy", search_mode)
-            results = self.search_manager.search(templates, filter_text, mode=SearchMode.FUZZY)
-            return self._pin_recents(results.get_items())
+            return self._pin_recents(search(templates, filter_text))
         except Exception as e:
             logger.error("Error filtering templates: %s", e, exc_info=True)
             filter_lower = filter_text.lower()

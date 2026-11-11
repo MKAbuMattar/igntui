@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import time
 from dataclasses import dataclass, field
 
@@ -25,7 +22,6 @@ class TUIState:
     selected_scroll: int = 0
     selected_index: int = 0
     content_scroll: int = 0
-    search_active: bool = False
     status_message: str = ""
     error_message: str = ""
     message_timestamp: float = field(default_factory=time.time)
@@ -82,9 +78,6 @@ class TUIState:
     def clear_all_selections(self) -> None:
         self.selected_templates.clear()
         self.reset_selected_panel()
-
-    def has_selections(self) -> bool:
-        return len(self.selected_templates) > 0
 
     def get_selection_count(self) -> int:
         return len(self.selected_templates)

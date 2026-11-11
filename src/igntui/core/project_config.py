@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Per-output sidecar config (.igntui.cfg.toml).
 
 Lives next to the generated `.gitignore`. Captures the selection that produced

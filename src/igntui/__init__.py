@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import platform
 import sys
 from collections.abc import Callable
@@ -23,7 +20,7 @@ def get_version_string() -> str:
 from .core.api import APIResponse, GitIgnoreAPI
 from .core.cache import CacheManager, TemplateCache
 from .core.config import config
-from .core.search import SearchManager, SearchMode
+from .core.search import SearchMode, search
 from .main import cli_main, tui_main
 
 # `run_tui` is annotated so the ImportError fallback is an explicit rebind of a
@@ -47,7 +44,7 @@ __all__ = [
     "GitIgnoreAPI",
     "APIResponse",
     "config",
-    "SearchManager",
+    "search",
     "SearchMode",
     "CacheManager",
     "TemplateCache",

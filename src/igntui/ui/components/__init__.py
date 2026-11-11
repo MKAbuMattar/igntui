@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from .base_dialog import BaseDialog
 from .base_panel import BasePanel
 from .confirm_dialog import ConfirmDialog

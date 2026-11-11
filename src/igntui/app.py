@@ -1,13 +1,10 @@
-#!/usr/bin/env python3
-
-
 import curses
 import sys
 
 
 def run_tui(show_splash: bool = True, api=None) -> int:
     try:
-        from .tui import GitIgnoreTUI
+        from .tui.app import GitIgnoreTUI
 
         def main(stdscr):
             tui = GitIgnoreTUI(stdscr, show_splash=show_splash, api=api)

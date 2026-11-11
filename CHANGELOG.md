@@ -6,6 +6,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Removed
+
+- **`pyfiglet` is no longer a dependency.** The splash banner is the same
+  slant-font art, stored as text. On a terminal narrower than the banner it is
+  skipped instead of wrapped across lines.
+- Nine config keys that did nothing: `ui.theme`, `ui.auto_save`,
+  `ui.panel_layout`, `ui.show_help`, `ui.animation_speed`,
+  `behavior.auto_refresh_interval`, `behavior.fuzzy_search_threshold`,
+  `behavior.auto_backup` and `behavior.max_cache_entries`, plus the
+  `IGNTUI_THEME` variable. A config file that still sets them loads as before.
+- The `deletes` counter in `igntui cache stats`. Nothing could increment it.
+- `SearchManager` is no longer exported from the package; `search()` replaces it.
+
+### Changed
+
+- Internal cleanup, about 740 lines lighter with no behaviour change: search is
+  one function instead of an engine class hierarchy, and unused stats
+  counters, re-export modules, helper functions and shebangs are gone.
+
 ## [0.6.0] - 2026-11-11
 
 ### Fixed

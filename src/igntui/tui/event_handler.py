@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import curses
 import logging
 from collections.abc import Callable
@@ -29,25 +26,14 @@ class EventHandler:
         if key == curses.KEY_MOUSE:
             return self._handle_mouse()
 
-        if key == curses.KEY_F1:
-            self.state.current_search_mode = "fuzzy"
+        mode = {curses.KEY_F1: "fuzzy", curses.KEY_F2: "exact", curses.KEY_F3: "regex"}.get(key)
+        if mode:
+            self.state.current_search_mode = mode
             self._apply_filter()
-            self.state.set_status_message("Search mode: FUZZY")
+            self.state.set_status_message(f"Search mode: {mode.upper()}")
             return True
 
-        elif key == curses.KEY_F2:
-            self.state.current_search_mode = "exact"
-            self._apply_filter()
-            self.state.set_status_message("Search mode: EXACT")
-            return True
-
-        elif key == curses.KEY_F3:
-            self.state.current_search_mode = "regex"
-            self._apply_filter()
-            self.state.set_status_message("Search mode: REGEX")
-            return True
-
-        elif key == curses.KEY_F5:
+        if key == curses.KEY_F5:
             if self.on_refresh:
                 self.on_refresh()
             return True

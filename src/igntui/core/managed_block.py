@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Managed-block marker handling for `.gitignore` files.
 
 A file written by igntui carries two marked regions:

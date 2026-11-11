@@ -1,20 +1,9 @@
-#!/usr/bin/env python3
-
-
 import argparse
 
 from ..base import CLICommand
 
 
 class TestCommand(CLICommand):
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument(
-            "--timeout",
-            type=int,
-            default=10,
-            help="Connection timeout in seconds (default: 10)",
-        )
-
     def execute(self, args: argparse.Namespace) -> int:
         try:
             print("Testing connection to gitignore.io API...")

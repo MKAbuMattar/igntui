@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import curses
 import json
 import logging
@@ -12,8 +9,7 @@ from .. import __version__, get_version_string
 from ..core.managed_block import merge as merge_managed_block
 from ..core.managed_block import write_file
 from ..core.project_config import SIDECAR_FILENAME, ProjectConfig
-from ..ui import ExportDialog, HelpDialog, SaveDialog
-from ..ui.components import DiffPreviewDialog
+from ..ui.components import DiffPreviewDialog, ExportDialog, HelpDialog, SaveDialog
 
 logger = logging.getLogger(__name__)
 

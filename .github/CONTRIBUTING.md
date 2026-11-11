@@ -96,7 +96,7 @@ Specifically, please don't:
 
 - Add a flag without a reader, or a config key without a reader.
 - Add a subcommand without a page under `docs/reference/`.
-- Add a dependency for something the standard library does. Three runtime dependencies, one of
+- Add a dependency for something the standard library does. Two runtime dependencies, one of
   them platform gated, is the budget.
 - Leave superseded iterations of your own work in the diff (`do_thing`, `do_thing_v2`).
 

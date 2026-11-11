@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from .cache_cmd import CacheCommand
 from .generate_cmd import GenerateCommand
 from .list_cmd import ListCommand

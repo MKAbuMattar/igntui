@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Diff-preview dialog shown before overwriting an existing file (Phase 5.4)."""
 
 import curses

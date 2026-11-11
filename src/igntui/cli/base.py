@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-
-
 import argparse
 import logging
-import sys
 from pathlib import Path
 
 from ..core.api import GitIgnoreAPI
@@ -59,14 +55,5 @@ class CLICommand:
     def __init__(self, cli: BaseCLI):
         self.cli = cli
 
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        raise NotImplementedError
-
     def execute(self, args: argparse.Namespace) -> int:
         raise NotImplementedError
-
-
-def safe_exit(code: int = 0) -> None:
-    # Note: Don't call curses.endwin() here as curses.wrapper handles cleanup
-    # Calling it multiple times causes "endwin() returned ERR" errors
-    sys.exit(code)

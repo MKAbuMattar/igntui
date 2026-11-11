@@ -81,7 +81,6 @@ Booleans accept `true`/`false`; numeric values are auto-detected.
 | `IGNTUI_API_URL`     | `api.base_url`                  |
 | `IGNTUI_API_TIMEOUT` | `api.timeout` (seconds)         |
 | `IGNTUI_CACHE_TTL`   | `api.cache_ttl` (seconds)       |
-| `IGNTUI_THEME`       | `ui.theme`                      |
 | `IGNTUI_MOUSE`       | `ui.mouse_support`              |
 | `IGNTUI_LOG_LEVEL`   | `logging.level`                 |
 | `IGNTUI_MAX_RECENT`  | `behavior.max_recent_templates` |

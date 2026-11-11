@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """`igntui completion <shell>`: emit a shell completion script."""
 
 import argparse
@@ -123,13 +122,6 @@ _TEMPLATES = {"bash": _BASH, "zsh": _ZSH, "fish": _FISH}
 
 
 class CompletionCommand(CLICommand):
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument(
-            "shell",
-            choices=["bash", "zsh", "fish"],
-            help="Shell to emit completion script for",
-        )
-
     def execute(self, args: argparse.Namespace) -> int:
         template = _TEMPLATES[args.shell]
         print(

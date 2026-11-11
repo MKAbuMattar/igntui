@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import hashlib
 import json
 import logging
@@ -43,7 +40,6 @@ class CacheManager:
             "hits": 0,
             "misses": 0,
             "sets": 0,
-            "deletes": 0,
             "evictions": 0,
             "disk_reads": 0,
             "disk_writes": 0,
@@ -124,23 +120,6 @@ class CacheManager:
             self._stats["sets"] += 1
 
             logger.debug("Cached value for key: %s (TTL: %ds)", key, ttl)
-
-    def delete(self, key: str) -> bool:
-        with self._lock:
-            deleted = False
-
-            if key in self._memory_cache:
-                del self._memory_cache[key]
-                deleted = True
-
-            if self._delete_disk_cache(key):
-                deleted = True
-
-            if deleted:
-                self._stats["deletes"] += 1
-                logger.debug("Deleted cache entry: %s", key)
-
-            return deleted
 
     def clear(self) -> int:
         with self._lock:

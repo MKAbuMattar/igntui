@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import curses
 import logging
 import queue
@@ -9,8 +6,7 @@ import time
 from ..core.api import GitIgnoreAPI
 from ..core.project_config import ProjectConfig, find_sidecar
 from ..core.repo_config import RepoConfig, find_repo_config
-from ..core.search import SearchManager
-from ..ui import (
+from ..ui.components import (
     ContentPanel,
     SearchPanel,
     SelectedPanel,
@@ -43,7 +39,6 @@ class GitIgnoreTUI:
         self.show_splash = show_splash
         # The CLI passes its own handle so `--no-cache` reaches the TUI.
         self.api = api or GitIgnoreAPI()
-        self.search_manager = SearchManager()
         self.state = TUIState()
         self.updates: queue.Queue[StateUpdate] = queue.Queue()
 
@@ -61,7 +56,7 @@ class GitIgnoreTUI:
                 self.state.loading = False
 
         self._init_ui_components()
-        self.lifecycle = TemplateLifecycle(self.api, self.search_manager)
+        self.lifecycle = TemplateLifecycle(self.api)
         self.actions = TUIActions(self.stdscr, self.state)
         self.event_handler = EventHandler(self.state, self.lifecycle, self.stdscr)
         self._setup_event_callbacks()
