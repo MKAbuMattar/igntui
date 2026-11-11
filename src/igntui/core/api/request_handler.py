@@ -7,7 +7,6 @@ import urllib.error
 import urllib.request
 
 from .errors import APIError, NetworkError, RateLimitError, ServiceUnavailableError
-from .rate_limiter import RateLimiter
 from .response import APIResponse
 
 logger = logging.getLogger(__name__)
@@ -18,10 +17,11 @@ class RequestHandler:
         self.user_agent = user_agent
         self.timeout = timeout
         self.retry_attempts = retry_attempts
-        self.rate_limiter = RateLimiter(min_interval=0.1)
+        self._last_request = 0.0
 
     def make_request(self, url: str, timeout: float | None = None) -> APIResponse:
-        self.rate_limiter.wait_if_needed()
+        # At most one request per 100 ms.
+        time.sleep(max(0.0, self._last_request + 0.1 - time.time()))
 
         start_time = time.time()
         timeout = timeout or self.timeout
@@ -40,7 +40,7 @@ class RequestHandler:
                 content = response.read().decode("utf-8")
                 response_time = time.time() - start_time
 
-                self.rate_limiter.mark_request()
+                self._last_request = time.time()
 
                 logger.debug("API request to %s took %.3fs", url, response_time)
 
