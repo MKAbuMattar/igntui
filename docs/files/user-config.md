@@ -21,20 +21,11 @@
     "retry_attempts": 3
   },
   "ui": {
-    "theme": "default",
-    "mouse_support": true,
-    "auto_save": false,
-    "panel_layout": "four_panel",
-    "show_help": true,
-    "animation_speed": 150
+    "mouse_support": true
   },
   "behavior": {
     "max_recent_templates": 10,
-    "auto_refresh_interval": 3600,
-    "fuzzy_search_threshold": 0.6,
-    "save_usage_stats": true,
-    "auto_backup": true,
-    "max_cache_entries": 1000
+    "save_usage_stats": true
   },
   "logging": {
     "level": "INFO",
@@ -73,23 +64,14 @@ override matching keys.
 
 | Key               | Type    | Default        | Notes                                   |
 | ----------------- | ------- | -------------- | --------------------------------------- |
-| `theme`           | string  | `"default"`    | currently only `default` is implemented |
 | `mouse_support`   | boolean | `true`         | enables click-to-focus and scroll-wheel |
-| `auto_save`       | boolean | `false`        | reserved (not yet honored)              |
-| `panel_layout`    | string  | `"four_panel"` | reserved                                |
-| `show_help`       | boolean | `true`         | reserved                                |
-| `animation_speed` | integer | `150`          | reserved                                |
 
 ### `behavior`
 
 | Key                      | Type    | Default | Notes                                              |
 | ------------------------ | ------- | ------- | -------------------------------------------------- |
 | `max_recent_templates`   | integer | `10`    | how many recents pin to the top of Templates panel |
-| `auto_refresh_interval`  | integer | `3600`  | seconds; reserved                                  |
-| `fuzzy_search_threshold` | float   | `0.6`   | reserved                                           |
 | `save_usage_stats`       | boolean | `true`  | enables `~/.igntui.usage.toml`                     |
-| `auto_backup`            | boolean | `true`  | reserved                                           |
-| `max_cache_entries`      | integer | `1000`  | reserved (no eviction policy yet enforces it)      |
 
 ### `logging`
 

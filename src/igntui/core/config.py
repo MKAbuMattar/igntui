@@ -33,21 +33,12 @@ class ApiConfig(TypedDict, total=False):
 
 
 class UiConfig(TypedDict, total=False):
-    theme: str
     mouse_support: bool
-    auto_save: bool
-    panel_layout: str
-    show_help: bool
-    animation_speed: int
 
 
 class BehaviorConfig(TypedDict, total=False):
     max_recent_templates: int
-    auto_refresh_interval: int
-    fuzzy_search_threshold: float
     save_usage_stats: bool
-    auto_backup: bool
-    max_cache_entries: int
 
 
 class LoggingConfig(TypedDict, total=False):
@@ -75,20 +66,11 @@ class Config:
             "retry_attempts": 3,
         },
         "ui": {
-            "theme": "default",
             "mouse_support": True,
-            "auto_save": False,
-            "panel_layout": "four_panel",
-            "show_help": True,
-            "animation_speed": 150,
         },
         "behavior": {
             "max_recent_templates": 10,
-            "auto_refresh_interval": 3600,
-            "fuzzy_search_threshold": 0.6,
             "save_usage_stats": True,
-            "auto_backup": True,
-            "max_cache_entries": 1000,
         },
         "logging": {
             "level": "INFO",
@@ -203,7 +185,6 @@ class Config:
             "IGNTUI_API_URL": ["api", "base_url"],
             "IGNTUI_API_TIMEOUT": ["api", "timeout"],
             "IGNTUI_CACHE_TTL": ["api", "cache_ttl"],
-            "IGNTUI_THEME": ["ui", "theme"],
             "IGNTUI_MOUSE": ["ui", "mouse_support"],
             "IGNTUI_LOG_LEVEL": ["logging", "level"],
             "IGNTUI_MAX_RECENT": ["behavior", "max_recent_templates"],

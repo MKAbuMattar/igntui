@@ -341,12 +341,9 @@ Configuration file location: `~/.igntui.cfg.toml`
     "retry_attempts": 3
   },
   "ui": {
-    "theme": "default",
-    "mouse_support": true,
-    "animation_speed": 150
+    "mouse_support": true
   },
   "behavior": {
-    "fuzzy_search_threshold": 0.6,
     "max_recent_templates": 10
   }
 }
