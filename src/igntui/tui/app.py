@@ -9,7 +9,7 @@ import time
 from ..core.api import GitIgnoreAPI
 from ..core.project_config import ProjectConfig, find_sidecar
 from ..core.repo_config import RepoConfig, find_repo_config
-from ..ui import (
+from ..ui.components import (
     ContentPanel,
     SearchPanel,
     SelectedPanel,

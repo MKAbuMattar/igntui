@@ -3,14 +3,9 @@
 
 import argparse
 
-from .cli import (
-    BaseCLI,
-    create_base_parser,
-    create_command_parser,
-    get_command_instance,
-    safe_exit,
-    setup_logging,
-)
+from .cli.base import BaseCLI, safe_exit
+from .cli.parser import create_base_parser, create_command_parser, get_command_instance
+from .cli.setup import setup_logging
 
 
 def main() -> int:

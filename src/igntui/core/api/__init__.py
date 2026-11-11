@@ -4,7 +4,6 @@
 from .client import GitIgnoreAPI
 from .errors import APIError, NetworkError, RateLimitError, ServiceUnavailableError
 from .response import APIResponse
-from .types import TemplateName
 
 __all__ = [
     "GitIgnoreAPI",
@@ -13,5 +12,4 @@ __all__ = [
     "NetworkError",
     "RateLimitError",
     "ServiceUnavailableError",
-    "TemplateName",
 ]
