@@ -55,12 +55,12 @@ gitignore-tui = "igntui.main:tui_main"
 # `pre-commit` were declared here and never run by anything: ruff covers the
 # first three, `ty` does the type-checking, and the build backend is uv_build.
 dev = [
-    "pytest>=9.1.1",
+    "pytest>=9.2.0",
     "pytest-cov>=7.1.0",
-    "ruff>=0.16.9",
+    "ruff>=0.17.4",
 ]
 test = [
-    "pytest>=9.1.1",
+    "pytest>=9.2.0",
     "pytest-cov>=7.1.0",
 ]
 windows = [
@@ -70,7 +70,7 @@ windows = [
 [build-system]
 # Upper bound kept wide on purpose: a narrow minor pin makes every build with a
 # newer uv print `build_system.requires does not contain the current uv version`.
-requires = ["uv_build>=0.9.5,<0.13.0"]
+requires = ["uv_build>=0.9.5,<0.14.0"]
 build-backend = "uv_build"
 
 # Ruff configuration

@@ -51,9 +51,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The development interpreter (`.python-version`) is now Python 3.14. Support
   is unchanged: 3.11 through 3.14, all tested in CI.
 - Dependency floors match the versions tested: `pyfiglet>=1.0.4`,
-  `tomli-w>=1.2.0`, and in the extras `pytest>=9.1.1`, `pytest-cov>=7.1.0`,
-  `ruff>=0.16.9`. `freezegun` and `pytest-mock` are removed from the extras
+  `tomli-w>=1.2.0`, and in the extras `pytest>=9.2.0`, `pytest-cov>=7.1.0`,
+  `ruff>=0.17.4`. `freezegun` and `pytest-mock` are removed from the extras
   because no test used them.
+- The `uv_build` build requirement accepts up to `<0.14.0`, so builds with uv
+  0.13 no longer warn. CI uses `astral-sh/setup-uv@v10.3.3`.
 - `uv.lock` is regenerated. It still pinned igntui 0.1.1 and about 60 packages
   from the old hatch, black, and mypy toolchain, so every plain `uv run`
   rewrote it.
