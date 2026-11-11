@@ -10,7 +10,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from igntui.core.api.response import APIResponse
-from igntui.core.search import SearchManager
 from igntui.tui.lifecycle import TemplateLifecycle
 from igntui.tui.updates import (
     ContentGenerated,
@@ -36,7 +35,7 @@ def _drain(q: "queue.Queue[StateUpdate]", timeout: float = 1.0) -> list:
 def test_load_success_posts_loaded_then_completed():
     api = MagicMock()
     api.list_templates.return_value = APIResponse(success=True, data=["python", "go"])
-    lc = TemplateLifecycle(api, SearchManager())
+    lc = TemplateLifecycle(api)
 
     q: queue.Queue[StateUpdate] = queue.Queue()
     lc.load_templates_async(q)
@@ -49,7 +48,7 @@ def test_load_success_posts_loaded_then_completed():
 def test_load_failure_posts_failed_then_completed():
     api = MagicMock()
     api.list_templates.return_value = APIResponse(success=False, data=[], error_message="boom")
-    lc = TemplateLifecycle(api, SearchManager())
+    lc = TemplateLifecycle(api)
 
     q: queue.Queue[StateUpdate] = queue.Queue()
     lc.load_templates_async(q)
@@ -62,7 +61,7 @@ def test_load_failure_posts_failed_then_completed():
 def test_generate_success_posts_content_then_completed():
     api = MagicMock()
     api.get_templates.return_value = APIResponse(success=True, data="GENERATED", from_cache=True)
-    lc = TemplateLifecycle(api, SearchManager())
+    lc = TemplateLifecycle(api)
 
     q: queue.Queue[StateUpdate] = queue.Queue()
     lc.generate_content_async(["python"], q)
@@ -77,7 +76,7 @@ def test_generate_success_posts_content_then_completed():
 
 def test_generate_empty_template_list_posts_failure_synchronously():
     api = MagicMock()
-    lc = TemplateLifecycle(api, SearchManager())
+    lc = TemplateLifecycle(api)
 
     q: queue.Queue[StateUpdate] = queue.Queue()
     lc.generate_content_async([], q)

@@ -1,6 +1,6 @@
 """Regression tests for tui.lifecycle.filter_templates.
 
-This locks in the Phase 1.1 fix: the call to SearchManager.search had its
+This locks in the Phase 1.1 fix: the call to search() had its
 positional args swapped, so search silently fell back to substring matching.
 """
 
@@ -8,13 +8,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from igntui.core.search import SearchManager
 from igntui.tui.lifecycle import TemplateLifecycle
 
 
 @pytest.fixture
 def lc():
-    return TemplateLifecycle(api=Mock(), search_manager=SearchManager())
+    return TemplateLifecycle(api=Mock())
 
 
 def test_fuzzy_returns_real_fuzzy_matches(lc, template_list):

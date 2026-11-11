@@ -1,63 +1,45 @@
-"""Tests for the search engines."""
+"""Tests for template search."""
 
-import pytest
-
-from igntui.core.search import SearchManager, SearchMode
+from igntui.core.search import SearchMode, search
 
 
-@pytest.fixture
-def mgr():
-    return SearchManager()
-
-
-def test_fuzzy_finds_subsequence(mgr, template_list):
-    out = mgr.search(template_list, "pyt", mode=SearchMode.FUZZY)
-    items = out.get_items()
+def test_fuzzy_finds_subsequence(template_list):
+    items = search(template_list, "pyt")
     assert "python" in items
     assert "pythonvanilla" in items
 
 
-def test_fuzzy_orders_exact_match_first(mgr, template_list):
-    out = mgr.search(template_list, "java", mode=SearchMode.FUZZY)
-    items = out.get_items()
+def test_fuzzy_orders_exact_match_first(template_list):
     # `java` is a substring/exact match and must outrank `javascript`
-    assert items[0] == "java"
+    assert search(template_list, "java")[0] == "java"
 
 
-def test_exact_matches_substring(mgr, template_list):
-    out = mgr.search(template_list, "java", mode=SearchMode.EXACT)
-    items = out.get_items()
+def test_exact_matches_substring(template_list):
+    items = search(template_list, "java", SearchMode.EXACT)
     assert "java" in items
     assert "javascript" in items
     assert "python" not in items
 
 
-def test_regex_anchors_work(mgr, template_list):
-    out = mgr.search(template_list, "^r", mode=SearchMode.REGEX)
-    items = out.get_items()
-    assert set(items) == {"rust", "ruby"}
+def test_regex_anchors_work(template_list):
+    assert set(search(template_list, "^r", SearchMode.REGEX)) == {"rust", "ruby"}
 
 
-def test_regex_invalid_pattern_returns_empty(mgr, template_list):
-    out = mgr.search(template_list, "[invalid", mode=SearchMode.REGEX)
-    assert out.get_items() == []
+def test_regex_invalid_pattern_returns_empty(template_list):
+    assert search(template_list, "[invalid", SearchMode.REGEX) == []
 
 
-def test_empty_query_returns_all(mgr, template_list):
-    out = mgr.search(template_list, "", mode=SearchMode.FUZZY)
-    assert set(out.get_items()) == set(template_list)
+def test_regex_zero_width_match_counts(template_list):
+    assert set(search(template_list, "x*", SearchMode.REGEX)) == set(template_list)
 
 
-def test_no_matches(mgr, template_list):
-    out = mgr.search(template_list, "zzzzzz", mode=SearchMode.FUZZY)
-    assert out.get_items() == []
+def test_empty_query_returns_all(template_list):
+    assert set(search(template_list, "")) == set(template_list)
 
 
-def test_max_results_caps_output(mgr, template_list):
-    out = mgr.search(template_list, "", mode=SearchMode.FUZZY, max_results=3)
-    assert len(out.get_items()) == 3
+def test_no_matches(template_list):
+    assert search(template_list, "zzzzzz") == []
 
 
-def test_set_mode_changes_default(mgr):
-    mgr.set_mode(SearchMode.REGEX)
-    assert mgr.get_mode() == SearchMode.REGEX
+def test_max_results_caps_output(template_list):
+    assert len(search(template_list, "", max_results=3)) == 3

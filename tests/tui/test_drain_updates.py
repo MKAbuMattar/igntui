@@ -3,7 +3,6 @@
 import queue
 from unittest.mock import MagicMock
 
-from igntui.core.search import SearchManager
 from igntui.tui.actions import TUIActions
 from igntui.tui.app import GitIgnoreTUI
 from igntui.tui.lifecycle import TemplateLifecycle
@@ -21,7 +20,7 @@ def _tui(selected: set[str]) -> GitIgnoreTUI:
     tui.state = TUIState()
     tui.state.selected_templates = set(selected)
     tui.updates = queue.Queue()
-    tui.lifecycle = TemplateLifecycle(MagicMock(), SearchManager())
+    tui.lifecycle = TemplateLifecycle(MagicMock())
     tui.lifecycle.usage = MagicMock(top=MagicMock(return_value=[]))
     return tui
 
