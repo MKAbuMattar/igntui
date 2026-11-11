@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-11
+
 ### Fixed
 
 - **The TUI could save an error message over your `.gitignore`.** After a
@@ -433,3 +435,4 @@ All three legacy paths are scheduled for removal in v0.2.0.
 [0.1.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.1.0
 [0.0.2]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.0.2
 [0.0.1]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.0.1
+[0.6.0]: https://github.com/MKAbuMattar/igntui/releases/tag/v0.6.0
