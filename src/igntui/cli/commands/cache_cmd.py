@@ -12,20 +12,6 @@ if TYPE_CHECKING:
 
 
 class CacheCommand(CLICommand):
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        subparsers = parser.add_subparsers(dest="cache_action", help="Cache action")
-
-        clear_parser = subparsers.add_parser("clear", help="Clear cache")
-        clear_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
-        clear_parser.add_argument(
-            "--expired",
-            action="store_true",
-            help="Remove only entries past their TTL, keeping everything still valid",
-        )
-
-        subparsers.add_parser("stats", help="Show cache statistics")
-        subparsers.add_parser("info", help="Show cache information")
-
     def execute(self, args: argparse.Namespace) -> int:
         try:
             # The manager the rest of the session uses. Constructing a fresh one

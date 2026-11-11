@@ -7,11 +7,6 @@ from ..base import CLICommand
 
 
 class TUICommand(CLICommand):
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument(
-            "--no-splash", action="store_true", help="Skip splash screen on startup"
-        )
-
     def execute(self, args: argparse.Namespace) -> int:
         if not self.cli.check_terminal_requirements():
             return 1

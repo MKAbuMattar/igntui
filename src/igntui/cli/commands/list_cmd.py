@@ -7,10 +7,6 @@ from ..base import CLICommand
 
 
 class ListCommand(CLICommand):
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument("--filter", "-f", metavar="PATTERN", help="Filter templates by pattern")
-        parser.add_argument("--count", "-c", action="store_true", help="Show count only")
-
     def execute(self, args: argparse.Namespace) -> int:
         try:
             if args.verbose:

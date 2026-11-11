@@ -59,9 +59,6 @@ class CLICommand:
     def __init__(self, cli: BaseCLI):
         self.cli = cli
 
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        raise NotImplementedError
-
     def execute(self, args: argparse.Namespace) -> int:
         raise NotImplementedError
 

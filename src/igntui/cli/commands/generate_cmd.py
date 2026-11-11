@@ -9,30 +9,6 @@ from ..base import CLICommand
 
 
 class GenerateCommand(CLICommand):
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument(
-            "templates", nargs="+", help="Template names to generate (space-separated)"
-        )
-        parser.add_argument(
-            "--output",
-            "-o",
-            type=Path,
-            metavar="FILE",
-            help="Output file path (default: print to stdout)",
-        )
-        parser.add_argument(
-            "--append",
-            "-a",
-            action="store_true",
-            help="Append to existing file instead of overwriting",
-        )
-        parser.add_argument(
-            "--force",
-            "-f",
-            action="store_true",
-            help="Force overwrite without confirmation",
-        )
-
     def execute(self, args: argparse.Namespace) -> int:
         try:
             if args.verbose:
