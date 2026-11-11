@@ -13,7 +13,7 @@ A curses TUI **and** a CLI for generating `.gitignore` files from
 pipx install igntui && igntui
 ```
 
-~6,300 lines under `src/igntui/`, two runtime dependencies (`tomli-w`, and
+~5,300 lines under `src/igntui/`, two runtime dependencies (`tomli-w`, and
 `windows-curses` on Windows only). One network dependency: the gitignore.io API. Everything
 else is stdlib.
 
